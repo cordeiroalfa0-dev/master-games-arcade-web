@@ -1,22 +1,113 @@
 name: Build MAME 0.168 Web
 
-on: [push, workflow_dispatch]
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-mame-0162.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
   build:
-    name: Compile MAME 0.168 arcade for Emscripten
+    name: Compile MAME 0.168 for Emscripten
     runs-on: ubuntu-22.04
     timeout-minutes: 360
+
     steps:
       - name: Checkout web project
         uses: actions/checkout@v4
 
-      - name: Verify runner
+      - name: Clone exact MAME 0.168 source
+        shell: bash
         run: |
-          echo "GitHub Actions OK"
-          uname -a
-          python3 --version
-          make --version | head -n 1
+          set -e
+          rm -rf mame-0168
+          git clone --depth 1 --branch mame0168 https://github.com/mamedev/mame.git mame-0168
+          git -C mame-0168 rev-parse HEAD
+
+      - name: Prepare MAME 0.168 build options
+        shell: bash
+        run: |
+          cat > mame-0168/useroptions.mak <<'EOF'
+          NOWERROR = 1
+          NOASM = 1
+          OPTIMIZE = 3
+          OSD = sdl
+          PTR64 = 0
+          EOF
+
+      - name: Verify historical Emscripten container
+        shell: bash
+        run: |
+          set -e
+          docker pull trzeci/emscripten:sdk-tag-1.35.10-64bit
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/src" \
+            -w /src \
+            trzeci/emscripten:sdk-tag-1.35.10-64bit \
+            bash -lc 'emcc --version && emmake --version && python --version'
+
+      - name: Generate MAME 0.168 makefiles for Emscripten
+        shell: bash
+        run: |
+          set -e
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/src" \
+            -w /src/mame-0168 \
+            trzeci/emscripten:sdk-tag-1.35.10-64bit \
+            bash -lc '
+              set -e
+              make REGENIE=1 gcc=asmjs gcc_version=4.9 \
+                TARGET=mame SUBTARGET=mame OSD=sdl \
+                PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
+            '
+
+      - name: Build MAME 0.168 with Emscripten
+        shell: bash
+        run: |
+          set -e
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/src" \
+            -w /src/mame-0168 \
+            trzeci/emscripten:sdk-tag-1.35.10-64bit \
+            bash -lc '
+              set -e
+              emmake make gcc=asmjs gcc_version=4.9 \
+                TARGET=mame SUBTARGET=mame OSD=sdl \
+                PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3 -j2
+            '
+
+      - name: Collect generated MAME Web files
+        shell: bash
+        run: |
+          set -e
+          rm -rf mame-0168-build
+          mkdir -p mame-0168-build
+
+          echo 'Arquivos JavaScript/WebAssembly encontrados:'
+          find mame-0168 -type f \( \
+            -name '*.js' -o \
+            -name '*.wasm' -o \
+            -name '*.mem' \
+          \) -print
+
+          find mame-0168 -type f \( \
+            -name 'mame.js' -o \
+            -name 'mame.wasm' -o \
+            -name 'mame.mem' \
+          \) -exec cp -v {} mame-0168-build/ \;
+
+          printf 'MAME 0.168 Web build\n' > mame-0168-build/VERSION.txt
+          git -C mame-0168 rev-parse HEAD >> mame-0168-build/VERSION.txt
+
+          test -f mame-0168-build/mame.js
+
+      - name: Upload MAME 0.168 Web artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mame-0168-web
+          path: mame-0168-build/
+          retention-days: 14
