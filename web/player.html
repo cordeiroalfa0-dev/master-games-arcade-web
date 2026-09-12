@@ -104,10 +104,39 @@
           window.EJS_disableAutoLang = true;
           window.EJS_language = "pt-BR";
 
+          const pressArcadeKey = (key, code, keyCode) => {
+            const target = document.querySelector("canvas") || document;
+            target.focus?.();
+            const event = new KeyboardEvent("keydown", {
+              key, code, bubbles: true, cancelable: true,
+              composed: true, keyCode, which: keyCode
+            });
+            // Chromium expõe keyCode/which como somente leitura; o MAME
+            // usa esses valores para mapear COIN (5) e START (1).
+            for (const prop of ["keyCode", "which"]) {
+              try { Object.defineProperty(event, prop, { value: keyCode }); } catch {}
+            }
+            target.dispatchEvent(event);
+            setTimeout(() => target.dispatchEvent(new KeyboardEvent("keyup", {
+              key, code, bubbles: true, cancelable: true,
+              composed: true, keyCode, which: keyCode
+            })), 100);
+          };
+
           window.EJS_onGameStart = () => {
             status.remove();
             try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
             document.documentElement.focus();
+
+            // O MAME precisa terminar o POST/BIOS antes de aceitar a ficha.
+            // Repetimos a sequência em dois momentos para cobrir jogos
+            // comuns e Neo Geo sem exigir teclado do usuário.
+            const autoStart = (delay) => setTimeout(() => {
+              pressArcadeKey("5", "Digit5", 53);
+              setTimeout(() => pressArcadeKey("1", "Digit1", 49), 700);
+            }, delay);
+            autoStart(2500);
+            autoStart(7000);
           };
 
           window.EJS_onExit = () => {
