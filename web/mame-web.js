@@ -51,11 +51,17 @@
     // A rota inclui o nome com extensão para o EmulatorJS/MAME reconhecer
     // o formato da ROM antes de iniciar o jogo automaticamente.
     const romUrl = `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
+    const neoGeoGames = new Set(["mslug.zip", "mslug2.zip", "mslug3.zip", "mslug4.zip", "mslug5.zip", "kof97.zip", "kof98.zip", "kof99.zip", "kof2000.zip", "garou.zip"]);
+    let parentUrl = "";
+    if (neoGeoGames.has(String(item.name).toLowerCase())) {
+      const bios = (catalog.files || []).find((entry) => String(entry?.name).toLowerCase() === "neogeo.zip");
+      if (bios?.id) parentUrl = `/api/rom/${encodeURIComponent(bios.id)}/neogeo.zip`;
+    }
     message.textContent = `CARREGANDO ${item.name}...`;
-    return { item, url: romUrl };
+    return { item, url: romUrl, parentUrl };
   }
 
-  function createWebPlayer(romName, romUrl, message, overlay) {
+  function createWebPlayer(romName, romUrl, message, overlay, parentUrl = "") {
     const iframe = document.createElement("iframe");
     iframe.title = `Master Games Arcade - ${cleanRomName(romName)}`;
     iframe.allow = "autoplay; fullscreen; gamepad";
@@ -65,6 +71,7 @@
     const playerUrl = new URL("/web/player.html", location.origin);
     playerUrl.searchParams.set("rom", romUrl);
     playerUrl.searchParams.set("name", cleanRomName(romName));
+    if (parentUrl) playerUrl.searchParams.set("parent", parentUrl);
 
     let closed = false;
 
@@ -139,8 +146,8 @@
 
       (async () => {
         try {
-          const { item, url } = await resolveRom(romName, message);
-          player = createWebPlayer(item.name, url, message, overlay);
+          const { item, url, parentUrl } = await resolveRom(romName, message);
+          player = createWebPlayer(item.name, url, message, overlay, parentUrl);
           resolve();
         } catch (error) {
           message.textContent = error?.message || "Falha ao iniciar a ROM.";

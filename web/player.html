@@ -12,13 +12,14 @@
   </style>
 </head>
 <body>
-    <canvas id="game" tabindex="0"></canvas>
+    <div id="game"></div>
   <div id="status">BAIXANDO ROM...</div>
   <pre id="debug"></pre>
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
       const romUrl = params.get("rom");
+      const parentUrl = params.get("parent") || "";
       const gameName = params.get("name") || "Master Games Arcade";
       const cleanName = gameName.replace(/\.(zip|7z|chd)$/i, "");
       const status = document.getElementById("status");
@@ -103,10 +104,14 @@
           // MAME Plus! 0.168.2 standalone: sem EmulatorJS e sem RetroArch.
           // O workflow publica o glue Emscripten em /web/mame0168/mame.js.
           const romFileName = gameName || `${cleanName}.zip`;
+          const standaloneCanvas = document.createElement("canvas");
+          standaloneCanvas.tabIndex = 0;
+          standaloneCanvas.style.cssText = "width:100%;height:100%;display:block;";
+          document.getElementById("game").appendChild(standaloneCanvas);
           window.Module = {
             arguments: [cleanName, "-rompath", "/roms", "-window", "-video", "soft"],
             preRun: [],
-            canvas: document.getElementById("game"),
+            canvas: standaloneCanvas,
             print: (text) => log(String(text)),
             printErr: (text) => log(`ERRO MAME: ${text}`),
             setStatus: (text) => { if (text) status.textContent = String(text); }
@@ -123,41 +128,6 @@
               Module.removeRunDependency("mga-rom");
             }
           });
-
-          // Controles originais do Master Games Arcade.
-          window.EJS_defaultControls = {
-            0: {
-              0:  { value: "z", value2: "BUTTON_1" },
-              1:  { value: "x", value2: "BUTTON_2" },
-              2:  { value: "5", value2: "SELECT" },
-              3:  { value: "1", value2: "START" },
-              4:  { value: "up arrow", value2: "DPAD_UP" },
-              5:  { value: "down arrow", value2: "DPAD_DOWN" },
-              6:  { value: "left arrow", value2: "DPAD_LEFT" },
-              7:  { value: "right arrow", value2: "DPAD_RIGHT" },
-              8:  { value: "c", value2: "BUTTON_3" },
-              9:  { value: "a", value2: "BUTTON_4" },
-              10: { value: "s", value2: "BUTTON_5" },
-              11: { value: "d", value2: "BUTTON_6" },
-              12: { value: "tab", value2: "LEFT_BOTTOM_SHOULDER" }
-            },
-            1: {
-              0:  { value: "a", value2: "BUTTON_1" },
-              1:  { value: "s", value2: "BUTTON_2" },
-              2:  { value: "6", value2: "SELECT" },
-              3:  { value: "2", value2: "START" },
-              4:  { value: "i", value2: "DPAD_UP" },
-              5:  { value: "k", value2: "DPAD_DOWN" },
-              6:  { value: "j", value2: "DPAD_LEFT" },
-              7:  { value: "l", value2: "DPAD_RIGHT" },
-              8:  { value: "q", value2: "BUTTON_3" },
-              9:  { value: "w", value2: "BUTTON_4" },
-              10: { value: "e", value2: "BUTTON_5" },
-              11: { value: "r", value2: "BUTTON_6" }
-            },
-            2: {},
-            3: {}
-          };
 
           const numpadMap = {
             Numpad8: "i",
@@ -249,42 +219,10 @@
             })), 100);
           };
 
-          window.EJS_onGameStart = () => {
-            status.remove();
-            debug.style.display = "none";
-            log(`EMULADOR INICIOU: ${cleanName}`);
-            try { window.parent.postMessage({ type: "mga-emulator-started", game: cleanName }, location.origin); } catch {}
-            document.documentElement.focus();
-            setTimeout(() => document.querySelector("canvas")?.focus(), 1000);
-
-            [6000, 11000, 16000, 21000, 26000].forEach((delay) => {
-              setTimeout(() => {
-                pressArcadeKey("5", "Digit5", 53);
-                setTimeout(() => pressArcadeKey("1", "Digit1", 49), 700);
-              }, delay);
-            });
-          };
-
-          window.EJS_onExit = () => {
-            try { window.parent.postMessage({ type: "mga-emulator-exit" }, location.origin); } catch {}
-          };
-
           const script = document.createElement("script");
           script.src = "/web/mame0168/mame.js";
           script.async = true;
-          script.onerror = () => {
-            log("Build standalone ainda não publicado; usando fallback web compatível.");
-            window.EJS_player = "#game";
-            window.EJS_gameName = cleanName;
-            window.EJS_gameUrl = absoluteRomUrl;
-            window.EJS_core = "mame2003_plus";
-            window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
-            window.EJS_startOnLoaded = true;
-            const fallback = document.createElement("script");
-            fallback.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
-            fallback.onerror = () => fail("NÃO FOI POSSÍVEL CARREGAR O MAME WEB");
-            document.head.appendChild(fallback);
-          };
+          script.onerror = () => fail("MAME Plus! 0.168.2 standalone ainda não publicado");
           document.head.appendChild(script);
         } catch (error) {
           fail(error?.message || "FALHA AO CARREGAR A ROM");
