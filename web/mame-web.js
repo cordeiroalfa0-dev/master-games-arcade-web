@@ -51,7 +51,7 @@
     // A rota inclui o nome com extensão para o EmulatorJS/MAME reconhecer
     // o formato da ROM antes de iniciar o jogo automaticamente.
     const romUrl = `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
-    const neoGeoGames = new Set(["mslug.zip", "mslug2.zip", "mslug3.zip", "mslug4.zip", "mslug5.zip", "kof97.zip", "kof98.zip", "kof99.zip", "kof2000.zip", "garou.zip"]);
+    const neoGeoGames = new Set(["aof3.zip", "bjourney.zip", "fatfury3.zip", "garou.zip", "kof2k4se.zip", "kof94.zip", "kof95.zip", "kof96.zip", "kof97.zip", "kof98.zip", "kof99.zip", "kof2000.zip", "kof2001.zip", "kof2002.zip", "kof2003.zip", "mslug.zip", "mslug2.zip", "mslug3.zip", "mslug3b6.zip", "mslug4.zip", "mslug5.zip", "mslugx.zip", "samsho.zip", "samsho2.zip", "samsho3.zip", "samsho4.zip", "sengoku3.zip", "twinspri.zip"]);
     let parentUrl = "";
     if (neoGeoGames.has(String(item.name).toLowerCase())) {
       const bios = (catalog.files || []).find((entry) => String(entry?.name).toLowerCase() === "neogeo.zip");
