@@ -9,6 +9,7 @@
   const originalFetch = window.fetch.bind(window);
   let catalogPromise;
   let titlesPromise;
+  let activeRomUrl = null;
 
   const jsonResponse = (data, status = 200) =>
     new Response(JSON.stringify(data), {
@@ -40,6 +41,75 @@
     return String(name || "").replace(/\.(zip|7z|chd)$/i, "");
   }
 
+  async function downloadRom(romName, message) {
+    const catalog = await loadCatalog();
+    const item = (catalog.files || []).find((entry) => entry?.name === romName);
+
+    if (!item?.id || item.skipDownload) {
+      throw new Error(`ROM não disponível para download: ${romName}`);
+    }
+
+    const url = `/api/rom?id=${encodeURIComponent(item.id)}&name=${encodeURIComponent(item.name)}`;
+    message.textContent = `BAIXANDO ${item.name}...`;
+
+    const response = await originalFetch(url);
+    if (!response.ok || !response.body) {
+      let detail = `HTTP ${response.status}`;
+      try {
+        const data = await response.json();
+        detail = data?.error || detail;
+      } catch {}
+      throw new Error(`Não foi possível baixar ${item.name}: ${detail}`);
+    }
+
+    const total = Number(response.headers.get("content-length")) || 0;
+    const reader = response.body.getReader();
+    const chunks = [];
+    let received = 0;
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.byteLength;
+      if (total > 0) {
+        const percent = Math.min(100, Math.round((received / total) * 100));
+        message.textContent = `BAIXANDO ${item.name}... ${percent}%`;
+      } else {
+        message.textContent = `BAIXANDO ${item.name}... ${(received / 1048576).toFixed(1)} MB`;
+      }
+    }
+
+    const blob = new Blob(chunks, { type: response.headers.get("content-type") || "application/octet-stream" });
+    if (activeRomUrl) URL.revokeObjectURL(activeRomUrl);
+    activeRomUrl = URL.createObjectURL(blob);
+    return { item, url: activeRomUrl };
+  }
+
+  async function startEmulator(romName, romUrl, message) {
+    message.textContent = `INICIANDO ${romName}...`;
+
+    window.EJS_player = "#game";
+    window.EJS_gameName = cleanRomName(romName);
+    window.EJS_gameUrl = romUrl;
+    window.EJS_core = "mame";
+    window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+    window.EJS_startOnLoaded = true;
+
+    const oldLoader = document.querySelector('script[data-mga-emulatorjs]');
+    oldLoader?.remove();
+
+    await new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+      script.async = true;
+      script.dataset.mgaEmulatorjs = "1";
+      script.onload = resolve;
+      script.onerror = () => reject(new Error("Não foi possível carregar o EmulatorJS."));
+      document.head.appendChild(script);
+    });
+  }
+
   function showWebPlayer(romName) {
     return new Promise((resolve, reject) => {
       document.getElementById("mga-web-player")?.remove();
@@ -60,6 +130,11 @@
       close.style.cssText = "background:#16051d;border:1px solid #ff2bd6;color:#fff;padding:8px 12px;cursor:pointer;font-weight:bold;";
       close.onclick = () => {
         try { window.EJS_onGameEnd?.(); } catch {}
+        document.querySelectorAll('script[data-mga-emulatorjs]').forEach((script) => script.remove());
+        if (activeRomUrl) {
+          URL.revokeObjectURL(activeRomUrl);
+          activeRomUrl = null;
+        }
         overlay.remove();
         resolve();
       };
@@ -72,51 +147,26 @@
       overlay.append(bar, area);
       document.body.appendChild(overlay);
 
-      const input = document.createElement("input");
-      input.type = "file";
-      input.accept = ".zip,.7z,.chd,.rom,.bin";
-      input.style.display = "none";
-      overlay.appendChild(input);
-
       const message = area.querySelector("#mga-rom-message");
-      message.textContent = `Selecione a ROM de ${romName}`;
+      message.textContent = `PREPARANDO ${romName}...`;
 
-      input.onchange = async () => {
-        const file = input.files?.[0];
-        if (!file) return;
+      (async () => {
         try {
-          message.textContent = `INICIANDO ${file.name}...`;
-          window.EJS_player = "#game";
-          window.EJS_gameName = cleanRomName(file.name);
-          window.EJS_gameUrl = URL.createObjectURL(file);
-          window.EJS_core = "mame";
-          window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
-          window.EJS_startOnLoaded = true;
-
-          const oldLoader = document.querySelector('script[data-mga-emulatorjs]');
-          oldLoader?.remove();
-
-          const script = document.createElement("script");
-          script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
-          script.async = true;
-          script.dataset.mgaEmulatorjs = "1";
-          script.onerror = () => reject(new Error("Não foi possível carregar o EmulatorJS."));
-          document.head.appendChild(script);
+          const { item, url } = await downloadRom(romName, message);
+          await startEmulator(item.name, url, message);
           message.remove();
           resolve();
         } catch (error) {
-          message.textContent = error?.message || "Falha ao iniciar o jogo.";
+          message.textContent = error?.message || "Falha ao baixar/iniciar a ROM.";
           reject(error);
         }
-      };
-
-      input.click();
+      })();
     });
   }
 
   window.MGA_WEB = Object.freeze({
     launch: showWebPlayer,
-    version: "1.1.0",
+    version: "1.2.0",
   });
 
   window.fetch = async function (input, init) {
@@ -188,5 +238,5 @@
     return originalFetch(input, init);
   };
 
-  console.info("[MGA Web] Bridge WebAssembly ativo — API localhost:7777 substituída no navegador.");
+  console.info("[MGA Web] Bridge WebAssembly ativo — download automático de ROMs do Google Drive.");
 })();
