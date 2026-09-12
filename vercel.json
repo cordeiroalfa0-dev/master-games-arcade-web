@@ -1,0 +1,16 @@
+{
+  "rewrites": [
+    {
+      "source": "/assets/:match*",
+      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/assets/:match*"
+    },
+    {
+      "source": "/favicon.png",
+      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/favicon.png"
+    },
+    {
+      "source": "/fonts/:match*",
+      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/fonts/:match*"
+    }
+  ]
+}
