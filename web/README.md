@@ -1,17 +1,22 @@
-# Camada WebAssembly
+# Master Games Arcade Web
 
-Esta pasta contém somente a camada nova de execução no navegador.
+Camada web do Master Games Arcade, mantendo a interface original e substituindo somente a execução nativa por uma camada compatível com navegador.
 
-## Teste atual
+## Estado atual
 
-`/web-emulator.html` carrega uma ROM local no EmulatorJS usando o core MAME via WebAssembly.
+- O launcher original continua sendo usado como interface principal.
+- `web/mame-web.js` agora é carregado antes do bundle original em `index.html`.
+- As chamadas locais `/api/*` usadas pelo launcher são interceptadas pelo bridge web quando necessário.
+- O catálogo de ROMs é exposto em `/roms-catalog.json` através do `roms-manifest.json` do repositório original.
+- Os títulos são expostos em `/game-titles.json` através do arquivo original de títulos.
+- O repositório original `master-games-arcade-system` permanece separado e não é alterado por esta migração.
 
-A interface principal continua usando os assets e o bundle visual original. A camada WebAssembly será integrada ao botão de jogar depois que o teste isolado for validado.
+## Execução das ROMs
 
-## Princípio
+A execução WebAssembly usa o EmulatorJS/MAME no navegador.
 
-Não substituir a interface original por uma interface nova. O objetivo é conectar a interface existente ao novo executor web.
+Nesta etapa, quando o usuário inicia um jogo, o navegador solicita a ROM localmente e o arquivo selecionado é entregue ao núcleo MAME WebAssembly. Isso permite validar a execução sem colocar os aproximadamente 3 GB de ROMs no Vercel.
 
-## Emulação
+## Próxima etapa
 
-O EmulatorJS fornece o carregador e os cores WebAssembly. A configuração usada no teste segue a API pública do projeto: `EJS_gameUrl`, `EJS_gameName`, `EJS_core` e `EJS_pathtodata`.
+Depois de validar a integração com a interface original, a próxima etapa é substituir a seleção manual por uma origem externa de ROMs/CDN/storage, mantendo o catálogo e sem transferir vários gigabytes para o repositório ou para o deploy da Vercel.
