@@ -23,16 +23,18 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git make clang lld python3 python2 zip gzip
+          sudo apt-get install -y git make clang lld python3 zip gzip
 
       - name: Install historical Emscripten 1.35.10
         shell: bash
         run: |
           git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$HOME/emsdk"
           cd "$HOME/emsdk"
-          ./emsdk update-tags || true
-          ./emsdk install sdk-1.35.10-64bit
-          ./emsdk activate sdk-1.35.10-64bit
+          git fetch --depth 1 origin 1ded1a9d4ad24240c29e724344f11acba22bddb6
+          git checkout 1ded1a9d4ad24240c29e724344f11acba22bddb6
+          python3 ./emsdk update-tags || true
+          python3 ./emsdk install sdk-tag-1.35.10-64bit
+          python3 ./emsdk activate sdk-tag-1.35.10-64bit
           echo "$HOME/emsdk" >> "$GITHUB_PATH"
           echo "$HOME/emsdk/emscripten/1.35.10" >> "$GITHUB_PATH"
 
