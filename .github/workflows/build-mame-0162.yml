@@ -39,42 +39,54 @@ jobs:
           PTR64 = 0
           EOF
 
-      - name: Verify historical Emscripten container
-        shell: bash
-        run: |
-          set -e
-          docker pull trzeci/emscripten:sdk-tag-1.35.10-64bit
-          docker run --rm \
-            -v "$GITHUB_WORKSPACE:/src" \
-            -w /src \
-            trzeci/emscripten:sdk-tag-1.35.10-64bit \
-            bash -lc 'emcc --version && emmake --version && python --version'
-
-      - name: Generate MAME 0.168 makefiles for Emscripten
+      - name: Build with exact historical Emscripten 1.35.10
         shell: bash
         run: |
           set -e
           docker run --rm \
-            -v "$GITHUB_WORKSPACE:/src" \
-            -w /src/mame-0168 \
-            trzeci/emscripten:sdk-tag-1.35.10-64bit \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -w /workspace \
+            python:2.7.18-buster \
             bash -lc '
               set -e
+
+              # Debian Buster is archived, so use the historical package archive.
+              printf "%s\n" \
+                "deb http://archive.debian.org/debian buster main" \
+                "deb http://archive.debian.org/debian-security buster/updates main" \
+                > /etc/apt/sources.list
+              echo "Acquire::Check-Valid-Until \"false\";" > /etc/apt/apt.conf.d/99no-check-valid-until
+
+              apt-get update
+              apt-get install -y --no-install-recommends \
+                git make gcc g++ clang lld ca-certificates curl zip gzip
+
+              echo "Python:"
+              python --version
+
+              rm -rf /root/emsdk
+              git clone --depth 1 https://github.com/emscripten-core/emsdk.git /root/emsdk
+              cd /root/emsdk
+              git fetch --depth 1 origin e4acfff1951edb2662ff6e3310824418e7c5bb83
+              git checkout e4acfff1951edb2662ff6e3310824418e7c5bb83
+
+              python ./emsdk update-tags || true
+              python ./emsdk install sdk-1.35.10-64bit
+              python ./emsdk activate sdk-1.35.10-64bit
+              source /root/emsdk/emsdk_env.sh
+
+              echo "Emscripten:"
+              emcc --version
+              emmake --version
+
+              cd /workspace/mame-0168
+
+              echo "Gerando makefiles MAME 0.168..."
               make REGENIE=1 gcc=asmjs gcc_version=4.9 \
                 TARGET=mame SUBTARGET=mame OSD=sdl \
                 PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
-            '
 
-      - name: Build MAME 0.168 with Emscripten
-        shell: bash
-        run: |
-          set -e
-          docker run --rm \
-            -v "$GITHUB_WORKSPACE:/src" \
-            -w /src/mame-0168 \
-            trzeci/emscripten:sdk-tag-1.35.10-64bit \
-            bash -lc '
-              set -e
+              echo "Compilando MAME 0.168..."
               emmake make gcc=asmjs gcc_version=4.9 \
                 TARGET=mame SUBTARGET=mame OSD=sdl \
                 PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3 -j2
