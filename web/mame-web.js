@@ -48,11 +48,10 @@
       throw new Error(`ROM não disponível para download: ${romName}`);
     }
 
-    // Importante: a URL termina com .zip/.7z/.chd.
-    // O core MAME precisa receber a ROM como uma URL de arquivo real,
-    // não como blob:, para identificar corretamente o conteúdo e iniciar
-    // o jogo diretamente em vez de abrir o menu do RetroArch.
-    const romUrl = `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
+    // O endpoint serverless é /api/rom.js (publicado como /api/rom) e
+    // recebe os dados por query string. Mantemos a extensão no nome para
+    // o player conseguir criar um File que o core MAME reconheça direto.
+    const romUrl = `/api/rom?id=${encodeURIComponent(item.id)}&name=${encodeURIComponent(item.name)}`;
     message.textContent = `CARREGANDO ${item.name}...`;
     return { item, url: romUrl };
   }
