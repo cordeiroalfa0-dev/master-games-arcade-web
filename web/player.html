@@ -7,30 +7,63 @@
   <style>
     html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#000; }
     #game { width:100vw; height:100vh; min-width:100%; min-height:100%; background:#000; }
+    #status { position:fixed; inset:0; z-index:9999; display:grid; place-items:center; background:#000; color:#00e5ff; font:700 16px monospace; text-align:center; padding:24px; box-sizing:border-box; text-shadow:0 0 8px #00e5ff; pointer-events:none; }
   </style>
 </head>
 <body>
   <div id="game"></div>
+  <div id="status">BAIXANDO ROM...</div>
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
       const romUrl = params.get("rom");
       const gameName = params.get("name") || "Master Games Arcade";
-      const cleanName = gameName.replace(/\.(zip|7z|chd)$/i, "");
+      const fileName = gameName.match(/\.(zip|7z|chd)$/i) ? gameName : `${gameName}.zip`;
+      const cleanName = fileName.replace(/\.(zip|7z|chd)$/i, "");
+      const status = document.getElementById("status");
+
+      const fail = (text) => {
+        status.textContent = text;
+        status.style.color = "#ff2bd6";
+        status.style.textShadow = "0 0 8px #ff2bd6";
+      };
 
       if (!romUrl) {
-        document.body.innerHTML = '<div style="height:100%;display:grid;place-items:center;background:#000;color:#ff2bd6;font:700 18px monospace">ROM NÃO INFORMADA</div>';
+        fail("ROM NÃO INFORMADA");
         return;
       }
 
-      // A URL absoluta continua terminando em .zip para o loader reconhecer o romset.
       const absoluteRomUrl = new URL(romUrl, location.origin).href;
+
+      // O EmulatorJS aceita File/Blob como EJS_gameUrl. Baixamos primeiro e
+      // entregamos um File com o nome real da ROM, eliminando qualquer dúvida
+      // sobre extensão, MIME ou roteamento da URL durante o boot do MAME.
+      async function loadRomFile() {
+        status.textContent = `BAIXANDO ${fileName}...`;
+        const response = await fetch(absoluteRomUrl, { cache: "no-store" });
+        if (!response.ok) throw new Error(`Falha ao baixar a ROM: HTTP ${response.status}`);
+
+        const contentType = response.headers.get("content-type") || "";
+        const bytes = new Uint8Array(await response.arrayBuffer());
+        if (!bytes.length) throw new Error("A ROM veio vazia.");
+
+        const isZip = bytes[0] === 0x50 && bytes[1] === 0x4b;
+        const isChd = bytes.length >= 8 && new TextDecoder().decode(bytes.slice(0, 8)) === "MComprHD";
+        const is7z = bytes.length >= 6 && bytes[0] === 0x37 && bytes[1] === 0x7a && bytes[2] === 0xbc && bytes[3] === 0xaf && bytes[4] === 0x27 && bytes[5] === 0x1c;
+
+        if (!isZip && !isChd && !is7z) {
+          throw new Error(`O servidor não devolveu uma ROM válida (Content-Type: ${contentType || "desconhecido"}).`);
+        }
+
+        status.textContent = `INICIANDO ${cleanName}...`;
+        const mime = isZip ? "application/zip" : isChd ? "application/octet-stream" : "application/x-7z-compressed";
+        return new File([bytes], fileName, { type: mime, lastModified: Date.now() });
+      }
 
       window.EJS_player = "#game";
       window.EJS_gameName = cleanName;
       window.EJS_gameTitle = cleanName;
-      window.EJS_gameUrl = absoluteRomUrl;
-      window.EJS_core = "mame2003_plus";
+      window.EJS_core = "mame";
       window.EJS_controlScheme = "mame";
       window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
       window.EJS_startOnLoaded = true;
@@ -38,6 +71,7 @@
       window.EJS_askBeforeExit = false;
       window.EJS_softLoad = false;
       window.EJS_disableLocalStorage = true;
+      window.EJS_disableDatabases = true;
       window.EJS_gameID = `mga-${cleanName.toLowerCase().replace(/[^a-z0-9_-]+/g, "-")}`;
       window.EJS_color = "#00e5ff";
       window.EJS_backgroundColor = "#000000";
@@ -45,6 +79,7 @@
       window.EJS_language = "pt-BR";
 
       window.EJS_onGameStart = () => {
+        status.remove();
         try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
         document.documentElement.focus();
       };
@@ -53,13 +88,18 @@
         try { window.parent.postMessage({ type: "mga-emulator-exit" }, location.origin); } catch {}
       };
 
-      const script = document.createElement("script");
-      script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
-      script.async = true;
-      script.onerror = () => {
-        document.body.innerHTML = '<div style="height:100%;display:grid;place-items:center;background:#000;color:#ff2bd6;font:700 18px monospace;text-align:center">NÃO FOI POSSÍVEL CARREGAR O EMULATORJS</div>';
-      };
-      document.head.appendChild(script);
+      loadRomFile()
+        .then((file) => {
+          // EJS_gameUrl é definido somente depois de termos validado os bytes.
+          window.EJS_gameUrl = file;
+
+          const script = document.createElement("script");
+          script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+          script.async = true;
+          script.onerror = () => fail("NÃO FOI POSSÍVEL CARREGAR O EMULATORJS");
+          document.head.appendChild(script);
+        })
+        .catch((error) => fail(error?.message || "FALHA AO CARREGAR A ROM"));
     })();
   </script>
 </body>
