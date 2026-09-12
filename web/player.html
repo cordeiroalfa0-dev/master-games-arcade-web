@@ -7,12 +7,14 @@
   <style>
     html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#000; }
     #game { width:100vw; height:100vh; min-width:100%; min-height:100%; background:#000; }
-    #status { position:fixed; inset:0; z-index:99999; display:grid; place-items:center; background:#000; color:#00e5ff; font:700 16px monospace; text-align:center; padding:24px; box-sizing:border-box; }
+    #status { position:fixed; inset:0; z-index:99999; display:grid; place-items:center; background:#000; color:#00e5ff; font:700 16px monospace; text-align:center; padding:24px; box-sizing:border-box; white-space:pre-wrap; }
+    #debug { position:fixed; left:10px; right:10px; bottom:10px; z-index:100000; max-height:42vh; overflow:auto; display:none; background:rgba(0,0,0,.88); border:1px solid #00e5ff; color:#00e5ff; padding:10px; box-sizing:border-box; font:12px/1.35 monospace; white-space:pre-wrap; pointer-events:none; }
   </style>
 </head>
 <body>
   <div id="game"></div>
   <div id="status">BAIXANDO ROM...</div>
+  <pre id="debug"></pre>
   <script>
     (() => {
       const params = new URLSearchParams(location.search);
@@ -20,11 +22,30 @@
       const gameName = params.get("name") || "Master Games Arcade";
       const cleanName = gameName.replace(/\.(zip|7z|chd)$/i, "");
       const status = document.getElementById("status");
+      const debug = document.getElementById("debug");
+
+      const diagnostic = [];
+      const log = (text) => {
+        const line = `[${new Date().toLocaleTimeString()}] ${text}`;
+        diagnostic.push(line);
+        if (diagnostic.length > 80) diagnostic.shift();
+        debug.textContent = diagnostic.join("\n");
+        console.log("[MGA]", text);
+      };
 
       const fail = (text) => {
         status.textContent = text;
         status.style.color = "#ff2bd6";
+        debug.style.display = "block";
+        log(`ERRO: ${text}`);
       };
+
+      window.addEventListener("error", (event) => {
+        log(`window.error: ${event.message || "erro desconhecido"}`);
+      });
+      window.addEventListener("unhandledrejection", (event) => {
+        log(`unhandledrejection: ${event.reason?.message || String(event.reason)}`);
+      });
 
       if (!romUrl) {
         fail("ROM NÃO INFORMADA");
@@ -32,6 +53,8 @@
       }
 
       const absoluteRomUrl = new URL(romUrl, location.origin).href;
+      log(`Jogo: ${cleanName}`);
+      log(`ROM: ${absoluteRomUrl}`);
 
       (async () => {
         try {
@@ -48,7 +71,10 @@
           }
 
           const contentType = (response.headers.get("content-type") || "").toLowerCase();
+          const contentLength = response.headers.get("content-length") || "desconhecido";
           const bytes = new Uint8Array(await response.arrayBuffer());
+
+          log(`Download: ${bytes.length} bytes; Content-Type: ${contentType || "desconhecido"}; Header: ${contentLength}`);
 
           if (!bytes.length) {
             throw new Error("A ROM veio vazia.");
@@ -61,6 +87,8 @@
           const is7z = bytes.length >= 6 && bytes[0] === 0x37 && bytes[1] === 0x7a &&
             bytes[2] === 0xbc && bytes[3] === 0xaf && bytes[4] === 0x27 && bytes[5] === 0x1c;
           const isChd = bytes.length >= 8 && new TextDecoder().decode(bytes.slice(0, 8)) === "MComprHD";
+
+          log(`Formato detectado: ${isZip ? "ZIP" : is7z ? "7Z" : isChd ? "CHD" : "desconhecido"}`);
 
           if (!(isZip || is7z || isChd)) {
             const looksHtml = contentType.includes("text/html") ||
@@ -76,11 +104,15 @@
           window.EJS_gameName = cleanName;
           window.EJS_gameTitle = cleanName;
           window.EJS_gameUrl = absoluteRomUrl;
-          window.EJS_gameParentUrl = new URL(
-            "/api/rom/1M3EmGFVuE0g_KWJDqGoqsYE1L46t70wq/neogeo.zip",
-            location.origin
-          ).href;
-          window.EJS_core = "mame";
+
+          // NÃO usamos neogeo.zip como parent universal. Cada ROMset MAME tem
+          // dependências próprias; aplicar NeoGeo a todos os jogos fazia jogos
+          // que não são NeoGeo receberem uma dependência incorreta.
+          window.EJS_gameParentUrl = "";
+
+          // O alias "mame" atualmente aponta para MAME 2003-Plus no EmulatorJS.
+          // Declaramos o core explicitamente para evitar depender desse alias.
+          window.EJS_core = "mame2003_plus";
           window.EJS_controlScheme = "mame";
           window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
           window.EJS_startOnLoaded = true;
@@ -94,9 +126,9 @@
           window.EJS_backgroundColor = "#000000";
           window.EJS_disableAutoLang = true;
           window.EJS_language = "pt-BR";
+          window.EJS_DEBUG_XX = true;
 
           // Controles originais do Master Games Arcade.
-          // A documentação do EmulatorJS usa os nomes de event.key para o teclado.
           window.EJS_defaultControls = {
             0: {
               0:  { value: "z", value2: "BUTTON_1" },
@@ -131,8 +163,6 @@
             3: {}
           };
 
-          // O teclado numérico do P2 é traduzido para teclas internas exclusivas,
-          // evitando conflito entre Numpad 2 (baixo) e START P2 (tecla 2 normal).
           const numpadMap = {
             Numpad8: "i",
             Numpad2: "k",
@@ -168,9 +198,6 @@
             dispatchKey(mapped, "keyup");
           }, true);
 
-          // Direções dos controles USB arcade: alguns DragonRise expõem o manche
-          // como eixos analógicos em vez de DPAD. Traduzimos os eixos para as
-          // mesmas teclas do P1/P2, mantendo compatibilidade com ambos os modos.
           const gamepadState = new Map();
           const gamepadKeys = [
             ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
@@ -228,7 +255,9 @@
 
           window.EJS_onGameStart = () => {
             status.remove();
-            try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
+            debug.style.display = "none";
+            log(`EMULADOR INICIOU: ${cleanName}`);
+            try { window.parent.postMessage({ type: "mga-emulator-started", game: cleanName }, location.origin); } catch {}
             document.documentElement.focus();
             setTimeout(() => document.querySelector("canvas")?.focus(), 1000);
 
