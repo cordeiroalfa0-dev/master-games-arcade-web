@@ -23,18 +23,14 @@
         return;
       }
 
-      // O endereço precisa continuar terminando em .zip para o loader reconhecer
-      // corretamente o romset de arcade. A rota /api/rom devolve os bytes da ROM.
+      // A URL absoluta continua terminando em .zip para o loader reconhecer o romset.
       const absoluteRomUrl = new URL(romUrl, location.origin).href;
 
       window.EJS_player = "#game";
       window.EJS_gameName = cleanName;
       window.EJS_gameTitle = cleanName;
       window.EJS_gameUrl = absoluteRomUrl;
-
-      // Na versão estável atual do EmulatorJS, "mame" é o nome do core MAME 2003.
-      // Mantemos o carregamento direto e não abrimos o menu de conteúdo.
-      window.EJS_core = "mame";
+      window.EJS_core = "mame2003_plus";
       window.EJS_controlScheme = "mame";
       window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
       window.EJS_startOnLoaded = true;
