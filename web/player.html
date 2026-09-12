@@ -82,8 +82,9 @@
           window.EJS_gameName = cleanName;
           window.EJS_gameTitle = cleanName;
           window.EJS_gameUrl = absoluteRomUrl;
-          window.EJS_core = "mame";
-          window.EJS_mameCore = "1|0";
+          // O catálogo usa ROMs do conjunto MAME 2003. O nome explícito
+          // evita que o alias "mame" selecione outro core automaticamente.
+          window.EJS_core = "mame2003";
           window.EJS_controlScheme = "mame";
           window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
           window.EJS_startOnLoaded = true;
