@@ -2,10 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "rewrites": [
     {
-      "source": "/intro.html",
-      "destination": "https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/dist/intro.html"
-    },
-    {
       "source": "/assets/:match*",
       "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/assets/:match*"
     },
