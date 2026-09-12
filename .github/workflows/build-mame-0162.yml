@@ -23,7 +23,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git make clang lld python3 zip gzip
+          sudo apt-get install -y git make clang lld python3 python2 zip gzip
 
       - name: Install historical Emscripten 1.35.10
         shell: bash
@@ -51,21 +51,30 @@ jobs:
         shell: bash
         run: |
           source "$HOME/emsdk/emsdk_env.sh"
+          export EMSCRIPTEN="$HOME/emsdk/emscripten/1.35.10"
           cat > mame-0168/useroptions.mak <<'EOF'
           NOWERROR = 1
           NOASM = 1
           OPTIMIZE = 3
           OSD = sdl
-          TARGETOS = asmjs
           PTR64 = 0
           EOF
 
-      - name: Build MAME 0.168 arcade core
+      - name: Generate MAME 0.168 Emscripten makefiles
         shell: bash
         run: |
           source "$HOME/emsdk/emsdk_env.sh"
+          export EMSCRIPTEN="$HOME/emsdk/emscripten/1.35.10"
           cd mame-0168
-          emmake make SUBTARGET=arcade TARGET=mame OSD=sdl TARGETOS=asmjs PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
+          make REGENIE=1 gcc=asmjs gcc_version=4.9 TARGET=mame SUBTARGET=arcade OSD=sdl PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
+
+      - name: Build MAME 0.168 arcade core with Emscripten
+        shell: bash
+        run: |
+          source "$HOME/emsdk/emsdk_env.sh"
+          export EMSCRIPTEN="$HOME/emsdk/emscripten/1.35.10"
+          cd mame-0168
+          emmake make gcc=asmjs gcc_version=4.9 TARGET=mame SUBTARGET=arcade OSD=sdl PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3 -j2
 
       - name: Collect emulator files
         shell: bash
