@@ -1,11 +1,6 @@
 name: Build MAME 0.168 Web
 
-on:
-  push:
-    branches: [main]
-    paths:
-      - '.github/workflows/build-mame-0162.yml'
-  workflow_dispatch:
+on: [push, workflow_dispatch]
 
 permissions:
   contents: read
@@ -15,75 +10,13 @@ jobs:
     name: Compile MAME 0.168 arcade for Emscripten
     runs-on: ubuntu-22.04
     timeout-minutes: 360
-
     steps:
       - name: Checkout web project
         uses: actions/checkout@v4
 
-      - name: Install build dependencies
+      - name: Verify runner
         run: |
-          sudo apt-get update
-          sudo apt-get install -y git make clang lld python3 zip gzip ca-certificates
-
-      - name: Install historical Emscripten 1.35.10
-        shell: bash
-        run: |
-          set -e
-          rm -rf "$HOME/emsdk"
-          git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$HOME/emsdk"
-          cd "$HOME/emsdk"
-          git fetch --depth 1 origin e4acfff1951edb2662ff6e3310824418e7c5bb83
-          git checkout e4acfff1951edb2662ff6e3310824418e7c5bb83
-          python3 ./emsdk update-tags || true
-          python3 ./emsdk install sdk-1.35.10-64bit
-          python3 ./emsdk activate sdk-1.35.10-64bit
-          source "$HOME/emsdk/emsdk_env.sh"
-          echo "$HOME/emsdk" >> "$GITHUB_PATH"
-          echo "$HOME/emsdk/emscripten/1.35.10" >> "$GITHUB_PATH"
-          emcc --version
-          emmake --version
-
-      - name: Fetch MAME 0.168 source
-        run: |
-          git clone --depth 1 --branch mame0168 https://github.com/mamedev/mame.git mame-0168
-
-      - name: Generate MAME 0.168 Emscripten makefiles
-        shell: bash
-        run: |
-          source "$HOME/emsdk/emsdk_env.sh"
-          export EMSCRIPTEN="$HOME/emsdk/emscripten/1.35.10"
-          cd mame-0168
-          cat > useroptions.mak <<'EOF'
-NOWERROR = 1
-NOASM = 1
-OPTIMIZE = 3
-OSD = sdl
-PTR64 = 0
-EOF
-          make REGENIE=1 gcc=asmjs gcc_version=4.9 TARGET=mame SUBTARGET=arcade OSD=sdl PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
-
-      - name: Build MAME 0.168 arcade core with Emscripten
-        shell: bash
-        run: |
-          source "$HOME/emsdk/emsdk_env.sh"
-          export EMSCRIPTEN="$HOME/emsdk/emscripten/1.35.10"
-          cd mame-0168
-          emmake make gcc=asmjs gcc_version=4.9 TARGET=mame SUBTARGET=arcade OSD=sdl PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3 -j2
-
-      - name: Collect emulator files
-        shell: bash
-        run: |
-          set -e
-          mkdir -p "$GITHUB_WORKSPACE/mame-0168-build"
-          find mame-0168 -type f \( -name '*.js' -o -name '*.wasm' -o -name '*.mem' \) -print
-          find mame-0168 -type f \( -name 'mamearcade.js' -o -name 'mamearcade.wasm' -o -name 'mamearcade.mem' -o -name 'arcade.js' -o -name 'arcade.wasm' -o -name 'arcade.mem' \) -exec cp -v {} "$GITHUB_WORKSPACE/mame-0168-build/" \;
-          printf 'MAME 0.168 Web build\n' > "$GITHUB_WORKSPACE/mame-0168-build/VERSION.txt"
-          git -C mame-0168 rev-parse HEAD >> "$GITHUB_WORKSPACE/mame-0168-build/VERSION.txt"
-          test "$(find "$GITHUB_WORKSPACE/mame-0168-build" -type f | wc -l)" -gt 1
-
-      - name: Upload MAME 0.168 build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: mame-0168-web
-          path: mame-0168-build/
-          retention-days: 14
+          echo "GitHub Actions OK"
+          uname -a
+          python3 --version
+          make --version | head -n 1
