@@ -66,13 +66,15 @@ jobs:
               rm -rf /root/emsdk
               git clone --depth 1 https://github.com/emscripten-core/emsdk.git /root/emsdk
               cd /root/emsdk
+              git fetch --depth 1 origin e4acfff1951edb2662ff6e3310824418e7c5bb83
+              git checkout e4acfff1951edb2662ff6e3310824418e7c5bb83
 
-              echo "Versões antigas disponíveis no emsdk:"
-              python3 ./emsdk list --old | grep -E "1\.35\.10|sdk-1\.35\.10" || true
+              echo "Emscripten histórico:"
+              ./emsdk list --old | grep -E "1\.35\.10|sdk-1\.35\.10" || true
 
               echo "Instalando Emscripten 1.35.10..."
-              python3 ./emsdk install 1.35.10
-              python3 ./emsdk activate 1.35.10
+              ./emsdk install sdk-1.35.10-64bit
+              ./emsdk activate sdk-1.35.10-64bit
               source /root/emsdk/emsdk_env.sh
 
               echo "Emscripten:"
