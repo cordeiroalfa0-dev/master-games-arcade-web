@@ -16,34 +16,44 @@
       const params = new URLSearchParams(location.search);
       const romUrl = params.get("rom");
       const gameName = params.get("name") || "Master Games Arcade";
+      const cleanName = gameName.replace(/\.(zip|7z|chd)$/i, "");
 
       if (!romUrl) {
         document.body.innerHTML = '<div style="height:100%;display:grid;place-items:center;background:#000;color:#ff2bd6;font:700 18px monospace">ROM NÃO INFORMADA</div>';
         return;
       }
 
+      // O endereço precisa continuar terminando em .zip para o loader reconhecer
+      // corretamente o romset de arcade. A rota /api/rom devolve os bytes da ROM.
+      const absoluteRomUrl = new URL(romUrl, location.origin).href;
+
       window.EJS_player = "#game";
-      window.EJS_gameName = gameName.replace(/\.(zip|7z|chd)$/i, "");
-      window.EJS_gameTitle = gameName;
-      window.EJS_gameUrl = romUrl;
-      window.EJS_core = "mame2003_plus";
+      window.EJS_gameName = cleanName;
+      window.EJS_gameTitle = cleanName;
+      window.EJS_gameUrl = absoluteRomUrl;
+
+      // Na versão estável atual do EmulatorJS, "mame" é o nome do core MAME 2003.
+      // Mantemos o carregamento direto e não abrimos o menu de conteúdo.
+      window.EJS_core = "mame";
       window.EJS_controlScheme = "mame";
       window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
       window.EJS_startOnLoaded = true;
       window.EJS_fullscreenOnLoaded = false;
       window.EJS_askBeforeExit = false;
+      window.EJS_softLoad = false;
+      window.EJS_disableLocalStorage = true;
+      window.EJS_gameID = `mga-${cleanName.toLowerCase().replace(/[^a-z0-9_-]+/g, "-")}`;
       window.EJS_color = "#00e5ff";
       window.EJS_backgroundColor = "#000000";
       window.EJS_disableAutoLang = true;
       window.EJS_language = "pt-BR";
-      window.EJS_disableLocalStorage = false;
 
       window.EJS_onGameStart = () => {
         try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
         document.documentElement.focus();
       };
 
-      window.EJS_onGameEnd = () => {
+      window.EJS_onExit = () => {
         try { window.parent.postMessage({ type: "mga-emulator-exit" }, location.origin); } catch {}
       };
 
