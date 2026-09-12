@@ -128,15 +128,15 @@
             try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
             document.documentElement.focus();
 
-            // O MAME precisa terminar o POST/BIOS antes de aceitar a ficha.
-            // Repetimos a sequência em dois momentos para cobrir jogos
-            // comuns e Neo Geo sem exigir teclado do usuário.
-            const autoStart = (delay) => setTimeout(() => {
-              pressArcadeKey("5", "Digit5", 53);
-              setTimeout(() => pressArcadeKey("1", "Digit1", 49), 700);
-            }, delay);
-            autoStart(2500);
-            autoStart(7000);
+            // O MAME exibe POST/copyright antes de aceitar a ficha. Como
+            // esse tempo varia por navegador e tamanho da ROM, repetimos
+            // a sequência durante o boot sem exigir teclado do usuário.
+            [6000, 11000, 16000, 21000, 26000].forEach((delay) => {
+              setTimeout(() => {
+                pressArcadeKey("5", "Digit5", 53);
+                setTimeout(() => pressArcadeKey("1", "Digit1", 49), 700);
+              }, delay);
+            });
           };
 
           window.EJS_onExit = () => {
