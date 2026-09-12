@@ -31,10 +31,9 @@
         return;
       }
 
-      // Não entregamos a URL diretamente ao EmulatorJS.
-      // Baixamos a ROM primeiro e entregamos um File real com o nome .zip.
-      // Isso evita que o MAME caia no menu do RetroArch por não conseguir
-      // identificar corretamente o conteúdo remoto.
+          // Validamos o download antes de iniciar o core. Depois entregamos
+          // a URL original ao EmulatorJS: ela termina em .zip/.7z/.chd e
+          // permite que o MAME identifique e inicie o jogo automaticamente.
       const absoluteRomUrl = new URL(romUrl, location.origin).href;
 
       (async () => {
@@ -77,19 +76,12 @@
               : "O arquivo recebido não é uma ROM ZIP/7Z/CHD válida.");
           }
 
-          const extension = /\.(7z|chd)$/i.test(gameName)
-            ? gameName.match(/\.(7z|chd)$/i)[0].toLowerCase()
-            : ".zip";
-          const fileName = cleanName + extension;
-          const mime = extension === ".chd" ? "application/octet-stream" : "application/zip";
-          const romFile = new File([bytes], fileName, { type: mime, lastModified: Date.now() });
-
           status.textContent = `INICIANDO ${cleanName}...`;
 
           window.EJS_player = "#game";
           window.EJS_gameName = cleanName;
           window.EJS_gameTitle = cleanName;
-          window.EJS_gameUrl = romFile;
+          window.EJS_gameUrl = absoluteRomUrl;
           window.EJS_core = "mame";
           window.EJS_mameCore = "1|0";
           window.EJS_controlScheme = "mame";

@@ -48,10 +48,9 @@
       throw new Error(`ROM não disponível para download: ${romName}`);
     }
 
-    // O endpoint serverless é /api/rom.js (publicado como /api/rom) e
-    // recebe os dados por query string. Mantemos a extensão no nome para
-    // o player conseguir criar um File que o core MAME reconheça direto.
-    const romUrl = `/api/rom?id=${encodeURIComponent(item.id)}&name=${encodeURIComponent(item.name)}`;
+    // A rota inclui o nome com extensão para o EmulatorJS/MAME reconhecer
+    // o formato da ROM antes de iniciar o jogo automaticamente.
+    const romUrl = `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
     message.textContent = `CARREGANDO ${item.name}...`;
     return { item, url: romUrl };
   }
