@@ -20,7 +20,7 @@
 <body>
 <div class="wrap">
   <header>
-    <div><h1>MASTER GAMES ARCADE</h1><p>Teste de emulação MAME via WebAssembly — sem Electron e sem MAME.exe</p></div>
+    <div><h1>MASTER GAMES ARCADE</h1><p>Teste do MAME Plus! 0.168.2 standalone via WebAssembly — sem RetroArch</p></div>
     <div class="controls"><label class="btn" for="rom">ABRIR ROM</label><input id="rom" type="file" accept=".zip,.7z,.chd,.rom,.bin"><span id="status" class="status">Selecione uma ROM local para iniciar o teste.</span></div>
   </header>
   <div id="game"></div>
@@ -32,22 +32,13 @@ const status=document.getElementById('status');
 input.addEventListener('change',()=>{
   const file=input.files?.[0];
   if(!file)return;
-  const url=URL.createObjectURL(file);
-  window.EJS_player='#game';
-  window.EJS_gameUrl=url;
-  window.EJS_gameName=file.name.replace(/\.[^.]+$/,'');
-  window.EJS_core='mame';
-  window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
-  window.EJS_startOnLoaded=true;
-  window.EJS_fullscreenOnLoaded=false;
-  status.textContent='Carregando '+file.name+' no MAME WebAssembly...';
-  const old=document.querySelector('script[data-ejs]');
-  if(old)old.remove();
+  window.Module={arguments:[file.name.replace(/\.[^.]+$/,''),'-rompath','/roms','-window','-video','soft'],preRun:[],canvas:document.getElementById('game'),print:text=>console.log(text),printErr:text=>console.error(text),setStatus:text=>{if(text)status.textContent=text}};
+  Module.preRun.push(()=>{Module.addRunDependency('rom');try{FS.mkdir('/roms')}catch{};file.arrayBuffer().then(data=>FS.writeFile('/roms/'+file.name,new Uint8Array(data))).finally(()=>Module.removeRunDependency('rom'));});
+  status.textContent='Carregando '+file.name+' no MAME Plus! 0.168.2...';
   const s=document.createElement('script');
-  s.src='https://cdn.emulatorjs.org/stable/data/loader.js';
-  s.dataset.ejs='1';
-  s.onload=()=>status.textContent='Emulador carregado. Aguarde o jogo iniciar.';
-  s.onerror=()=>status.textContent='Não foi possível carregar o EmulatorJS.';
+  s.src='/web/mame0168/mame.js';
+  s.onload=()=>status.textContent='MAME carregado. Aguarde o jogo iniciar.';
+  s.onerror=()=>status.textContent='Build standalone do MAME indisponível.';
   document.body.appendChild(s);
 });
 </script>

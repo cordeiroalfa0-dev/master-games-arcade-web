@@ -26,6 +26,11 @@ Migrar o launcher atual para execução no navegador com WebAssembly, preservand
 - Controles nativos → Keyboard/Gamepad API
 - Persistência local nativa → IndexedDB/Cache quando necessário
 
+## Emulador web
+
+A execução WebAssembly usa o build standalone do **MAME Plus! 0.168.2**, sem EmulatorJS
+ou RetroArch. O artefato é publicado em `web/mame0168/` pelo workflow do GitHub Actions.
+
 ## Hospedagem planejada
 
 Frontend: Vercel.

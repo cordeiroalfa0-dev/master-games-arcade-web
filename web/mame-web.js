@@ -222,5 +222,5 @@
     return originalFetch(input, init);
   };
 
-  console.info("[MGA Web] Bridge WebAssembly 1.4.0 ativo — ROM por URL .zip e inicialização direta do MAME 2003 Plus.");
+  console.info("[MGA Web] Bridge WebAssembly 2.0.0 ativo — MAME Plus! 0.168.2 standalone, ROM por URL .zip.");
 })();

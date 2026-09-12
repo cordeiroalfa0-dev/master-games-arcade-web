@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <div id="game"></div>
+    <canvas id="game" tabindex="0"></canvas>
   <div id="status">BAIXANDO ROM...</div>
   <pre id="debug"></pre>
   <script>
@@ -100,33 +100,29 @@
 
           status.textContent = `INICIANDO ${cleanName}...`;
 
-          window.EJS_player = "#game";
-          window.EJS_gameName = cleanName;
-          window.EJS_gameTitle = cleanName;
-          window.EJS_gameUrl = absoluteRomUrl;
-
-          // NÃO usamos neogeo.zip como parent universal. Cada ROMset MAME tem
-          // dependências próprias; aplicar NeoGeo a todos os jogos fazia jogos
-          // que não são NeoGeo receberem uma dependência incorreta.
-          window.EJS_gameParentUrl = "";
-
-          // O alias "mame" atualmente aponta para MAME 2003-Plus no EmulatorJS.
-          // Declaramos o core explicitamente para evitar depender desse alias.
-          window.EJS_core = "mame2003_plus";
-          window.EJS_controlScheme = "mame";
-          window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
-          window.EJS_startOnLoaded = true;
-          window.EJS_fullscreenOnLoaded = false;
-          window.EJS_askBeforeExit = false;
-          window.EJS_softLoad = false;
-          window.EJS_disableLocalStorage = true;
-          window.EJS_noAutoFocus = false;
-          window.EJS_gameID = `mga-${cleanName.toLowerCase().replace(/[^a-z0-9_-]+/g, "-")}`;
-          window.EJS_color = "#00e5ff";
-          window.EJS_backgroundColor = "#000000";
-          window.EJS_disableAutoLang = true;
-          window.EJS_language = "pt-BR";
-          window.EJS_DEBUG_XX = true;
+          // MAME Plus! 0.168.2 standalone: sem EmulatorJS e sem RetroArch.
+          // O workflow publica o glue Emscripten em /web/mame0168/mame.js.
+          const romFileName = gameName || `${cleanName}.zip`;
+          window.Module = {
+            arguments: [cleanName, "-rompath", "/roms", "-window", "-video", "soft"],
+            preRun: [],
+            canvas: document.getElementById("game"),
+            print: (text) => log(String(text)),
+            printErr: (text) => log(`ERRO MAME: ${text}`),
+            setStatus: (text) => { if (text) status.textContent = String(text); }
+          };
+          Module.preRun.push(() => {
+            Module.addRunDependency("mga-rom");
+            try { FS.mkdir("/roms"); } catch {}
+            try {
+              FS.writeFile(`/roms/${romFileName}`, bytes);
+              log(`ROM montada em /roms/${romFileName}`);
+            } catch (error) {
+              fail(error?.message || "Falha ao montar a ROM");
+            } finally {
+              Module.removeRunDependency("mga-rom");
+            }
+          });
 
           // Controles originais do Master Games Arcade.
           window.EJS_defaultControls = {
@@ -274,9 +270,9 @@
           };
 
           const script = document.createElement("script");
-          script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+          script.src = "/web/mame0168/mame.js";
           script.async = true;
-          script.onerror = () => fail("NÃO FOI POSSÍVEL CARREGAR O EMULATORJS");
+          script.onerror = () => fail("BUILD STANDALONE DO MAME 0.168 INDISPONÍVEL");
           document.head.appendChild(script);
         } catch (error) {
           fail(error?.message || "FALHA AO CARREGAR A ROM");

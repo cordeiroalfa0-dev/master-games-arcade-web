@@ -13,9 +13,12 @@ Camada web do Master Games Arcade, mantendo a interface original e substituindo 
 
 ## Execução das ROMs
 
-A execução WebAssembly usa o EmulatorJS/MAME no navegador.
+A execução WebAssembly usa o build standalone do **MAME Plus! 0.168.2**, carregado por
+`web/mame0168/mame.js`. O player não usa EmulatorJS nem RetroArch.
 
-Nesta etapa, quando o usuário inicia um jogo, o navegador solicita a ROM localmente e o arquivo selecionado é entregue ao núcleo MAME WebAssembly. Isso permite validar a execução sem colocar os aproximadamente 3 GB de ROMs no Vercel.
+Quando o usuário inicia um jogo, o navegador baixa a ROM pelo endpoint configurado e a
+monta em `/roms` no filesystem virtual do Emscripten. Isso permite manter os
+aproximadamente 3 GB de ROMs fora do repositório e do deploy da Vercel.
 
 ## Próxima etapa
 
