@@ -1,4 +1,4 @@
-name: Build MAME 0.162 Web
+name: Build MAME 0.168 Web
 
 on:
   push:
@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   build:
-    name: Compile MAME 0.162 arcade for Emscripten
+    name: Compile MAME 0.168 arcade for Emscripten
     runs-on: ubuntu-22.04
     timeout-minutes: 360
 
@@ -23,81 +23,64 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git make clang lld zip gzip python2
+          sudo apt-get install -y git make clang lld python3 zip gzip
 
-      - name: Install historical Emscripten 1.29 toolchain
+      - name: Install historical Emscripten 1.35.10
         shell: bash
         run: |
-          git clone --depth 1 https://github.com/destenson/juj--emsdk.git "$HOME/emsdk"
+          git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$HOME/emsdk"
           cd "$HOME/emsdk"
-          mkdir -p "$HOME/legacy-python-bin"
-          ln -sf /usr/bin/python2 "$HOME/legacy-python-bin/python"
-          export PATH="$HOME/legacy-python-bin:$PATH"
-          python --version
-          python2 --version
-          python2 ./emsdk update-tags
-          python2 ./emsdk install sdk-tag-1.29.0-64bit
-          python2 ./emsdk activate sdk-tag-1.29.0-64bit
-          echo "$HOME/legacy-python-bin" >> "$GITHUB_PATH"
+          ./emsdk update-tags || true
+          ./emsdk install sdk-1.35.10-64bit
+          ./emsdk activate sdk-1.35.10-64bit
           echo "$HOME/emsdk" >> "$GITHUB_PATH"
-          echo "$HOME/emsdk/emscripten/1.29.0" >> "$GITHUB_PATH"
-          echo "$HOME/emsdk/clang/tag-e1.29.0_64/bin" >> "$GITHUB_PATH"
+          echo "$HOME/emsdk/emscripten/1.35.10" >> "$GITHUB_PATH"
 
       - name: Verify Emscripten
         shell: bash
         run: |
-          export PATH="$HOME/legacy-python-bin:$PATH"
           source "$HOME/emsdk/emsdk_env.sh"
-          python --version
           emcc --version
           emmake --version
 
-      - name: Fetch MAME 0.162 source
+      - name: Fetch MAME 0.168 source
         run: |
-          git clone --depth 1 --branch mame0162 https://github.com/mamedev/mame.git mame-0162
+          git clone --depth 1 --branch mame0168 https://github.com/mamedev/mame.git mame-0168
 
-      - name: Prepare MAME 0.162 Emscripten configuration
+      - name: Prepare MAME 0.168 Emscripten configuration
         shell: bash
         run: |
-          export PATH="$HOME/legacy-python-bin:$PATH"
           source "$HOME/emsdk/emsdk_env.sh"
-          export EMSCRIPTEN="$EMSDK/emscripten/1.29.0"
-          cat > mame-0162/useroptions.mak <<'EOF'
+          cat > mame-0168/useroptions.mak <<'EOF'
           NOWERROR = 1
           NOASM = 1
           OPTIMIZE = 3
           OSD = sdl
-          TARGETOS = emscripten
-          CROSS_BUILD = 1
+          TARGETOS = asmjs
           PTR64 = 0
-          USE_SDL = 2
           EOF
-          cd mame-0162
-          make REGENIE=1 gcc=asmjs TARGET=mame SUBTARGET=arcade OSD=sdl TARGETOS=emscripten CROSS_BUILD=1 PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
 
-      - name: Build MAME 0.162 arcade core with Emscripten
+      - name: Build MAME 0.168 arcade core
         shell: bash
         run: |
-          export PATH="$HOME/legacy-python-bin:$PATH"
           source "$HOME/emsdk/emsdk_env.sh"
-          export EMSCRIPTEN="$EMSDK/emscripten/1.29.0"
-          cd mame-0162
-          emmake make gcc=asmjs TARGET=mame SUBTARGET=arcade OSD=sdl TARGETOS=emscripten CROSS_BUILD=1 PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
+          cd mame-0168
+          emmake make SUBTARGET=arcade TARGET=mame OSD=sdl TARGETOS=asmjs PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
 
       - name: Collect emulator files
         shell: bash
         run: |
-          mkdir -p "$GITHUB_WORKSPACE/mame-0162-build"
-          find mame-0162 -type f \( -name 'mamearcade*' -o -name 'mamearcade*.js' -o -name 'mamearcade*.wasm' -o -name 'mamearcade*.mem' \) -print
-          find mame-0162 -type f \( -name 'mamearcade' -o -name 'mamearcade.js' -o -name 'mamearcade.wasm' -o -name 'mamearcade.mem' \) -exec cp -v {} "$GITHUB_WORKSPACE/mame-0162-build/" \; || true
-          find mame-0162 -type f -name 'arcade' -exec cp -v {} "$GITHUB_WORKSPACE/mame-0162-build/" \; || true
-          printf 'MAME 0.162 Web build\n' > "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
-          git -C mame-0162 rev-parse HEAD >> "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
-          test "$(find "$GITHUB_WORKSPACE/mame-0162-build" -type f | wc -l)" -gt 1
+          mkdir -p "$GITHUB_WORKSPACE/mame-0168-build"
+          echo 'Arquivos gerados:'
+          find mame-0168 -type f \( -name '*.js' -o -name '*.wasm' -o -name '*.mem' \) -print
+          find mame-0168 -type f \( -name 'mamearcade.js' -o -name 'mamearcade.wasm' -o -name 'mamearcade.mem' -o -name 'arcade.js' -o -name 'arcade.wasm' -o -name 'arcade.mem' \) -exec cp -v {} "$GITHUB_WORKSPACE/mame-0168-build/" \; || true
+          printf 'MAME 0.168 Web build\n' > "$GITHUB_WORKSPACE/mame-0168-build/VERSION.txt"
+          git -C mame-0168 rev-parse HEAD >> "$GITHUB_WORKSPACE/mame-0168-build/VERSION.txt"
+          test "$(find "$GITHUB_WORKSPACE/mame-0168-build" -type f | wc -l)" -gt 1
 
-      - name: Upload MAME 0.162 build artifact
+      - name: Upload MAME 0.168 build artifact
         uses: actions/upload-artifact@v4
         with:
-          name: mame-0162-web
-          path: mame-0162-build/
+          name: mame-0168-web
+          path: mame-0168-build/
           retention-days: 14
