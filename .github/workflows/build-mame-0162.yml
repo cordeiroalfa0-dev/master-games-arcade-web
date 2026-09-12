@@ -30,16 +30,25 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/destenson/juj--emsdk.git "$HOME/emsdk"
           cd "$HOME/emsdk"
-          ./emsdk update-tags
-          ./emsdk install sdk-tag-1.29.0-64bit
-          ./emsdk activate sdk-tag-1.29.0-64bit
+          mkdir -p "$HOME/legacy-python-bin"
+          ln -sf /usr/bin/python2 "$HOME/legacy-python-bin/python"
+          export PATH="$HOME/legacy-python-bin:$PATH"
+          python --version
+          python2 --version
+          python2 ./emsdk update-tags
+          python2 ./emsdk install sdk-tag-1.29.0-64bit
+          python2 ./emsdk activate sdk-tag-1.29.0-64bit
+          echo "$HOME/legacy-python-bin" >> "$GITHUB_PATH"
           echo "$HOME/emsdk" >> "$GITHUB_PATH"
           echo "$HOME/emsdk/emscripten/1.29.0" >> "$GITHUB_PATH"
           echo "$HOME/emsdk/clang/tag-e1.29.0_64/bin" >> "$GITHUB_PATH"
 
       - name: Verify Emscripten
+        shell: bash
         run: |
+          export PATH="$HOME/legacy-python-bin:$PATH"
           source "$HOME/emsdk/emsdk_env.sh"
+          python --version
           emcc --version
           emmake --version
 
@@ -63,6 +72,7 @@ jobs:
       - name: Build MAME 0.162 arcade core
         shell: bash
         run: |
+          export PATH="$HOME/legacy-python-bin:$PATH"
           source "$HOME/emsdk/emsdk_env.sh"
           cd mame-0162
           emmake make SUBTARGET=arcade TARGET=mame NOWERROR=1 NOASM=1 OPTIMIZE=3 OSD=sdl TARGETOS=emscripten CROSS_BUILD=1 PTR64=0
