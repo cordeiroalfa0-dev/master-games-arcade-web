@@ -20,74 +20,81 @@ jobs:
       - name: Checkout web project
         uses: actions/checkout@v4
 
-      - name: Install build dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y git make clang lld python3 python2 zip gzip
-
-      - name: Install historical Emscripten 1.35.10
+      - name: Build with historical Python 2 container
         shell: bash
         run: |
-          git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$HOME/emsdk"
-          cd "$HOME/emsdk"
-          git fetch --depth 1 origin e4acfff1951edb2662ff6e3310824418e7c5bb83
-          git checkout e4acfff1951edb2662ff6e3310824418e7c5bb83
-          python3 ./emsdk update-tags || true
-          python3 ./emsdk install sdk-1.35.10-64bit
-          python3 ./emsdk activate sdk-1.35.10-64bit
-          echo "$HOME/emsdk" >> "$GITHUB_PATH"
-          echo "$HOME/emsdk/emscripten/1.35.10" >> "$GITHUB_PATH"
+          docker run --rm \
+            -v "$GITHUB_WORKSPACE:/workspace" \
+            -w /workspace \
+            python:2.7.18-buster \
+            bash -lc '
+              set -e
 
-      - name: Verify Emscripten
-        shell: bash
-        run: |
-          source "$HOME/emsdk/emsdk_env.sh"
-          emcc --version
-          emmake --version
+              # Debian Buster is archived; use the historical package mirror.
+              printf "%s\n" \
+                "deb http://archive.debian.org/debian buster main" \
+                "deb http://archive.debian.org/debian-security buster/updates main" \
+                > /etc/apt/sources.list
+              echo "Acquire::Check-Valid-Until \"false\";" > /etc/apt/apt.conf.d/99no-check-valid-until
 
-      - name: Fetch MAME 0.168 source
-        run: |
-          git clone --depth 1 --branch mame0168 https://github.com/mamedev/mame.git mame-0168
+              apt-get update
+              apt-get install -y --no-install-recommends git make gcc g++ clang lld zip gzip ca-certificates
 
-      - name: Prepare MAME 0.168 Emscripten configuration
-        shell: bash
-        run: |
-          source "$HOME/emsdk/emsdk_env.sh"
-          export EMSCRIPTEN="$HOME/emsdk/emscripten/1.35.10"
-          cat > mame-0168/useroptions.mak <<'EOF'
-          NOWERROR = 1
-          NOASM = 1
-          OPTIMIZE = 3
-          OSD = sdl
-          PTR64 = 0
-          EOF
+              echo "Python:"
+              python --version
 
-      - name: Generate MAME 0.168 Emscripten makefiles
-        shell: bash
-        run: |
-          source "$HOME/emsdk/emsdk_env.sh"
-          export EMSCRIPTEN="$HOME/emsdk/emscripten/1.35.10"
-          cd mame-0168
-          make REGENIE=1 gcc=asmjs gcc_version=4.9 TARGET=mame SUBTARGET=arcade OSD=sdl PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
+              echo "Clonando emsdk histórico..."
+              rm -rf /root/emsdk
+              git clone --depth 1 https://github.com/emscripten-core/emsdk.git /root/emsdk
+              cd /root/emsdk
+              git fetch --depth 1 origin e4acfff1951edb2662ff6e3310824418e7c5bb83
+              git checkout e4acfff1951edb2662ff6e3310824418e7c5bb83
 
-      - name: Build MAME 0.168 arcade core with Emscripten
-        shell: bash
-        run: |
-          source "$HOME/emsdk/emsdk_env.sh"
-          export EMSCRIPTEN="$HOME/emsdk/emscripten/1.35.10"
-          cd mame-0168
-          emmake make gcc=asmjs gcc_version=4.9 TARGET=mame SUBTARGET=arcade OSD=sdl PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3 -j2
+              python ./emsdk update-tags || true
+              python ./emsdk install sdk-1.35.10-64bit
+              python ./emsdk activate sdk-1.35.10-64bit
+              source /root/emsdk/emsdk_env.sh
 
-      - name: Collect emulator files
-        shell: bash
-        run: |
-          mkdir -p "$GITHUB_WORKSPACE/mame-0168-build"
-          echo 'Arquivos gerados:'
-          find mame-0168 -type f \( -name '*.js' -o -name '*.wasm' -o -name '*.mem' \) -print
-          find mame-0168 -type f \( -name 'mamearcade.js' -o -name 'mamearcade.wasm' -o -name 'mamearcade.mem' -o -name 'arcade.js' -o -name 'arcade.wasm' -o -name 'arcade.mem' \) -exec cp -v {} "$GITHUB_WORKSPACE/mame-0168-build/" \; || true
-          printf 'MAME 0.168 Web build\n' > "$GITHUB_WORKSPACE/mame-0168-build/VERSION.txt"
-          git -C mame-0168 rev-parse HEAD >> "$GITHUB_WORKSPACE/mame-0168-build/VERSION.txt"
-          test "$(find "$GITHUB_WORKSPACE/mame-0168-build" -type f | wc -l)" -gt 1
+              echo "Emscripten:"
+              emcc --version
+              emmake --version
+
+              cd /workspace
+              rm -rf mame-0168
+              git clone --depth 1 --branch mame0168 https://github.com/mamedev/mame.git mame-0168
+
+              cd /workspace/mame-0168
+              cat > useroptions.mak <<"EOF"
+NOWERROR = 1
+NOASM = 1
+OPTIMIZE = 3
+OSD = sdl
+PTR64 = 0
+EOF
+
+              echo "Gerando makefiles MAME 0.168..."
+              make REGENIE=1 gcc=asmjs gcc_version=4.9 TARGET=mame SUBTARGET=arcade OSD=sdl PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
+
+              echo "Compilando MAME 0.168..."
+              emmake make gcc=asmjs gcc_version=4.9 TARGET=mame SUBTARGET=arcade OSD=sdl PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3 -j2
+
+              cd /workspace
+              rm -rf mame-0168-build
+              mkdir -p mame-0168-build
+
+              echo "Arquivos gerados:"
+              find /workspace/mame-0168 -type f \( -name "*.js" -o -name "*.wasm" -o -name "*.mem" \) -print
+
+              find /workspace/mame-0168 -type f \( \
+                -name "mamearcade.js" -o -name "mamearcade.wasm" -o -name "mamearcade.mem" -o \
+                -name "arcade.js" -o -name "arcade.wasm" -o -name "arcade.mem" \
+              \) -exec cp -v {} /workspace/mame-0168-build/ \;
+
+              printf "MAME 0.168 Web build\n" > /workspace/mame-0168-build/VERSION.txt
+              git -C /workspace/mame-0168 rev-parse HEAD >> /workspace/mame-0168-build/VERSION.txt
+
+              test "$(find /workspace/mame-0168-build -type f | wc -l)" -gt 1
+            '
 
       - name: Upload MAME 0.168 build artifact
         uses: actions/upload-artifact@v4
