@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Master Games Arcade</title>
+<style>
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000}body{cursor:none}
+#bgVideo{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1}
+#bgImage{position:fixed;inset:0;z-index:1;background:url('/assets/background.png') center/cover no-repeat;opacity:0;transition:opacity 2s}
+#darkLayer{position:fixed;inset:0;z-index:2;background:rgba(0,0,10,.45)}
+.scanlines{position:fixed;inset:0;z-index:4;pointer-events:none;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,.12) 3px,rgba(0,0,0,.12) 4px)}
+#introContent{position:fixed;left:0;right:0;bottom:10vh;z-index:10;display:flex;flex-direction:column;align-items:center;color:#fff;font-family:monospace;transition:opacity 1s}.hidden{opacity:0}
+.line{height:1px;width:220px;background:linear-gradient(90deg,transparent,#00e5ff,#e040fb,transparent);margin:6px}.subtitle{font-size:12px;letter-spacing:3px;color:#e040fb;text-shadow:0 0 15px #e040fb;margin:8px}.title{font-size:28px;line-height:1.25;text-align:center;text-shadow:0 0 20px #00e5ff}.title b{display:block}.games{color:#00e5ff}.arcade{color:#e040fb}.version{margin-top:15px;color:#b7dce8;font-size:18px;letter-spacing:3px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 10px #00e676;margin-right:10px}
+#insertCoin{position:fixed;z-index:20;left:0;right:0;bottom:7vh;text-align:center;opacity:0;transition:opacity .8s;font-family:monospace;color:#fff}.show{opacity:1!important}.coin{font-size:18px;letter-spacing:4px;text-shadow:0 0 15px #00e5ff;animation:pulse 1.2s infinite}.hint{margin-top:12px;color:#9ab0ba;font-size:18px}@keyframes pulse{50%{opacity:.45}}
+#cursor{position:fixed;z-index:100;width:10px;height:10px;border:1px solid #00e5ff;border-radius:50%;box-shadow:0 0 8px #00e5ff;pointer-events:none;transform:translate(-50%,-50%)}
+</style>
+</head>
+<body>
+<video id="bgVideo" playsinline preload="auto" autoplay muted><source src="https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/dist/intro_bg.mp4" type="video/mp4"></video>
+<div id="bgImage"></div><div id="darkLayer"></div><div class="scanlines"></div>
+<div id="introContent"><div class="line"></div><div class="subtitle">THE ULTIMATE ARCADE EXPERIENCE</div><div class="title"><b>MASTER</b><b class="games">GAMES</b><b class="arcade">ARCADE</b></div><div class="version"><span class="dot"></span>WEB EDITION • 2026</div><div class="line"></div></div>
+<div id="insertCoin"><div class="coin">INSERT COIN</div><div class="hint">PRESSIONE QUALQUER TECLA PARA CONTINUAR</div></div><div id="cursor"></div>
+<script>
+let canEnter=false;
+const video=document.getElementById('bgVideo');
+function transition(){if(canEnter)return;document.getElementById('introContent').classList.add('hidden');video.style.opacity='0';document.getElementById('bgImage').style.opacity='1';setTimeout(()=>{document.getElementById('insertCoin').classList.add('show');canEnter=true},1800)}
+video.addEventListener('ended',transition);video.addEventListener('error',()=>setTimeout(transition,3000));
+setTimeout(()=>document.getElementById('introContent').classList.add('show'),100);
+setTimeout(()=>{document.querySelector('.subtitle').classList.add('show');document.querySelector('.title').classList.add('show');document.querySelector('.version').classList.add('show')},300);
+setTimeout(()=>{if(video.readyState>=2)video.play().catch(()=>{});},100);
+document.addEventListener('keydown',()=>{if(canEnter){canEnter=false;sessionStorage.setItem('mga.introSeen','1');location.href='/?launcher=1'}});
+document.addEventListener('mousemove',e=>{const c=document.getElementById('cursor');c.style.left=e.clientX+'px';c.style.top=e.clientY+'px'});
+</script>
+</body></html>
