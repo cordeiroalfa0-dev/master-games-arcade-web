@@ -23,7 +23,7 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git make python2 python3 clang lld zip gzip
+          sudo apt-get install -y git make clang lld zip gzip
 
       - name: Install historical Emscripten toolchain
         run: |
