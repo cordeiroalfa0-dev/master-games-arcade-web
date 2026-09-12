@@ -77,6 +77,9 @@
       };
 
       window.EJS_onGameStart = () => {
+        try {
+          window.parent.postMessage({ type: "mga-emulator-started" }, location.origin);
+        } catch {}
         document.documentElement.focus();
       };
 
