@@ -82,6 +82,12 @@
           window.EJS_gameName = cleanName;
           window.EJS_gameTitle = cleanName;
           window.EJS_gameUrl = absoluteRomUrl;
+          // Jogos Neo Geo (como sonicwi3) precisam do parent neogeo.zip
+          // disponível no rompath antes do core MAME ser iniciado.
+          window.EJS_gameParentUrl = new URL(
+            "/api/rom/1M3EmGFVuE0g_KWJDqGoqsYE1L46t70wq/neogeo.zip",
+            location.origin
+          ).href;
           // O catálogo usa ROMs do conjunto MAME 2003. O nome explícito
           // evita que o alias "mame" selecione outro core automaticamente.
           window.EJS_core = "mame2003";
