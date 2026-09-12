@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -50,7 +50,6 @@ jobs:
             bash -lc '
               set -e
 
-              # Debian Buster is archived, so use the historical package archive.
               printf "%s\n" \
                 "deb http://archive.debian.org/debian buster main" \
                 "deb http://archive.debian.org/debian-security buster/updates main" \
@@ -61,7 +60,6 @@ jobs:
               apt-get install -y --no-install-recommends \
                 git make gcc g++ clang lld ca-certificates curl zip gzip
 
-              echo "Python:"
               python --version
 
               rm -rf /root/emsdk
@@ -123,3 +121,21 @@ jobs:
           name: mame-0168-web
           path: mame-0168-build/
           retention-days: 14
+
+      - name: Publish generated MAME Web files into the web project
+        shell: bash
+        run: |
+          set -e
+          rm -rf web/mame0168
+          mkdir -p web/mame0168
+          cp -v mame-0168-build/* web/mame0168/
+          printf 'MAME 0.168\n' > web/mame0168/README.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add web/mame0168
+          if git diff --cached --quiet; then
+            echo "Nenhuma alteração no build Web."
+            exit 0
+          fi
+          git commit -m "Publicar build Web do MAME 0.168"
+          git push origin HEAD:main
