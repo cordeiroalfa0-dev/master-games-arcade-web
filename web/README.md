@@ -14,4 +14,4 @@ Não substituir a interface original por uma interface nova. O objetivo é conec
 
 ## Emulação
 
-O EmulatorJS fornece o carregador e os cores WebAssembly. A documentação/projeto atual mostra `EJS_gameUrl`, `EJS_gameName`, `EJS_core` e `EJS_pathtodata` como pontos de configuração, e o core `mame` está disponível. citeturn0search1turn0search2
+O EmulatorJS fornece o carregador e os cores WebAssembly. A configuração usada no teste segue a API pública do projeto: `EJS_gameUrl`, `EJS_gameName`, `EJS_core` e `EJS_pathtodata`.
