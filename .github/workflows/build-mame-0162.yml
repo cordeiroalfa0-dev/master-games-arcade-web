@@ -56,8 +56,12 @@ jobs:
         run: |
           git clone --depth 1 --branch mame0162 https://github.com/mamedev/mame.git mame-0162
 
-      - name: Prepare Emscripten build configuration
+      - name: Prepare MAME 0.162 Emscripten configuration
+        shell: bash
         run: |
+          export PATH="$HOME/legacy-python-bin:$PATH"
+          source "$HOME/emsdk/emsdk_env.sh"
+          export EMSCRIPTEN="$EMSDK/emscripten/1.29.0"
           cat > mame-0162/useroptions.mak <<'EOF'
           NOWERROR = 1
           NOASM = 1
@@ -68,22 +72,26 @@ jobs:
           PTR64 = 0
           USE_SDL = 2
           EOF
+          cd mame-0162
+          make REGENIE=1 gcc=asmjs TARGET=mame SUBTARGET=arcade OSD=sdl TARGETOS=emscripten CROSS_BUILD=1 PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
 
-      - name: Build MAME 0.162 arcade core
+      - name: Build MAME 0.162 arcade core with Emscripten
         shell: bash
         run: |
           export PATH="$HOME/legacy-python-bin:$PATH"
           source "$HOME/emsdk/emsdk_env.sh"
+          export EMSCRIPTEN="$EMSDK/emscripten/1.29.0"
           cd mame-0162
-          emmake make SUBTARGET=arcade TARGET=mame NOWERROR=1 NOASM=1 OPTIMIZE=3 OSD=sdl TARGETOS=emscripten CROSS_BUILD=1 PTR64=0
+          emmake make gcc=asmjs TARGET=mame SUBTARGET=arcade OSD=sdl TARGETOS=emscripten CROSS_BUILD=1 PTR64=0 NOASM=1 NOWERROR=1 OPTIMIZE=3
 
       - name: Collect emulator files
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE/mame-0162-build"
-          find mame-0162 -maxdepth 5 -type f \( -name 'mamearcade*' -o -name 'arcade*' -o -name 'mame*.js' -o -name 'mame*.wasm' -o -name 'mame*.mem' \) -print
-          find mame-0162 -type f \( -name 'mamearcade.js' -o -name 'mamearcade.wasm' -o -name 'mamearcade.mem' \) -exec cp -v {} "$GITHUB_WORKSPACE/mame-0162-build/" \; || true
-          printf 'MAME 0.162 build\n' > "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
+          find mame-0162 -type f \( -name 'mamearcade*' -o -name 'mamearcade*.js' -o -name 'mamearcade*.wasm' -o -name 'mamearcade*.mem' \) -print
+          find mame-0162 -type f \( -name 'mamearcade' -o -name 'mamearcade.js' -o -name 'mamearcade.wasm' -o -name 'mamearcade.mem' \) -exec cp -v {} "$GITHUB_WORKSPACE/mame-0162-build/" \; || true
+          find mame-0162 -type f -name 'arcade' -exec cp -v {} "$GITHUB_WORKSPACE/mame-0162-build/" \; || true
+          printf 'MAME 0.162 Web build\n' > "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
           git -C mame-0162 rev-parse HEAD >> "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
           test "$(find "$GITHUB_WORKSPACE/mame-0162-build" -type f | wc -l)" -gt 1
 
