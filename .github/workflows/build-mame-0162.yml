@@ -1,0 +1,84 @@
+name: Build MAME 0.162 Web
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-mame-0162.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Compile MAME 0.162 arcade for Emscripten
+    runs-on: ubuntu-22.04
+    timeout-minutes: 360
+
+    steps:
+      - name: Checkout web project
+        uses: actions/checkout@v4
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git make python2 python3 clang lld zip gzip
+
+      - name: Install historical Emscripten toolchain
+        run: |
+          git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$HOME/emsdk"
+          cd "$HOME/emsdk"
+          ./emsdk install 1.29.0
+          ./emsdk activate 1.29.0
+          echo "$HOME/emsdk" >> "$GITHUB_PATH"
+          echo "$HOME/emsdk/upstream/emscripten" >> "$GITHUB_PATH"
+
+      - name: Verify Emscripten
+        run: |
+          source "$HOME/emsdk/emsdk_env.sh"
+          emcc --version
+          emmake --version
+
+      - name: Fetch MAME 0.162 source
+        run: |
+          git clone --depth 1 --branch mame0162 https://github.com/mamedev/mame.git mame-0162
+
+      - name: Prepare Emscripten build configuration
+        run: |
+          cat > mame-0162/useroptions.mak <<'EOF'
+          NOWERROR = 1
+          NOASM = 1
+          OPTIMIZE = 3
+          OSD = sdl
+          TARGETOS = emscripten
+          CROSS_BUILD = 1
+          PTR64 = 0
+          USE_SDL = 2
+          EOF
+
+      - name: Build MAME 0.162 arcade core
+        shell: bash
+        run: |
+          source "$HOME/emsdk/emsdk_env.sh"
+          cd mame-0162
+          emmake make SUBTARGET=arcade TARGET=mame NOWERROR=1 NOASM=1 OPTIMIZE=3 OSD=sdl TARGETOS=emscripten CROSS_BUILD=1 PTR64=0
+
+      - name: Collect emulator files
+        shell: bash
+        run: |
+          mkdir -p "$GITHUB_WORKSPACE/mame-0162-build"
+          find mame-0162 -maxdepth 4 -type f \( -name 'mamearcade*' -o -name 'arcade*' \) -print
+          find mame-0162 -maxdepth 5 -type f \( -name '*.js' -o -name '*.wasm' -o -name '*.mem' \) -print
+          cp -v mame-0162/mamearcade* "$GITHUB_WORKSPACE/mame-0162-build/" 2>/dev/null || true
+          find mame-0162 -type f \( -name 'mamearcade.js' -o -name 'mamearcade.wasm' -o -name 'mamearcade.mem' \) -exec cp -v {} "$GITHUB_WORKSPACE/mame-0162-build/" \; || true
+          printf 'MAME 0.162 build\n' > "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
+          git -C mame-0162 rev-parse HEAD >> "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
+          test "$(find "$GITHUB_WORKSPACE/mame-0162-build" -type f | wc -l)" -gt 1
+
+      - name: Upload MAME 0.162 build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: mame-0162-web
+          path: mame-0162-build/
+          retention-days: 14
