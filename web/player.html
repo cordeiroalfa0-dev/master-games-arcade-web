@@ -31,9 +31,6 @@
         return;
       }
 
-          // Validamos o download antes de iniciar o core. Depois entregamos
-          // a URL original ao EmulatorJS: ela termina em .zip/.7z/.chd e
-          // permite que o MAME identifique e inicie o jogo automaticamente.
       const absoluteRomUrl = new URL(romUrl, location.origin).href;
 
       (async () => {
@@ -57,9 +54,6 @@
             throw new Error("A ROM veio vazia.");
           }
 
-          // ZIP = PK\x03\x04 / PK\x05\x06 / PK\x07\x08
-          // 7Z  = 37 7A BC AF 27 1C
-          // CHD = assinatura ASCII MComprHD
           const isZip = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4b &&
             ((bytes[2] === 0x03 && bytes[3] === 0x04) ||
              (bytes[2] === 0x05 && bytes[3] === 0x06) ||
@@ -82,14 +76,10 @@
           window.EJS_gameName = cleanName;
           window.EJS_gameTitle = cleanName;
           window.EJS_gameUrl = absoluteRomUrl;
-          // Jogos Neo Geo (como sonicwi3) precisam do parent neogeo.zip
-          // disponível no rompath antes do core MAME ser iniciado.
           window.EJS_gameParentUrl = new URL(
             "/api/rom/1M3EmGFVuE0g_KWJDqGoqsYE1L46t70wq/neogeo.zip",
             location.origin
           ).href;
-          // O alias "mame" seleciona o MAME 2003 Plus, que é o core arcade
-          // publicado e compatível com o pacote atual do EmulatorJS.
           window.EJS_core = "mame";
           window.EJS_controlScheme = "mame";
           window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
@@ -98,11 +88,89 @@
           window.EJS_askBeforeExit = false;
           window.EJS_softLoad = false;
           window.EJS_disableLocalStorage = true;
+          window.EJS_noAutoFocus = false;
           window.EJS_gameID = `mga-${cleanName.toLowerCase().replace(/[^a-z0-9_-]+/g, "-")}`;
           window.EJS_color = "#00e5ff";
           window.EJS_backgroundColor = "#000000";
           window.EJS_disableAutoLang = true;
           window.EJS_language = "pt-BR";
+
+          // Controles originais do Master Games Arcade.
+          // EmulatorJS usa índices padronizados: 0=B, 1=Y, 2=SELECT,
+          // 3=START, 4..7=direções, 8=A, 9=X, 10=L, 11=R.
+          // P1: setas + Z X C A S D + 1 START + 5 COIN + TAB MENU.
+          // P2: numpad + A S Q W E R + 2 START + 6 COIN.
+          window.EJS_defaultControls = {
+            0: {
+              0:  { value: "z", value2: "BUTTON_1" },
+              1:  { value: "x", value2: "BUTTON_2" },
+              2:  { value: "5", value2: "SELECT" },
+              3:  { value: "1", value2: "START" },
+              4:  { value: "ArrowUp", value2: "DPAD_UP" },
+              5:  { value: "ArrowDown", value2: "DPAD_DOWN" },
+              6:  { value: "ArrowLeft", value2: "DPAD_LEFT" },
+              7:  { value: "ArrowRight", value2: "DPAD_RIGHT" },
+              8:  { value: "c", value2: "BUTTON_3" },
+              9:  { value: "a", value2: "BUTTON_4" },
+              10: { value: "s", value2: "BUTTON_5" },
+              11: { value: "d", value2: "BUTTON_6" },
+              12: { value: "Tab", value2: "LEFT_BOTTOM_SHOULDER" },
+              13: { value: "", value2: "RIGHT_BOTTOM_SHOULDER" }
+            },
+            1: {
+              0:  { value: "a", value2: "BUTTON_1" },
+              1:  { value: "s", value2: "BUTTON_2" },
+              2:  { value: "6", value2: "SELECT" },
+              3:  { value: "2", value2: "START" },
+              4:  { value: "8", value2: "DPAD_UP" },
+              5:  { value: "2", value2: "DPAD_DOWN" },
+              6:  { value: "4", value2: "DPAD_LEFT" },
+              7:  { value: "6", value2: "DPAD_RIGHT" },
+              8:  { value: "q", value2: "BUTTON_3" },
+              9:  { value: "w", value2: "BUTTON_4" },
+              10: { value: "e", value2: "BUTTON_5" },
+              11: { value: "r", value2: "BUTTON_6" }
+            },
+            2: {},
+            3: {}
+          };
+
+          // O teclado numérico precisa ser distinguido do teclado normal.
+          // O EmulatorJS trabalha com event.key, por isso traduzimos somente
+          // os códigos Numpad para teclas internas exclusivas do P2.
+          const numpadMap = {
+            Numpad8: "i",
+            Numpad2: "k",
+            Numpad4: "j",
+            Numpad6: "l"
+          };
+
+          window.addEventListener("keydown", (event) => {
+            const mapped = numpadMap[event.code];
+            if (!mapped) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            const translated = new KeyboardEvent("keydown", {
+              key: mapped,
+              code: mapped.length === 1 ? `Key${mapped.toUpperCase()}` : mapped,
+              bubbles: true,
+              cancelable: true
+            });
+            document.dispatchEvent(translated);
+          }, true);
+
+          window.addEventListener("keyup", (event) => {
+            const mapped = numpadMap[event.code];
+            if (!mapped) return;
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            document.dispatchEvent(new KeyboardEvent("keyup", {
+              key: mapped,
+              code: mapped.length === 1 ? `Key${mapped.toUpperCase()}` : mapped,
+              bubbles: true,
+              cancelable: true
+            }));
+          }, true);
 
           const pressArcadeKey = (key, code, keyCode) => {
             const target = document.querySelector("canvas") || document;
@@ -111,8 +179,6 @@
               key, code, bubbles: true, cancelable: true,
               composed: true, keyCode, which: keyCode
             });
-            // Chromium expõe keyCode/which como somente leitura; o MAME
-            // usa esses valores para mapear COIN (5) e START (1).
             for (const prop of ["keyCode", "which"]) {
               try { Object.defineProperty(event, prop, { value: keyCode }); } catch {}
             }
@@ -127,10 +193,8 @@
             status.remove();
             try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
             document.documentElement.focus();
+            setTimeout(() => document.querySelector("canvas")?.focus(), 1000);
 
-            // O MAME exibe POST/copyright antes de aceitar a ficha. Como
-            // esse tempo varia por navegador e tamanho da ROM, repetimos
-            // a sequência durante o boot sem exigir teclado do usuário.
             [6000, 11000, 16000, 21000, 26000].forEach((delay) => {
               setTimeout(() => {
                 pressArcadeKey("5", "Digit5", 53);
