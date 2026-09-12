@@ -23,16 +23,19 @@ jobs:
       - name: Install build dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git make clang lld zip gzip
+          sudo apt-get install -y git make clang lld zip gzip python2
 
-      - name: Install historical Emscripten toolchain
+      - name: Install historical Emscripten 1.29 toolchain
+        shell: bash
         run: |
-          git clone --depth 1 https://github.com/emscripten-core/emsdk.git "$HOME/emsdk"
+          git clone --depth 1 https://github.com/destenson/juj--emsdk.git "$HOME/emsdk"
           cd "$HOME/emsdk"
-          ./emsdk install 1.29.0
-          ./emsdk activate 1.29.0
+          ./emsdk update-tags
+          ./emsdk install sdk-tag-1.29.0-64bit
+          ./emsdk activate sdk-tag-1.29.0-64bit
           echo "$HOME/emsdk" >> "$GITHUB_PATH"
-          echo "$HOME/emsdk/upstream/emscripten" >> "$GITHUB_PATH"
+          echo "$HOME/emsdk/emscripten/1.29.0" >> "$GITHUB_PATH"
+          echo "$HOME/emsdk/clang/tag-e1.29.0_64/bin" >> "$GITHUB_PATH"
 
       - name: Verify Emscripten
         run: |
@@ -68,9 +71,7 @@ jobs:
         shell: bash
         run: |
           mkdir -p "$GITHUB_WORKSPACE/mame-0162-build"
-          find mame-0162 -maxdepth 4 -type f \( -name 'mamearcade*' -o -name 'arcade*' \) -print
-          find mame-0162 -maxdepth 5 -type f \( -name '*.js' -o -name '*.wasm' -o -name '*.mem' \) -print
-          cp -v mame-0162/mamearcade* "$GITHUB_WORKSPACE/mame-0162-build/" 2>/dev/null || true
+          find mame-0162 -maxdepth 5 -type f \( -name 'mamearcade*' -o -name 'arcade*' -o -name 'mame*.js' -o -name 'mame*.wasm' -o -name 'mame*.mem' \) -print
           find mame-0162 -type f \( -name 'mamearcade.js' -o -name 'mamearcade.wasm' -o -name 'mamearcade.mem' \) -exec cp -v {} "$GITHUB_WORKSPACE/mame-0162-build/" \; || true
           printf 'MAME 0.162 build\n' > "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
           git -C mame-0162 rev-parse HEAD >> "$GITHUB_WORKSPACE/mame-0162-build/VERSION.txt"
