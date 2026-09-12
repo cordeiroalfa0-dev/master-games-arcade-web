@@ -1,25 +1,5 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "headers": [
-    {
-      "source": "/assets/index-CQxxgdzD.js",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "application/javascript; charset=utf-8"
-        }
-      ]
-    },
-    {
-      "source": "/assets/index-CJVcYSDx.css",
-      "headers": [
-        {
-          "key": "Content-Type",
-          "value": "text/css; charset=utf-8"
-        }
-      ]
-    }
-  ],
   "rewrites": [
     {
       "source": "/assets/:match*",
