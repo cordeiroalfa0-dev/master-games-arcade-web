@@ -9,7 +9,6 @@
   const originalFetch = window.fetch.bind(window);
   let catalogPromise;
   let titlesPromise;
-  let activeRomUrl = null;
 
   const jsonResponse = (data, status = 200) =>
     new Response(JSON.stringify(data), {
@@ -41,7 +40,7 @@
     return String(name || "").replace(/\.(zip|7z|chd)$/i, "");
   }
 
-  async function downloadRom(romName, message) {
+  async function resolveRom(romName, message) {
     const catalog = await loadCatalog();
     const item = (catalog.files || []).find((entry) => entry?.name === romName);
 
@@ -49,49 +48,13 @@
       throw new Error(`ROM não disponível para download: ${romName}`);
     }
 
-    const url = `/api/rom?id=${encodeURIComponent(item.id)}&name=${encodeURIComponent(item.name)}`;
-    message.textContent = `BAIXANDO ${item.name}...`;
-
-    const response = await originalFetch(url);
-    if (!response.ok || !response.body) {
-      let detail = `HTTP ${response.status}`;
-      try {
-        const data = await response.json();
-        detail = data?.error || detail;
-      } catch {}
-      throw new Error(`Não foi possível baixar ${item.name}: ${detail}`);
-    }
-
-    const total = Number(response.headers.get("content-length")) || 0;
-    const reader = response.body.getReader();
-    const chunks = [];
-    let received = 0;
-
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      chunks.push(value);
-      received += value.byteLength;
-      if (total > 0) {
-        const percent = Math.min(100, Math.round((received / total) * 100));
-        message.textContent = `BAIXANDO ${item.name}... ${percent}%`;
-      } else {
-        message.textContent = `BAIXANDO ${item.name}... ${(received / 1048576).toFixed(1)} MB`;
-      }
-    }
-
-    if (!received) {
-      throw new Error(`A ROM ${item.name} foi recebida vazia.`);
-    }
-
-    const blob = new Blob(chunks, {
-      type: response.headers.get("content-type") || "application/zip",
-    });
-
-    if (activeRomUrl) URL.revokeObjectURL(activeRomUrl);
-    activeRomUrl = URL.createObjectURL(blob);
-
-    return { item, url: activeRomUrl };
+    // Importante: a URL termina com .zip/.7z/.chd.
+    // O core MAME precisa receber a ROM como uma URL de arquivo real,
+    // não como blob:, para identificar corretamente o conteúdo e iniciar
+    // o jogo diretamente em vez de abrir o menu do RetroArch.
+    const romUrl = `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
+    message.textContent = `CARREGANDO ${item.name}...`;
+    return { item, url: romUrl };
   }
 
   function createWebPlayer(romName, romUrl, message, overlay) {
@@ -99,38 +62,34 @@
     iframe.title = `Master Games Arcade - ${cleanRomName(romName)}`;
     iframe.allow = "autoplay; fullscreen; gamepad";
     iframe.setAttribute("allowfullscreen", "true");
-    iframe.style.cssText = [
-      "position:absolute;inset:0;width:100%;height:100%;",
-      "border:0;background:#000;display:block;",
-    ].join("");
+    iframe.style.cssText = "position:absolute;inset:0;width:100%;height:100%;border:0;background:#000;display:block;";
 
     const playerUrl = new URL("/web/player.html", location.origin);
     playerUrl.searchParams.set("rom", romUrl);
     playerUrl.searchParams.set("name", cleanRomName(romName));
 
-    let settled = false;
+    let closed = false;
 
-    const finishLoading = () => {
-      if (settled) return;
-      settled = true;
-      message.remove();
+    const closePlayer = () => {
+      if (closed) return;
+      closed = true;
+      window.removeEventListener("message", onMessage);
+      iframe.src = "about:blank";
+      iframe.remove();
+      overlay.remove();
     };
 
     const onMessage = (event) => {
       if (event.origin !== location.origin || event.source !== iframe.contentWindow) return;
-      if (event.data?.type === "mga-emulator-started") finishLoading();
-      if (event.data?.type === "mga-emulator-exit") closePlayer();
-    };
-
-    const closePlayer = () => {
-      window.removeEventListener("message", onMessage);
-      iframe.src = "about:blank";
-      iframe.remove();
-      if (activeRomUrl) {
-        URL.revokeObjectURL(activeRomUrl);
-        activeRomUrl = null;
+      if (event.data?.type === "mga-emulator-started") {
+        message.remove();
       }
-      overlay.remove();
+      if (event.data?.type === "mga-emulator-exit") {
+        closePlayer();
+      }
+      if (event.data?.type === "mga-emulator-error") {
+        message.textContent = event.data.message || "Erro ao iniciar o jogo.";
+      }
     };
 
     window.addEventListener("message", onMessage);
@@ -149,23 +108,14 @@
 
       const overlay = document.createElement("div");
       overlay.id = "mga-web-player";
-      overlay.style.cssText = [
-        "position:fixed;inset:0;z-index:2147483647;background:#000;",
-        "overflow:hidden;font-family:Arial,sans-serif;",
-      ].join("");
+      overlay.style.cssText = "position:fixed;inset:0;z-index:2147483647;background:#000;overflow:hidden;font-family:Arial,sans-serif;";
 
       const area = document.createElement("div");
       area.id = "mga-web-player-area";
       area.style.cssText = "position:absolute;inset:0;background:#000;";
 
       const bar = document.createElement("div");
-      bar.style.cssText = [
-        "position:absolute;top:0;left:0;right:0;height:44px;z-index:20;",
-        "display:flex;align-items:center;justify-content:space-between;",
-        "padding:0 12px 0 14px;box-sizing:border-box;",
-        "background:linear-gradient(180deg,#08000f 0%,rgba(8,0,15,.78) 72%,transparent 100%);",
-        "color:#fff;pointer-events:none;",
-      ].join("");
+      bar.style.cssText = "position:absolute;top:0;left:0;right:0;height:44px;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 14px;box-sizing:border-box;background:linear-gradient(180deg,#08000f 0%,rgba(8,0,15,.78) 72%,transparent 100%);color:#fff;pointer-events:none;";
 
       const brand = document.createElement("strong");
       brand.textContent = "MASTER GAMES ARCADE";
@@ -175,22 +125,13 @@
       const close = document.createElement("button");
       close.type = "button";
       close.textContent = "✕ FECHAR";
-      close.style.cssText = [
-        "pointer-events:auto;background:#16051d;border:1px solid #ff2bd6;",
-        "box-shadow:0 0 10px #ff2bd655;color:#fff;padding:7px 12px;",
-        "cursor:pointer;font-weight:bold;font-family:Arial,sans-serif;",
-      ].join("");
+      close.style.cssText = "pointer-events:auto;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;padding:7px 12px;cursor:pointer;font-weight:bold;font-family:Arial,sans-serif;";
       bar.appendChild(close);
 
       const message = document.createElement("div");
       message.id = "mga-rom-message";
       message.textContent = `PREPARANDO ${romName}...`;
-      message.style.cssText = [
-        "position:absolute;inset:0;z-index:10;display:grid;place-items:center;",
-        "background:#000;color:#00e5ff;font-family:monospace;font-size:16px;",
-        "font-weight:bold;text-align:center;padding:24px;box-sizing:border-box;",
-        "text-shadow:0 0 8px #00e5ff;pointer-events:none;",
-      ].join("");
+      message.style.cssText = "position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:#000;color:#00e5ff;font-family:monospace;font-size:16px;font-weight:bold;text-align:center;padding:24px;box-sizing:border-box;text-shadow:0 0 8px #00e5ff;pointer-events:none;";
 
       overlay.append(area, message, bar);
       document.body.appendChild(overlay);
@@ -200,11 +141,11 @@
 
       (async () => {
         try {
-          const { item, url } = await downloadRom(romName, message);
+          const { item, url } = await resolveRom(romName, message);
           player = createWebPlayer(item.name, url, message, overlay);
           resolve();
         } catch (error) {
-          message.textContent = error?.message || "Falha ao baixar/iniciar a ROM.";
+          message.textContent = error?.message || "Falha ao iniciar a ROM.";
           reject(error);
         }
       })();
@@ -213,7 +154,7 @@
 
   window.MGA_WEB = Object.freeze({
     launch: showWebPlayer,
-    version: "1.3.0",
+    version: "1.4.0",
   });
 
   window.fetch = async function (input, init) {
@@ -223,9 +164,7 @@
 
     const isNativeApi = parsed.origin === NATIVE_API;
     const isLocalApi = parsed.origin === location.origin && parsed.pathname.startsWith(API_PREFIX);
-    if (!isNativeApi && !isLocalApi) {
-      return originalFetch(input, init);
-    }
+    if (!isNativeApi && !isLocalApi) return originalFetch(input, init);
 
     const path = parsed.pathname;
     const method = (init?.method || "GET").toUpperCase();
@@ -285,5 +224,5 @@
     return originalFetch(input, init);
   };
 
-  console.info("[MGA Web] Bridge WebAssembly 1.3.0 ativo — player isolado, ROM automática e inicialização direta.");
+  console.info("[MGA Web] Bridge WebAssembly 1.4.0 ativo — ROM por URL .zip e inicialização direta do MAME 2003 Plus.");
 })();
