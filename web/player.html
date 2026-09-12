@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Master Games Arcade - Player</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #000;
+    }
+
+    #game {
+      width: 100vw;
+      height: 100vh;
+      min-width: 100%;
+      min-height: 100%;
+      background: #000;
+    }
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+
+  <script>
+    (() => {
+      const params = new URLSearchParams(location.search);
+      const romUrl = params.get("rom");
+      const gameName = params.get("name") || "Master Games Arcade";
+
+      if (!romUrl) {
+        document.body.innerHTML = '<div style="height:100%;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 18px monospace">ROM NÃO INFORMADA</div>';
+        return;
+      }
+
+      // EmulatorJS é executado isoladamente neste documento para não interferir
+      // no renderer original do Master Games Arcade.
+      window.EJS_player = "#game";
+      window.EJS_gameName = gameName.replace(/\.(zip|7z|chd)$/i, "");
+      window.EJS_gameUrl = romUrl;
+      window.EJS_core = "mame";
+      window.EJS_controlScheme = "mame";
+      window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+      window.EJS_startOnLoaded = true;
+      window.EJS_askBeforeExit = false;
+      window.EJS_color = "#00e5ff";
+      window.EJS_backgroundColor = "#000000";
+      window.EJS_browserMode = "desktop";
+      window.EJS_disableAutoLang = true;
+      window.EJS_language = "pt-BR";
+      window.EJS_disableLocalStorage = false;
+
+      // O launcher possui seu próprio botão FECHAR; não precisamos do menu
+      // padrão do EmulatorJS ocupando a tela.
+      window.EJS_Buttons = {
+        playPause: false,
+        restart: false,
+        mute: false,
+        settings: false,
+        fullscreen: false,
+        saveState: false,
+        loadState: false,
+        screenRecord: false,
+        gamepad: false,
+        cheat: false,
+        volume: false,
+        saveSavFiles: false,
+        loadSavFiles: false,
+        quickSave: false,
+        quickLoad: false,
+        screenshot: false,
+        cacheManager: false,
+        exitEmulation: false
+      };
+
+      window.EJS_onGameStart = () => {
+        document.documentElement.focus();
+      };
+
+      window.EJS_onExit = () => {
+        try {
+          window.parent.postMessage({ type: "mga-emulator-exit" }, location.origin);
+        } catch {}
+      };
+
+      const script = document.createElement("script");
+      script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+      script.async = true;
+      script.onerror = () => {
+        document.body.innerHTML = '<div style="height:100%;display:grid;place-items:center;background:#000;color:#ff2bd6;font:700 18px monospace;text-align:center">NÃO FOI POSSÍVEL CARREGAR O EMULATORJS</div>';
+      };
+      document.head.appendChild(script);
+    })();
+  </script>
+</body>
+</html>
