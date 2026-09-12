@@ -3,6 +3,7 @@
  */
 (() => {
   const API_PREFIX = "/api/";
+  const NATIVE_API = "http://localhost:7777";
   const CATALOG_URL = "/roms-catalog.json";
   const TITLES_URL = "/game-titles.json";
   const originalFetch = window.fetch.bind(window);
@@ -36,7 +37,7 @@
   };
 
   function cleanRomName(name) {
-    return String(name || "").replace(/\\.(zip|7z|chd)$/i, "");
+    return String(name || "").replace(/\.(zip|7z|chd)$/i, "");
   }
 
   function showWebPlayer(romName) {
@@ -66,7 +67,7 @@
 
       const area = document.createElement("div");
       area.style.cssText = "position:relative;flex:1;min-height:0;background:#000;display:flex;align-items:center;justify-content:center;";
-      area.innerHTML = '<div id="mga-rom-message" style="color:#00e5ff;font-family:monospace;text-align:center;padding:24px">CARREGANDO...</div><div id="game" style="width:100%;height:100%;"></div>';
+      area.innerHTML = '<div id="mga-rom-message" style="color:#00e5ff;font-family:monospace;text-align:center;padding:24px"></div><div id="game" style="width:100%;height:100%;"></div>';
 
       overlay.append(bar, area);
       document.body.appendChild(overlay);
@@ -91,8 +92,10 @@
           window.EJS_core = "mame";
           window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
           window.EJS_startOnLoaded = true;
+
           const oldLoader = document.querySelector('script[data-mga-emulatorjs]');
           oldLoader?.remove();
+
           const script = document.createElement("script");
           script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
           script.async = true;
@@ -113,28 +116,32 @@
 
   window.MGA_WEB = Object.freeze({
     launch: showWebPlayer,
-    version: "1.0.0",
+    version: "1.1.0",
   });
 
   window.fetch = async function (input, init) {
-    const url = typeof input === "string" ? input : input?.url || "";
+    const rawUrl = typeof input === "string" ? input : input?.url || "";
     let parsed;
-    try { parsed = new URL(url, location.href); } catch { return originalFetch(input, init); }
-    if (parsed.origin !== location.origin || !parsed.pathname.startsWith(API_PREFIX)) {
+    try { parsed = new URL(rawUrl, location.href); } catch { return originalFetch(input, init); }
+
+    const isNativeApi = parsed.origin === NATIVE_API;
+    const isLocalApi = parsed.origin === location.origin && parsed.pathname.startsWith(API_PREFIX);
+    if (!isNativeApi && !isLocalApi) {
       return originalFetch(input, init);
     }
 
     const path = parsed.pathname;
+    const method = (init?.method || "GET").toUpperCase();
 
     if (path === "/api/health") {
       return jsonResponse({ ok: true, port: 0, version: "web-wasm", installDir: "", romsDir: "WEB" });
     }
 
-    if (path === "/api/config" && (!init || !init.method || init.method.toUpperCase() === "GET")) {
+    if (path === "/api/config" && method === "GET") {
       return jsonResponse({ mamePath: "WEBASSEMBLY", romsDir: "WEB", emulator: "mame-web" });
     }
 
-    if (path === "/api/config" && init?.method?.toUpperCase() === "POST") {
+    if (path === "/api/config" && method === "POST") {
       return jsonResponse({ ok: true, mamePath: "WEBASSEMBLY", romsDir: "WEB" });
     }
 
@@ -153,7 +160,7 @@
       return jsonResponse({ names: titles, details: {}, total: Object.keys(titles).length });
     }
 
-    if (path === "/api/launch" && init?.method?.toUpperCase() === "POST") {
+    if (path === "/api/launch" && method === "POST") {
       let body = {};
       try { body = JSON.parse(init.body || "{}"); } catch {}
       const romName = body.romName || "ROM";
@@ -169,8 +176,17 @@
       return jsonResponse({ running: false, completed: 0, total: 0, files: [] });
     }
 
+    if (path === "/api/roms/manifest") {
+      const catalog = await loadCatalog();
+      return jsonResponse(catalog);
+    }
+
+    if (path === "/api/set-rompath" || path === "/api/reset-controls" || path === "/api/test-mame") {
+      return jsonResponse({ ok: true, web: true });
+    }
+
     return originalFetch(input, init);
   };
 
-  console.info("[MGA Web] Bridge WebAssembly ativo — interface original preservada.");
+  console.info("[MGA Web] Bridge WebAssembly ativo — API localhost:7777 substituída no navegador.");
 })();
