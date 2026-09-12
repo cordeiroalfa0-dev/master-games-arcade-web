@@ -272,7 +272,19 @@
           const script = document.createElement("script");
           script.src = "/web/mame0168/mame.js";
           script.async = true;
-          script.onerror = () => fail("BUILD STANDALONE DO MAME 0.168 INDISPONÍVEL");
+          script.onerror = () => {
+            log("Build standalone ainda não publicado; usando fallback web compatível.");
+            window.EJS_player = "#game";
+            window.EJS_gameName = cleanName;
+            window.EJS_gameUrl = absoluteRomUrl;
+            window.EJS_core = "mame2003_plus";
+            window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
+            window.EJS_startOnLoaded = true;
+            const fallback = document.createElement("script");
+            fallback.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
+            fallback.onerror = () => fail("NÃO FOI POSSÍVEL CARREGAR O MAME WEB");
+            document.head.appendChild(fallback);
+          };
           document.head.appendChild(script);
         } catch (error) {
           fail(error?.message || "FALHA AO CARREGAR A ROM");
