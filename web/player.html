@@ -36,21 +36,38 @@
       (async () => {
         try {
           status.textContent = `BAIXANDO ${gameName}...`;
-          const response = await fetch(absoluteRomUrl, { method: "GET", cache: "no-store", credentials: "same-origin" });
-          if (!response.ok) throw new Error(`Servidor da ROM respondeu HTTP ${response.status}`);
+
+          const response = await fetch(absoluteRomUrl, {
+            method: "GET",
+            cache: "no-store",
+            credentials: "same-origin"
+          });
+
+          if (!response.ok) {
+            throw new Error(`Servidor da ROM respondeu HTTP ${response.status}`);
+          }
 
           const contentType = (response.headers.get("content-type") || "").toLowerCase();
           const bytes = new Uint8Array(await response.arrayBuffer());
-          if (!bytes.length) throw new Error("A ROM veio vazia.");
+
+          if (!bytes.length) {
+            throw new Error("A ROM veio vazia.");
+          }
 
           const isZip = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4b &&
-            ((bytes[2] === 0x03 && bytes[3] === 0x04) || (bytes[2] === 0x05 && bytes[3] === 0x06) || (bytes[2] === 0x07 && bytes[3] === 0x08));
-          const is7z = bytes.length >= 6 && bytes[0] === 0x37 && bytes[1] === 0x7a && bytes[2] === 0xbc && bytes[3] === 0xaf && bytes[4] === 0x27 && bytes[5] === 0x1c;
+            ((bytes[2] === 0x03 && bytes[3] === 0x04) ||
+             (bytes[2] === 0x05 && bytes[3] === 0x06) ||
+             (bytes[2] === 0x07 && bytes[3] === 0x08));
+          const is7z = bytes.length >= 6 && bytes[0] === 0x37 && bytes[1] === 0x7a &&
+            bytes[2] === 0xbc && bytes[3] === 0xaf && bytes[4] === 0x27 && bytes[5] === 0x1c;
           const isChd = bytes.length >= 8 && new TextDecoder().decode(bytes.slice(0, 8)) === "MComprHD";
 
           if (!(isZip || is7z || isChd)) {
-            const looksHtml = contentType.includes("text/html") || new TextDecoder().decode(bytes.slice(0, Math.min(bytes.length, 120))).toLowerCase().includes("<!doctype");
-            throw new Error(looksHtml ? "O Google Drive devolveu uma página HTML em vez da ROM." : "O arquivo recebido não é uma ROM ZIP/7Z/CHD válida.");
+            const looksHtml = contentType.includes("text/html") ||
+              new TextDecoder().decode(bytes.slice(0, Math.min(bytes.length, 120))).toLowerCase().includes("<!doctype");
+            throw new Error(looksHtml
+              ? "O Google Drive devolveu uma página HTML em vez da ROM."
+              : "O arquivo recebido não é uma ROM ZIP/7Z/CHD válida.");
           }
 
           status.textContent = `INICIANDO ${cleanName}...`;
@@ -59,7 +76,10 @@
           window.EJS_gameName = cleanName;
           window.EJS_gameTitle = cleanName;
           window.EJS_gameUrl = absoluteRomUrl;
-          window.EJS_gameParentUrl = new URL("/api/rom/1M3EmGFVuE0g_KWJDqGoqsYE1L46t70wq/neogeo.zip", location.origin).href;
+          window.EJS_gameParentUrl = new URL(
+            "/api/rom/1M3EmGFVuE0g_KWJDqGoqsYE1L46t70wq/neogeo.zip",
+            location.origin
+          ).href;
           window.EJS_core = "mame";
           window.EJS_controlScheme = "mame";
           window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
@@ -76,24 +96,22 @@
           window.EJS_language = "pt-BR";
 
           // Controles originais do Master Games Arcade.
-          // P1: setas + Z X C A S D + 1 START + 5 COIN + TAB MENU.
-          // P2: Numpad + A S Q W E R + 2 START + 6 COIN.
+          // A documentação do EmulatorJS usa os nomes de event.key para o teclado.
           window.EJS_defaultControls = {
             0: {
               0:  { value: "z", value2: "BUTTON_1" },
               1:  { value: "x", value2: "BUTTON_2" },
               2:  { value: "5", value2: "SELECT" },
               3:  { value: "1", value2: "START" },
-              4:  { value: "ArrowUp", value2: "DPAD_UP" },
-              5:  { value: "ArrowDown", value2: "DPAD_DOWN" },
-              6:  { value: "ArrowLeft", value2: "DPAD_LEFT" },
-              7:  { value: "ArrowRight", value2: "DPAD_RIGHT" },
+              4:  { value: "up arrow", value2: "DPAD_UP" },
+              5:  { value: "down arrow", value2: "DPAD_DOWN" },
+              6:  { value: "left arrow", value2: "DPAD_LEFT" },
+              7:  { value: "right arrow", value2: "DPAD_RIGHT" },
               8:  { value: "c", value2: "BUTTON_3" },
               9:  { value: "a", value2: "BUTTON_4" },
               10: { value: "s", value2: "BUTTON_5" },
               11: { value: "d", value2: "BUTTON_6" },
-              12: { value: "Tab", value2: "LEFT_BOTTOM_SHOULDER" },
-              13: { value: "", value2: "RIGHT_BOTTOM_SHOULDER" }
+              12: { value: "tab", value2: "LEFT_BOTTOM_SHOULDER" }
             },
             1: {
               0:  { value: "a", value2: "BUTTON_1" },
@@ -113,20 +131,33 @@
             3: {}
           };
 
-          // Numpad do teclado físico -> teclas internas exclusivas do P2.
-          const numpadMap = { Numpad8: "i", Numpad2: "k", Numpad4: "j", Numpad6: "l" };
+          // O teclado numérico do P2 é traduzido para teclas internas exclusivas,
+          // evitando conflito entre Numpad 2 (baixo) e START P2 (tecla 2 normal).
+          const numpadMap = {
+            Numpad8: "i",
+            Numpad2: "k",
+            Numpad4: "j",
+            Numpad6: "l"
+          };
+
+          const dispatchKey = (key, type) => {
+            const target = document.querySelector("canvas") || document;
+            const event = new KeyboardEvent(type, {
+              key,
+              code: key.length === 1 ? `Key${key.toUpperCase()}` : key,
+              bubbles: true,
+              cancelable: true,
+              composed: true
+            });
+            target.dispatchEvent(event);
+          };
 
           window.addEventListener("keydown", (event) => {
             const mapped = numpadMap[event.code];
             if (!mapped) return;
             event.preventDefault();
             event.stopImmediatePropagation();
-            document.dispatchEvent(new KeyboardEvent("keydown", {
-              key: mapped,
-              code: `Key${mapped.toUpperCase()}`,
-              bubbles: true,
-              cancelable: true
-            }));
+            dispatchKey(mapped, "keydown");
           }, true);
 
           window.addEventListener("keyup", (event) => {
@@ -134,21 +165,65 @@
             if (!mapped) return;
             event.preventDefault();
             event.stopImmediatePropagation();
-            document.dispatchEvent(new KeyboardEvent("keyup", {
-              key: mapped,
-              code: `Key${mapped.toUpperCase()}`,
-              bubbles: true,
-              cancelable: true
-            }));
+            dispatchKey(mapped, "keyup");
           }, true);
+
+          // Direções dos controles USB arcade: alguns DragonRise expõem o manche
+          // como eixos analógicos em vez de DPAD. Traduzimos os eixos para as
+          // mesmas teclas do P1/P2, mantendo compatibilidade com ambos os modos.
+          const gamepadState = new Map();
+          const gamepadKeys = [
+            ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
+            ["i", "k", "j", "l"]
+          ];
+
+          const updateArcadeDirections = () => {
+            const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+            for (let player = 0; player < 2; player++) {
+              const pad = pads[player];
+              if (!pad) continue;
+
+              const x = Number(pad.axes?.[0] || 0);
+              const y = Number(pad.axes?.[1] || 0);
+              const threshold = 0.35;
+              const wanted = {
+                [gamepadKeys[player][0]]: y < -threshold,
+                [gamepadKeys[player][1]]: y > threshold,
+                [gamepadKeys[player][2]]: x < -threshold,
+                [gamepadKeys[player][3]]: x > threshold
+              };
+
+              let state = gamepadState.get(player);
+              if (!state) {
+                state = {};
+                gamepadState.set(player, state);
+              }
+
+              for (const [key, pressed] of Object.entries(wanted)) {
+                if (pressed === !!state[key]) continue;
+                state[key] = pressed;
+                dispatchKey(key, pressed ? "keydown" : "keyup");
+              }
+            }
+            requestAnimationFrame(updateArcadeDirections);
+          };
+          requestAnimationFrame(updateArcadeDirections);
 
           const pressArcadeKey = (key, code, keyCode) => {
             const target = document.querySelector("canvas") || document;
             target.focus?.();
-            const event = new KeyboardEvent("keydown", { key, code, bubbles: true, cancelable: true, composed: true, keyCode, which: keyCode });
-            for (const prop of ["keyCode", "which"]) { try { Object.defineProperty(event, prop, { value: keyCode }); } catch {} }
+            const event = new KeyboardEvent("keydown", {
+              key, code, bubbles: true, cancelable: true,
+              composed: true, keyCode, which: keyCode
+            });
+            for (const prop of ["keyCode", "which"]) {
+              try { Object.defineProperty(event, prop, { value: keyCode }); } catch {}
+            }
             target.dispatchEvent(event);
-            setTimeout(() => target.dispatchEvent(new KeyboardEvent("keyup", { key, code, bubbles: true, cancelable: true, composed: true, keyCode, which: keyCode })), 100);
+            setTimeout(() => target.dispatchEvent(new KeyboardEvent("keyup", {
+              key, code, bubbles: true, cancelable: true,
+              composed: true, keyCode, which: keyCode
+            })), 100);
           };
 
           window.EJS_onGameStart = () => {
@@ -156,6 +231,7 @@
             try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
             document.documentElement.focus();
             setTimeout(() => document.querySelector("canvas")?.focus(), 1000);
+
             [6000, 11000, 16000, 21000, 26000].forEach((delay) => {
               setTimeout(() => {
                 pressArcadeKey("5", "Digit5", 53);
