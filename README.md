@@ -48,3 +48,27 @@ ROMs: armazenamento separado/CDN, evitando colocar vários GB de ROMs dentro do 
 ## Fonte
 
 O projeto reconstruído enviado anteriormente será usado como referência visual e funcional. O repositório original `master-games-arcade-system` permanece separado e não deve ser alterado durante esta migração.
+
+## BIOS servidas na raiz (mesmo ajuste da Neo Geo para todas)
+
+Toda BIOS é publicada na raiz do site com o nome exato do arquivo
+(`/neogeo.zip`, `/pgm.zip`, `/qsound.zip`, ...) através dos rewrites de
+`vercel.json` para `/api/bios`. O player usa esse caminho simples em
+`EJS_biosUrl` e mantém `EJS_dontExtractBIOS=true`, para o FBNeo fazer o merge
+do ZIP com o romset.
+
+- `neogeo.zip` — jogos Neo Geo
+- `qsound.zip` — CPS1 com QSound e todos os jogos CPS2 (Street Fighter Alpha,
+  Marvel vs. Capcom, Vampire Savior, Dino, Punisher, ...)
+- `pgm.zip` — placa PGM/IGS (Martial Masters, Knights of Valour, ...)
+- CPS3 (Street Fighter III, JoJo, Warzard) **não** usa BIOS externa: no romset
+  MAME/FBNeo o bios da placa já vem dentro do ZIP do próprio jogo. Se o jogo
+  não iniciar, falta o set `nocd` completo ou o CHD do CD, não uma BIOS.
+
+## Controles no celular
+
+- Intro: um toque na tela substitui "pressione qualquer tecla".
+- Launcher: mini-controle de toque (`web/mobile-nav.js`) que traduz os toques
+  em setas, Enter e Escape para a interface original, sem alterá-la.
+- Jogo: gamepad virtual do EmulatorJS forçado como ativado em telas de toque,
+  com layout de fliperama (alavanca + 6 botões + START e COIN).
