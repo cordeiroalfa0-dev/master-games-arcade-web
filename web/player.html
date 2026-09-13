@@ -135,22 +135,43 @@
           // ouvia o carregamento do EmulatorJS, então a UI parecia travada
           // mesmo quando o emulador terminava de iniciar por baixo dela.
           let gameStarted = false;
+          let coreReady = false;
           const hideStatusOverlay = () => {
+            status.style.display = "none";
+          };
+          window.EJS_onGameStart = () => {
             if (gameStarted) return;
             gameStarted = true;
-            status.style.display = "none";
+            hideStatusOverlay();
             try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
             log("EmulatorJS/FBNeo reportou início do jogo; overlay removido");
           };
-          window.EJS_onGameStart = hideStatusOverlay;
-          window.EJS_ready = () => log("EmulatorJS pronto (EJS_ready)");
+          // As versões atuais exibem um botão "Start Game" para exigir um gesto
+          // do usuário; liberamos o overlay e acionamos o botão quando possível.
+          const clickStartButton = () => {
+            const candidates = [...document.querySelectorAll("#game *")]
+              .filter((el) => el.children.length === 0 && /^\s*start game\s*$/i.test(el.textContent || ""));
+            const btn = candidates[0]?.closest("button, [role='button'], div, span") || candidates[0];
+            if (!btn) return false;
+            btn.click();
+            log("Clique automático no botão Start Game do EmulatorJS");
+            return true;
+          };
+          window.EJS_ready = () => {
+            coreReady = true;
+            log("EmulatorJS pronto (EJS_ready)");
+            hideStatusOverlay();
+            if (!clickStartButton()) {
+              const timer = setInterval(() => {
+                if (gameStarted || clickStartButton()) clearInterval(timer);
+              }, 500);
+            }
+          };
 
-          // Watchdog: se o FBNeo não confirmar o início em 30s (ex.: BIOS
-          // incompatível, CORS bloqueando o core, ROM/BIOS não reconhecidas),
-          // mostramos um erro em vez de deixar a tela travada para sempre.
+          // Watchdog: falha apenas se o core nem ficar pronto em 30s.
           setTimeout(() => {
-            if (!gameStarted) {
-              fail("FBNeo não iniciou em 30s. Verifique se o ZIP da ROM e o neogeo.zip da BIOS são compatíveis com o core FBNeo do EmulatorJS.");
+            if (!coreReady && !gameStarted) {
+              fail("Core FBNeo não carregou em 30s. Verifique sua conexão e se o ZIP da ROM e o neogeo.zip da BIOS são compatíveis com o core FBNeo do EmulatorJS.");
             }
           }, 30000);
 
