@@ -120,6 +120,81 @@
     manual.style.display='none';
   };
 
+  // ---------------------------------------------------------------
+  // Controles de teclado (valem para TODOS os jogos)
+  // Jogador 1: setas + Z X A S (socos/chutes), Enter = Start, Shift = Coin
+  // Jogador 2: T F G H + J K U I, V = Start, C = Coin
+  // ---------------------------------------------------------------
+  window.EJS_defaultControls={
+    0:{
+      0:{value:'z',value2:'BUTTON_2'},
+      1:{value:'a',value2:'BUTTON_4'},
+      2:{value:'shift',value2:'SELECT'},
+      3:{value:'enter',value2:'START'},
+      4:{value:'up arrow',value2:'DPAD_UP'},
+      5:{value:'down arrow',value2:'DPAD_DOWN'},
+      6:{value:'left arrow',value2:'DPAD_LEFT'},
+      7:{value:'right arrow',value2:'DPAD_RIGHT'},
+      8:{value:'x',value2:'BUTTON_1'},
+      9:{value:'s',value2:'BUTTON_3'},
+      10:{value:'q',value2:'LEFT_TOP_SHOULDER'},
+      11:{value:'w',value2:'RIGHT_TOP_SHOULDER'},
+      12:{value:'1',value2:'LEFT_BOTTOM_SHOULDER'},
+      13:{value:'2',value2:'RIGHT_BOTTOM_SHOULDER'},
+      14:{value:'',value2:'LEFT_STICK'},
+      15:{value:'',value2:'RIGHT_STICK'},
+      16:{value:'',value2:'LEFT_STICK_X:+1'},
+      17:{value:'',value2:'LEFT_STICK_X:-1'},
+      18:{value:'',value2:'LEFT_STICK_Y:+1'},
+      19:{value:'',value2:'LEFT_STICK_Y:-1'},
+      20:{value:'',value2:'RIGHT_STICK_X:+1'},
+      21:{value:'',value2:'RIGHT_STICK_X:-1'},
+      22:{value:'',value2:'RIGHT_STICK_Y:+1'},
+      23:{value:'',value2:'RIGHT_STICK_Y:-1'},
+      24:{value:''},25:{value:''},26:{value:''},27:{},28:{},29:{}
+    },
+    1:{
+      0:{value:'j',value2:'BUTTON_2'},
+      1:{value:'u',value2:'BUTTON_4'},
+      2:{value:'c',value2:'SELECT'},
+      3:{value:'v',value2:'START'},
+      4:{value:'t',value2:'DPAD_UP'},
+      5:{value:'g',value2:'DPAD_DOWN'},
+      6:{value:'f',value2:'DPAD_LEFT'},
+      7:{value:'h',value2:'DPAD_RIGHT'},
+      8:{value:'k',value2:'BUTTON_1'},
+      9:{value:'i',value2:'BUTTON_3'},
+      10:{value:'o',value2:'LEFT_TOP_SHOULDER'},
+      11:{value:'p',value2:'RIGHT_TOP_SHOULDER'},
+      12:{value:'3',value2:'LEFT_BOTTOM_SHOULDER'},
+      13:{value:'4',value2:'RIGHT_BOTTOM_SHOULDER'}
+    },
+    2:{},3:{}
+  };
+
+  const goFullscreen=()=>{
+    try{
+      const el=document.documentElement;
+      if(document.fullscreenElement)return;
+      const req=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;
+      if(req){
+        const p=req.call(el,{navigationUI:'hide'});
+        if(p&&p.catch)p.catch(err=>log('Tela cheia recusada: '+(err?.message||err)));
+        log('Tela cheia solicitada');
+      }
+    }catch(e){
+      log('Tela cheia falhou: '+(e?.message||e));
+    }
+  };
+
+  // F11 / tecla F alterna tela cheia sem sair do jogo.
+  addEventListener('keydown',e=>{
+    if(e.key==='F11'||e.code==='F11'){
+      e.preventDefault();
+      document.fullscreenElement?document.exitFullscreen():goFullscreen();
+    }
+  });
+
   window.EJS_onGameStart=()=>{
     if(started)return;
     started=true;
@@ -128,6 +203,7 @@
     if(startWatchdog)clearTimeout(startWatchdog);
     hide();
     log('Arcade/FBNeo iniciou o jogo');
+    goFullscreen();
 
     try{
       const fs=window.EJS_emulator?.gameManager?.FS;
@@ -186,6 +262,7 @@
 
   manual.addEventListener('click',()=>{
     manual.style.display='none';
+    goFullscreen();
     if(!tryStart()){
       log('Nenhum botão Start Game encontrado após clique');
       showManualStart();
@@ -235,58 +312,8 @@
     }
   },45000);
 
-  const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
-  const key=(k,type)=>{
-    const t=document.querySelector('canvas')||document;
-    t.dispatchEvent(new KeyboardEvent(type,{
-      key:k,
-      code:k.length===1?'Key'+k.toUpperCase():k,
-      bubbles:true,
-      cancelable:true,
-      composed:true
-    }));
-  };
-
-  addEventListener('keydown',e=>{
-    if(map[e.code]){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      key(map[e.code],'keydown');
-    }
-  },true);
-
-  addEventListener('keyup',e=>{
-    if(map[e.code]){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      key(map[e.code],'keyup');
-    }
-  },true);
-
-  const pads=new Map();
-  const pkeys=[['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'],['i','k','j','l']];
-  const poll=()=>{
-    const gs=navigator.getGamepads?navigator.getGamepads():[];
-    for(let p=0;p<2;p++){
-      const g=gs[p];
-      if(!g)continue;
-      const x=+(g.axes?.[0]||0),y=+(g.axes?.[1]||0),s=pads.get(p)||{};
-      const w={
-        [pkeys[p][0]]:y<-.35,
-        [pkeys[p][1]]:y>.35,
-        [pkeys[p][2]]:x<-.35,
-        [pkeys[p][3]]:x>.35
-      };
-      for(const [k,v] of Object.entries(w)){
-        if(v===!!s[k])continue;
-        s[k]=v;
-        key(k,v?'keydown':'keyup');
-      }
-      pads.set(p,s);
-    }
-    requestAnimationFrame(poll);
-  };
-  requestAnimationFrame(poll);
+  // Os controles de teclado e gamepad são tratados pelo próprio EmulatorJS
+  // através de EJS_defaultControls (mapa acima). Nenhum remapeamento manual.
 
   const script=document.createElement('script');
   script.src='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/loader.js';
