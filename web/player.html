@@ -27,14 +27,17 @@
  const parentUrl=parentRom?new URL(parentRom,location.origin).href:'';
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo URL: '+parentUrl);
 
- // Para Neo Geo usamos o mecanismo oficial de BIOS do EmulatorJS.
- // O ZIP é baixado como BIOS e NÃO é extraído. Isso evita o conflito
- // causado por EJS_externalFiles e preserva o neogeo.zip como arquivo,
- // que é o formato que o FBNeo valida.
+ // O EmulatorJS 4.2.x possui um detalhe importante no tratamento de BIOS:
+ // quando EJS_biosUrl recebe uma URL completa, dontExtractBIOS tenta gravar
+ // essa URL como caminho no FS. Para Neo Geo precisamos que o arquivo físico
+ // se chame exatamente /neogeo.zip. EJS_paths permite manter o nome lógico
+ // "neogeo.zip" e buscar os bytes na nossa URL do Google Drive/proxy.
  if(parentUrl){
-   window.EJS_biosUrl=parentUrl;
+   window.EJS_biosUrl='neogeo.zip';
+   window.EJS_paths=window.EJS_paths||{};
+   window.EJS_paths['neogeo.zip']=parentUrl;
    window.EJS_dontExtractBIOS=true;
-   log('BIOS Neo Geo configurado via EJS_biosUrl como ZIP sem extração');
+   log('BIOS Neo Geo configurado como /neogeo.zip sem extração');
  }else{
    window.EJS_biosUrl='';
    window.EJS_dontExtractBIOS=false;
@@ -65,7 +68,7 @@
    try{
      const fs=window.EJS_emulator?.gameManager?.FS;
      if(fs){
-       const checks=['/home/web_user/retroarch/userdata/system/neogeo.zip','/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip','/neogeo.zip'];
+       const checks=['/neogeo.zip','/home/web_user/retroarch/userdata/system/neogeo.zip','/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip'];
        const found=checks.filter(p=>{try{fs.stat(p);return true}catch{return false}});
        log('neogeo.zip encontrado no FS: '+(found.length?found.join(' | '):'NENHUM'));
      }
