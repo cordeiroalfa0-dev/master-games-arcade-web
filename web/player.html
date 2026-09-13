@@ -1,283 +1,68 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
   <title>Master Games Arcade - Player</title>
   <style>
-    html, body { margin:0; width:100%; height:100%; overflow:hidden; background:#000; }
-    #game { width:100vw; height:100vh; min-width:100%; min-height:100%; background:#000; }
-    #status { position:fixed; inset:0; z-index:99999; display:grid; place-items:center; background:#000; color:#00e5ff; font:700 16px monospace; text-align:center; padding:24px; box-sizing:border-box; white-space:pre-wrap; }
-    #debug { position:fixed; left:10px; right:10px; bottom:10px; z-index:100000; max-height:42vh; overflow:auto; display:none; background:rgba(0,0,0,.88); border:1px solid #00e5ff; color:#00e5ff; padding:10px; box-sizing:border-box; font:12px/1.35 monospace; white-space:pre-wrap; pointer-events:none; }
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+    #game{width:100vw;height:100vh;background:#000}
+    #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap}
+    #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
   </style>
 </head>
 <body>
-    <div id="game"></div>
-  <div id="status">BAIXANDO ROM...</div>
-  <pre id="debug"></pre>
-  <script>
-    (() => {
-      const params = new URLSearchParams(location.search);
-      const romUrl = params.get("rom");
-      const parentUrl = params.get("parent") || "";
-      const gameName = params.get("name") || "Master Games Arcade";
-      const cleanName = gameName.replace(/\.(zip|7z|chd)$/i, "");
-      const status = document.getElementById("status");
-      const debug = document.getElementById("debug");
-
-      const diagnostic = [];
-      const log = (text) => {
-        const line = `[${new Date().toLocaleTimeString()}] ${text}`;
-        diagnostic.push(line);
-        if (diagnostic.length > 80) diagnostic.shift();
-        debug.textContent = diagnostic.join("\n");
-        console.log("[MGA]", text);
-      };
-
-      const fail = (text) => {
-        status.textContent = text;
-        status.style.color = "#ff2bd6";
-        debug.style.display = "block";
-        log(`ERRO: ${text}`);
-      };
-
-
-      window.addEventListener("error", (event) => {
-        log(`window.error: ${event.message || "erro desconhecido"}`);
-      });
-      window.addEventListener("unhandledrejection", (event) => {
-        log(`unhandledrejection: ${event.reason?.message || String(event.reason)}`);
-      });
-
-      if (!romUrl) {
-        fail("ROM NÃO INFORMADA");
-        return;
-      }
-
-      const absoluteRomUrl = new URL(romUrl, location.origin).href;
-      log(`Jogo: ${cleanName}`);
-      log(`ROM: ${absoluteRomUrl}`);
-
-      (async () => {
-        try {
-          status.textContent = `BAIXANDO ${gameName}...`;
-
-          const response = await fetch(absoluteRomUrl, {
-            method: "GET",
-            cache: "no-store",
-            credentials: "same-origin"
-          });
-
-          if (!response.ok) {
-            throw new Error(`Servidor da ROM respondeu HTTP ${response.status}`);
-          }
-
-          const contentType = (response.headers.get("content-type") || "").toLowerCase();
-          const contentLength = response.headers.get("content-length") || "desconhecido";
-          const bytes = new Uint8Array(await response.arrayBuffer());
-
-          // IMPORTANTE: o FBNeo (core "arcade"/"fbneo" do EmulatorJS) já sabe
-          // combinar o ZIP do jogo com o ZIP de BIOS via EJS_gameParentUrl.
-          // Fazer merge manual de ZIP (renomeando arquivos "na mão") corrompe
-          // o conjunto de BIOS esperado pelo core e faz o FBNeo travar
-          // silenciosamente em "INICIANDO FBNeo". Aqui só baixamos o BIOS
-          // sem alterá-lo e deixamos o core cuidar da combinação.
-          let biosObjectUrl = "";
-          if (parentUrl) {
-            const biosResponse = await fetch(new URL(parentUrl, location.origin), { cache: "no-store", credentials: "same-origin" });
-            if (!biosResponse.ok) throw new Error(`BIOS Neo Geo respondeu HTTP ${biosResponse.status}`);
-            const biosBytes = new Uint8Array(await biosResponse.arrayBuffer());
-            biosObjectUrl = URL.createObjectURL(new Blob([biosBytes], { type: "application/zip" }));
-            log(`BIOS Neo Geo baixada sem modificações (${biosBytes.length} bytes)`);
-          }
-
-          log(`Download: ${bytes.length} bytes; Content-Type: ${contentType || "desconhecido"}; Header: ${contentLength}`);
-
-          if (!bytes.length) {
-            throw new Error("A ROM veio vazia.");
-          }
-
-          const isZip = bytes.length >= 4 && bytes[0] === 0x50 && bytes[1] === 0x4b &&
-            ((bytes[2] === 0x03 && bytes[3] === 0x04) ||
-             (bytes[2] === 0x05 && bytes[3] === 0x06) ||
-             (bytes[2] === 0x07 && bytes[3] === 0x08));
-          const is7z = bytes.length >= 6 && bytes[0] === 0x37 && bytes[1] === 0x7a &&
-            bytes[2] === 0xbc && bytes[3] === 0xaf && bytes[4] === 0x27 && bytes[5] === 0x1c;
-          const isChd = bytes.length >= 8 && new TextDecoder().decode(bytes.slice(0, 8)) === "MComprHD";
-
-          log(`Formato detectado: ${isZip ? "ZIP" : is7z ? "7Z" : isChd ? "CHD" : "desconhecido"}`);
-
-          if (!(isZip || is7z || isChd)) {
-            const looksHtml = contentType.includes("text/html") ||
-              new TextDecoder().decode(bytes.slice(0, Math.min(bytes.length, 120))).toLowerCase().includes("<!doctype");
-            throw new Error(looksHtml
-              ? "O Google Drive devolveu uma página HTML em vez da ROM."
-              : "O arquivo recebido não é uma ROM ZIP/7Z/CHD válida.");
-          }
-
-          status.textContent = `INICIANDO FBNeo — ${cleanName}...`;
-          const romObjectUrl = URL.createObjectURL(new Blob([bytes], { type: "application/zip" }));
-          window.EJS_player = "#game";
-          window.EJS_core = "fbneo";
-          window.EJS_gameName = cleanName;
-          window.EJS_gameUrl = romObjectUrl;
-          if (biosObjectUrl) {
-            window.EJS_gameParentUrl = biosObjectUrl;
-            log("BIOS associada via EJS_gameParentUrl");
-          }
-          window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
-          window.EJS_startOnLoad = true;
-          window.EJS_color = "#00e5ff";
-          window.EJS_backgroundColor = "#000";
-
-          // A tela "INICIANDO FBNeo..." (#status) cobre o canvas com
-          // z-index alto e, antes deste patch, NUNCA era escondida: nada
-          // ouvia o carregamento do EmulatorJS, então a UI parecia travada
-          // mesmo quando o emulador terminava de iniciar por baixo dela.
-          let gameStarted = false;
-          let coreReady = false;
-          const hideStatusOverlay = () => {
-            status.style.display = "none";
-          };
-          window.EJS_onGameStart = () => {
-            if (gameStarted) return;
-            gameStarted = true;
-            hideStatusOverlay();
-            try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
-            log("EmulatorJS/FBNeo reportou início do jogo; overlay removido");
-          };
-          // As versões atuais exibem um botão "Start Game" para exigir um gesto
-          // do usuário; liberamos o overlay e acionamos o botão quando possível.
-          const clickStartButton = () => {
-            const candidates = [...document.querySelectorAll("#game *")]
-              .filter((el) => el.children.length === 0 && /^\s*start game\s*$/i.test(el.textContent || ""));
-            const btn = candidates[0]?.closest("button, [role='button'], div, span") || candidates[0];
-            if (!btn) return false;
-            btn.click();
-            log("Clique automático no botão Start Game do EmulatorJS");
-            return true;
-          };
-          window.EJS_ready = () => {
-            coreReady = true;
-            log("EmulatorJS pronto (EJS_ready)");
-            hideStatusOverlay();
-            if (!clickStartButton()) {
-              const timer = setInterval(() => {
-                if (gameStarted || clickStartButton()) clearInterval(timer);
-              }, 500);
-            }
-          };
-
-          // Watchdog: falha apenas se o core nem ficar pronto em 30s.
-          setTimeout(() => {
-            if (!coreReady && !gameStarted) {
-              fail("Core FBNeo não carregou em 30s. Verifique sua conexão e se o ZIP da ROM e o neogeo.zip da BIOS são compatíveis com o core FBNeo do EmulatorJS.");
-            }
-          }, 30000);
-
-          log("Core selecionado: FinalBurn Neo (FBNeo)");
-
-          const numpadMap = {
-            Numpad8: "i",
-            Numpad2: "k",
-            Numpad4: "j",
-            Numpad6: "l"
-          };
-
-          const dispatchKey = (key, type) => {
-            const target = document.querySelector("canvas") || document;
-            const event = new KeyboardEvent(type, {
-              key,
-              code: key.length === 1 ? `Key${key.toUpperCase()}` : key,
-              bubbles: true,
-              cancelable: true,
-              composed: true
-            });
-            target.dispatchEvent(event);
-          };
-
-          window.addEventListener("keydown", (event) => {
-            const mapped = numpadMap[event.code];
-            if (!mapped) return;
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            dispatchKey(mapped, "keydown");
-          }, true);
-
-          window.addEventListener("keyup", (event) => {
-            const mapped = numpadMap[event.code];
-            if (!mapped) return;
-            event.preventDefault();
-            event.stopImmediatePropagation();
-            dispatchKey(mapped, "keyup");
-          }, true);
-
-          const gamepadState = new Map();
-          const gamepadKeys = [
-            ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"],
-            ["i", "k", "j", "l"]
-          ];
-
-          const updateArcadeDirections = () => {
-            const pads = navigator.getGamepads ? navigator.getGamepads() : [];
-            for (let player = 0; player < 2; player++) {
-              const pad = pads[player];
-              if (!pad) continue;
-
-              const x = Number(pad.axes?.[0] || 0);
-              const y = Number(pad.axes?.[1] || 0);
-              const threshold = 0.35;
-              const wanted = {
-                [gamepadKeys[player][0]]: y < -threshold,
-                [gamepadKeys[player][1]]: y > threshold,
-                [gamepadKeys[player][2]]: x < -threshold,
-                [gamepadKeys[player][3]]: x > threshold
-              };
-
-              let state = gamepadState.get(player);
-              if (!state) {
-                state = {};
-                gamepadState.set(player, state);
-              }
-
-              for (const [key, pressed] of Object.entries(wanted)) {
-                if (pressed === !!state[key]) continue;
-                state[key] = pressed;
-                dispatchKey(key, pressed ? "keydown" : "keyup");
-              }
-            }
-            requestAnimationFrame(updateArcadeDirections);
-          };
-          requestAnimationFrame(updateArcadeDirections);
-
-          const pressArcadeKey = (key, code, keyCode) => {
-            const target = document.querySelector("canvas") || document;
-            target.focus?.();
-            const event = new KeyboardEvent("keydown", {
-              key, code, bubbles: true, cancelable: true,
-              composed: true, keyCode, which: keyCode
-            });
-            for (const prop of ["keyCode", "which"]) {
-              try { Object.defineProperty(event, prop, { value: keyCode }); } catch {}
-            }
-            target.dispatchEvent(event);
-            setTimeout(() => target.dispatchEvent(new KeyboardEvent("keyup", {
-              key, code, bubbles: true, cancelable: true,
-              composed: true, keyCode, which: keyCode
-            })), 100);
-          };
-
-          const script = document.createElement("script");
-          script.src = "https://cdn.emulatorjs.org/stable/data/loader.js";
-          script.async = true;
-          script.onerror = () => fail("Core FBNeo não carregou do CDN do EmulatorJS");
-          document.head.appendChild(script);
-        } catch (error) {
-          fail(error?.message || "FALHA AO CARREGAR A ROM");
-          try { window.parent.postMessage({ type: "mga-emulator-error", message: error?.message || "Falha ao carregar a ROM." }, location.origin); } catch {}
-        }
-      })();
-    })();
-  </script>
+<div id="game"></div><div id="status">CARREGANDO...</div><pre id="debug"></pre>
+<script>
+(()=>{
+ const q=new URLSearchParams(location.search),rom=q.get('rom'),parentRom=q.get('parent')||'',name=q.get('name')||'Master Games Arcade';
+ const status=document.getElementById('status'),debug=document.getElementById('debug'),logs=[];
+ const log=x=>{logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);if(logs.length>60)logs.shift();debug.textContent=logs.join('\n');console.log('[MGA]',x)};
+ const fail=x=>{status.textContent=x;status.style.color='#ff2bd6';debug.style.display='block';log('ERRO: '+x);try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}};
+ addEventListener('error',e=>log('window.error: '+(e.message||'erro')));
+ addEventListener('unhandledrejection',e=>log('unhandledrejection: '+(e.reason?.message||e.reason)));
+ if(!rom){fail('ROM NÃO INFORMADA');return}
+ const romUrl=new URL(rom,location.origin).href;
+ const parentUrl=parentRom?new URL(parentRom,location.origin).href:'';
+ log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('Parent/BIOS URL: '+parentUrl);
+ 
+ // Não fazemos download da ROM para ArrayBuffer/Blob antes do EmulatorJS.
+ // O player recebe a URL HTTP do endpoint da Vercel e o próprio EmulatorJS
+ // administra o download e o carregamento do ZIP/CHD. Isso evita baixar a
+ // ROM duas vezes e evita que jogos grandes desapareçam da tela.
+ status.textContent='INICIANDO FBNeo — '+name+'...';
+ window.EJS_player='#game';
+ window.EJS_core='fbneo';
+ window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
+ window.EJS_gameUrl=romUrl;
+ window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
+ window.EJS_startOnLoad=true;
+ window.EJS_color='#00e5ff';
+ window.EJS_backgroundColor='#000';
+ if(parentUrl)window.EJS_gameParentUrl=parentUrl;
+ 
+ let ready=false,started=false;
+ const hide=()=>{status.style.display='none'};
+ window.EJS_onGameStart=()=>{if(started)return;started=true;hide();log('FBNeo iniciou o jogo');try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}};
+ const tryStart=()=>{
+   const els=[...document.querySelectorAll('#game button,#game [role="button"]')];
+   const b=els.find(e=>/^\s*start game\s*$/i.test(e.textContent||''));
+   if(b){b.click();log('Start Game acionado');return true}return false;
+ };
+ window.EJS_ready=()=>{ready=true;log('EmulatorJS pronto');if(!tryStart()){
+   const t=setInterval(()=>{if(started||tryStart())clearInterval(t)},500);
+ }};
+ setTimeout(()=>{if(!ready&&!started)fail('FBNeo não carregou em 30s. Verifique a ROM/BIOS e o endpoint de download.')},30000);
+ 
+ // Controles auxiliares do gabinete.
+ const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
+ const key=(k,type)=>{const t=document.querySelector('canvas')||document;t.dispatchEvent(new KeyboardEvent(type,{key:k,code:k.length===1?'Key'+k.toUpperCase():k,bubbles:true,cancelable:true,composed:true}))};
+ addEventListener('keydown',e=>{if(map[e.code]){e.preventDefault();e.stopImmediatePropagation();key(map[e.code],'keydown')}},true);
+ addEventListener('keyup',e=>{if(map[e.code]){e.preventDefault();e.stopImmediatePropagation();key(map[e.code],'keyup')}},true);
+ const pads=new Map(),pkeys=[['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'],['i','k','j','l']];
+ const poll=()=>{const gs=navigator.getGamepads?navigator.getGamepads():[];for(let p=0;p<2;p++){const g=gs[p];if(!g)continue;const x=+(g.axes?.[0]||0),y=+(g.axes?.[1]||0),s=pads.get(p)||{},w={[pkeys[p][0]]:y<-.35,[pkeys[p][1]]:y>.35,[pkeys[p][2]]:x<-.35,[pkeys[p][3]]:x>.35};for(const [k,v]of Object.entries(w)){if(v===!!s[k])continue;s[k]=v;key(k,v?'keydown':'keyup')}pads.set(p,s)}requestAnimationFrame(poll)};requestAnimationFrame(poll);
+ const script=document.createElement('script');script.src='https://cdn.emulatorjs.org/stable/data/loader.js';script.async=true;script.onerror=()=>fail('Não foi possível carregar o EmulatorJS pelo CDN.');document.head.appendChild(script);
+})();
+</script>
 </body>
 </html>
