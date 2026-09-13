@@ -184,13 +184,30 @@
 
   window.EJS_ready=()=>{
     ready=true;
-    // O EmulatorJS exibe seu próprio botão Start Game. Não o acionamos por
-    // script: um segundo clique durante a inicialização causa
-    // "toggleMainLoop undefined". O usuário deve clicar uma única vez no
-    // botão nativo quando ele aparecer.
     status.style.display='none';
     manual.style.display='none';
-    log('EmulatorJS pronto; clique uma única vez no botão nativo Start Game');
+    log('EmulatorJS pronto; iniciando o core Arcade...');
+
+    // Em alguns celulares o clique no botão visual não chega ao método
+    // interno do EmulatorJS e a tela fica preta. EJS_ready já indica que o
+    // módulo está pronto; aguardamos um ciclo para evitar a corrida
+    // "toggleMainLoop undefined" e chamamos a API oficial uma única vez.
+    setTimeout(()=>{
+      if(started||attempting)return;
+      const emulator=window.EJS_emulator;
+      if(!emulator?.startGame){
+        log('API startGame ainda não disponível; aguardando o botão nativo.');
+        return;
+      }
+      attempting=true;
+      try{
+        emulator.startGame();
+        log('startGame() acionado pelo player');
+      }catch(e){
+        attempting=false;
+        log('Falha ao iniciar o core: '+(e?.message||e));
+      }
+    },1200);
   };
 
   addEventListener('error',e=>{
