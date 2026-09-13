@@ -1,21 +1,51 @@
-// CORRIGIDO: endpoint dedicado pra servir arquivos de BIOS (ex: neogeo.zip)
-// através de query string (?id=...&name=...) em vez de segmentos de path
-// (/api/rom/{id}/{name}). Isso evita um bug conhecido do EmulatorJS até a
-// versão 4.2.3 (corrigido só na 4.3.0-pre): "Fix EJS_dontExtractBIOS if the
-// bios url has a '/' in its path". Como o core arcade/FBNeo EXIGE
-// EJS_dontExtractBIOS=true para funcionar com BIOS zipadas (neogeo.zip,
-// pgm.zip, isgsm.zip), a URL da BIOS não pode ter path com múltiplos
-// segmentos enquanto estivermos pinados na 4.2.3.
-// A URL da ROM do jogo (api/rom/[id]/[name].js) NÃO precisa dessa mudança,
-// pois não passa pelo mecanismo de dontExtractBIOS.
+// Endpoint dedicado para servir arquivos de BIOS (neogeo.zip, pgm.zip, ...).
+//
+// Como o core arcade/FBNeo do EmulatorJS exige EJS_dontExtractBIOS=true e a
+// versão 4.2.3 grava a BIOS usando a PRÓPRIA URL como caminho no sistema de
+// arquivos do core, a página NÃO pode apontar para "/api/bios?...". O site
+// expõe a BIOS na raiz (ex.: https://site/neogeo.zip) e a vercel.json
+// reescreve esse caminho para cá.
+//
+// O ID do Google Drive é resolvido pelo próprio catálogo (roms-manifest.json),
+// então não é preciso manter IDs fixos em vários lugares.
 export const config = {
   runtime: "nodejs",
   maxDuration: 300,
 };
 
+const CATALOG_URL =
+  "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/roms-manifest.json";
+
+let catalogCache = null;
+let catalogCachedAt = 0;
+
+async function loadCatalog() {
+  const now = Date.now();
+  if (catalogCache && now - catalogCachedAt < 5 * 60 * 1000) return catalogCache;
+
+  const response = await fetch(CATALOG_URL, {
+    headers: { "User-Agent": "MasterGamesArcade-Web/1.1", Accept: "application/json" },
+  });
+  if (!response.ok) throw new Error(`Catálogo respondeu ${response.status}.`);
+
+  const data = await response.json();
+  catalogCache = Array.isArray(data?.files) ? data.files : [];
+  catalogCachedAt = now;
+  return catalogCache;
+}
+
+async function resolveBiosId(name) {
+  const wanted = String(name || "").toLowerCase();
+  const files = await loadCatalog();
+  const match = files.find(
+    (file) => String(file?.name || "").toLowerCase() === wanted && !file?.skipDownload
+  );
+  return match?.id ? String(match.id).trim() : "";
+}
+
 export default async function handler(req, res) {
-  const id = String(req.query?.id || "").trim();
   const name = String(req.query?.name || "bios.zip").trim() || "bios.zip";
+  let id = String(req.query?.id || "").trim();
 
   if (req.method === "OPTIONS") {
     res.status(204).end();
@@ -24,6 +54,26 @@ export default async function handler(req, res) {
 
   if (req.method !== "GET" && req.method !== "HEAD") {
     res.status(405).json({ ok: false, error: "Método não permitido." });
+    return;
+  }
+
+  if (!id) {
+    try {
+      id = await resolveBiosId(name);
+    } catch (error) {
+      res.status(502).json({
+        ok: false,
+        error: error?.message || "Falha ao consultar o catálogo de ROMs.",
+      });
+      return;
+    }
+  }
+
+  if (!id) {
+    res.status(404).json({
+      ok: false,
+      error: `BIOS ${name} não encontrada no catálogo.`,
+    });
     return;
   }
 
