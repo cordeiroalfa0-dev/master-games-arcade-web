@@ -84,7 +84,17 @@
     if (path === "/api/check-mame") return jsonResponse({ exists: true, path: "WEBASSEMBLY", currentRompath: "WEB", emulator: "arcade-fba-0.2.97.42" });
     if (path === "/api/art") return jsonResponse({ ok: false, available: false, url: null }, 404);
     if (path === "/api/roms") { const catalog = await loadCatalog(); const roms = (catalog.files || []).map((item) => item.name).filter(Boolean).sort((a, b) => a.localeCompare(b)); return jsonResponse({ roms, path: "WEB", total: roms.length }); }
-    if (path === "/api/gamenames") { const titles = await loadTitles(); return jsonResponse({ names: titles, details: {}, total: Object.keys(titles).length }); }
+    if (path === "/api/gamenames") {
+      const [titles, catalog] = await Promise.all([loadTitles(), loadCatalog()]);
+      const names = { ...titles };
+      for (const item of catalog.files || []) {
+        const name = String(item?.name || "");
+        if (!/\.(zip|7z|chd)$/i.test(name)) continue;
+        const key = fileBase(name);
+        if (key && !names[key]) names[key] = key.replace(/[-_]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
+      }
+      return jsonResponse({ names, details: {}, total: Object.keys(names).length });
+    }
     if (path === "/api/launch" && method === "POST") { let body = {}; try { body = JSON.parse(init.body || "{}"); } catch {} const romName = body.romName || "ROM"; try { await showWebPlayer(romName); return jsonResponse({ ok: true, web: true, romName }); } catch (error) { return jsonResponse({ ok: false, error: error?.message || "Falha no player WebAssembly" }, 500); } }
     if (path === "/api/roms/status") return jsonResponse({ running: false, completed: 0, total: 0, files: [] });
     if (path === "/api/roms/manifest") { const catalog = await loadCatalog(); return jsonResponse(catalog); }
