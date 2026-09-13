@@ -142,14 +142,13 @@
       (entry) => fileBase(entry?.name) === fileBase(biosName)
     );
 
-    // A BIOS precisa ser servida na RAIZ do site com o nome exato
-    // (ex.: /neogeo.zip). Com EJS_dontExtractBIOS=true o EmulatorJS 4.2.3
-    // grava a BIOS usando a própria URL como caminho no sistema de
-    // arquivos: uma URL com query string ("/api/bios?id=...") gerava um
-    // caminho inválido e a BIOS nunca chegava ao core. O rewrite da Vercel
-    // encaminha /neogeo.zip, /pgm.zip e /isgsm.zip para /api/bios.
+    // O player recebe a BIOS pela rota dinâmica anterior, que mantém a
+    // resolução do catálogo no backend e funciona com o fluxo padrão do
+    // EmulatorJS para ZIPs de BIOS.
     const biosUrl =
-      bios && !bios.skipDownload ? `/${bios.name}` : "";
+      bios && !bios.skipDownload
+        ? `/api/bios?name=${encodeURIComponent(bios.name)}`
+        : "";
 
     if (!biosName && SELF_CONTAINED_BIOS.has(fileBase(item.name))) {
       console.info(
