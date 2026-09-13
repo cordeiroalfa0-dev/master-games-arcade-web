@@ -18,9 +18,24 @@
 (async()=>{
  const q=new URLSearchParams(location.search),rom=q.get('rom'),biosUrl=q.get('bios')||'',biosName=q.get('biosName')||'',name=q.get('name')||'Master Games Arcade';
  const status=document.getElementById('status'),debug=document.getElementById('debug'),manual=document.getElementById('manual-start'),logs=[];
+ let retriedAfterRace=false;
  const log=x=>{logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);if(logs.length>80)logs.shift();debug.textContent=logs.join('\n');console.log('[MGA]',x)};
  const fail=x=>{status.textContent=x;status.style.color='#ff2bd6';debug.style.display='block';manual.style.display='none';log('ERRO: '+x);try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}};
- addEventListener('error',e=>log('window.error: '+(e.message||'erro')));
+ addEventListener('error',e=>{
+   const msg=e.message||'erro';
+   log('window.error: '+msg);
+   // Corrida conhecida: EJS_ready avisa que a UI está pronta, mas o core
+   // pesado (FBNeo) pode ainda estar compilando/alocando memória quando
+   // clicamos em Start Game — Module.toggleMainLoop só existe depois que
+   // o core termina de inicializar de verdade. Se isso acontecer, esperamos
+   // o core acomodar e tentamos iniciar de novo (só uma vez).
+   if(/toggleMainLoop/.test(msg)&&!started&&!retriedAfterRace){
+     retriedAfterRace=true;
+     log('Core ainda inicializando (toggleMainLoop indisponível) — tentando de novo em 2.5s...');
+     attempting=false;
+     setTimeout(()=>{if(!started)tryStart()},2500);
+   }
+ });
  addEventListener('unhandledrejection',e=>log('unhandledrejection: '+(e.reason?.message||e.reason)));
  if(!rom){fail('ROM NÃO INFORMADA');return}
  const romUrl=new URL(rom,location.origin).href;
@@ -55,10 +70,11 @@
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
  // ArrayBuffer/Blob da ROM antes do player para evitar download duplicado.
- status.textContent='INICIANDO Arcade/FBA 0.2.97.42 — '+name+'...';
+ status.textContent='INICIANDO Arcade (FBNeo) — '+name+'...';
  window.EJS_player='#game';
-   // O catálogo informa ROMs do set FBA 0.2.97.42. Não misture com
-   // conjuntos de MAME 0.168, MAME moderno ou FBNeo.
+   // O catálogo deve informar ROMs no set que o core FBNeo desta versão
+   // pinada espera. Não misture com sets antigos de MAME 0.168 sem
+   // verificar CRC32 e nome interno do zip primeiro.
  window.EJS_core='arcade';
  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
    window.EJS_gameUrl=romUrl;
@@ -120,7 +136,7 @@
    setTimeout(()=>clearInterval(t),45000);
  }};
  setTimeout(()=>{if(!ready&&!started)fail('Arcade não carregou em 30s. Verifique a ROM/BIOS e o endpoint de download.')},30000);
- setTimeout(()=>{if(ready&&!started)fail('EmulatorJS ficou pronto, mas o core Arcade não iniciou a ROM. Confirme o FBA 0.2.97.42 e o nome correto da BIOS.')},45000);
+ setTimeout(()=>{if(ready&&!started)fail('EmulatorJS ficou pronto, mas o core Arcade (FBNeo) não iniciou a ROM. Confirme o romset e o BIOS.')},45000);
 
  const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
  const key=(k,type)=>{const t=document.querySelector('canvas')||document;t.dispatchEvent(new KeyboardEvent(type,{key:k,code:k.length===1?'Key'+k.toUpperCase():k,bubbles:true,cancelable:true,composed:true}))};
