@@ -27,16 +27,18 @@
  const parentUrl=parentRom?new URL(parentRom,location.origin).href:'';
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo URL: '+parentUrl);
 
- // O FBNeo/libretro declara o firmware como fbneo/neogeo.zip.
- // Portanto, NÃO extraímos o BIOS: mantemos o neogeo.zip como ZIP no
- // filesystem virtual, para que o próprio FBNeo possa abrir o arquivo e
- // validar os CRCs internos (sp-s3.sp1, sm1.sm1, sfix.sfix, 000-lo.lo).
+ // O FBNeo procura o BIOS Neo Geo como um arquivo ZIP inteiro.
+ // O EmulatorJS consegue gravar EJS_externalFiles sem extrair quando o
+ // destino é um arquivo (sem barra final). Colocamos o mesmo neogeo.zip
+ // na pasta real de conteúdo do RetroArch, que é onde o FBNeo procura a
+ // BIOS junto das ROMs, e também mantemos os caminhos alternativos.
  if(parentUrl){
    window.EJS_externalFiles={
-     '/neogeo.zip': parentUrl,
-     '/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip': parentUrl
+     '/home/web_user/retroarch/userdata/content/downloads/neogeo.zip': parentUrl,
+     '/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip': parentUrl,
+     '/neogeo.zip': parentUrl
    };
-   log('BIOS Neo Geo configurado como neogeo.zip na raiz da ROM e em /home/web_user/retroarch/userdata/system/fbneo/');
+   log('BIOS Neo Geo configurado como ZIP em content/downloads, system/fbneo e raiz.');
  }
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
@@ -65,7 +67,11 @@
    try{
      const fs=window.EJS_emulator?.gameManager?.FS;
      if(fs){
-       const checks=['/neogeo.zip','/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip'];
+       const checks=[
+         '/home/web_user/retroarch/userdata/content/downloads/neogeo.zip',
+         '/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip',
+         '/neogeo.zip'
+       ];
        const found=checks.filter(p=>{try{fs.stat(p);return true}catch{return false}});
        log('neogeo.zip encontrado no FS: '+(found.length?found.join(' | '):'NENHUM'));
      }
