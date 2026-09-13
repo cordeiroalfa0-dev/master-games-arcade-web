@@ -2,10 +2,10 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Master Games Arcade</title>
 <style>
-html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000}body{cursor:none}
+html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#000;touch-action:manipulation;-webkit-tap-highlight-color:transparent}body{cursor:none}@media (pointer:coarse){body{cursor:auto}#cursor{display:none}.title{font-size:22px}.hint{font-size:15px}}
 #bgVideo{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;opacity:1}
 #bgImage{position:fixed;inset:0;z-index:1;background:url('/assets/background.png') center/cover no-repeat;opacity:0;transition:opacity 2s}
 #darkLayer{position:fixed;inset:0;z-index:2;background:rgba(0,0,10,.45)}
@@ -29,7 +29,13 @@ video.addEventListener('ended',transition);video.addEventListener('error',()=>se
 setTimeout(()=>document.getElementById('introContent').classList.add('show'),100);
 setTimeout(()=>{document.querySelector('.subtitle').classList.add('show');document.querySelector('.title').classList.add('show');document.querySelector('.version').classList.add('show')},300);
 setTimeout(()=>{if(video.readyState>=2)video.play().catch(()=>{});},100);
-document.addEventListener('keydown',()=>{if(canEnter){canEnter=false;sessionStorage.setItem('mga.introSeen','1');location.href='/?launcher=1'}});
+const enter=()=>{if(!canEnter)return;canEnter=false;sessionStorage.setItem('mga.introSeen','1');location.href='/?launcher=1'};
+document.addEventListener('keydown',enter);
+// Celular/tablet: um toque na tela tem o mesmo efeito de "pressione qualquer tecla".
+document.addEventListener('pointerdown',enter);
+document.addEventListener('touchstart',enter,{passive:true});
+const coarse=matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0;
+if(coarse){document.querySelector('.hint').textContent='TOQUE NA TELA PARA CONTINUAR';}
 document.addEventListener('mousemove',e=>{const c=document.getElementById('cursor');c.style.left=e.clientX+'px';c.style.top=e.clientY+'px'});
 </script>
 </body></html>
