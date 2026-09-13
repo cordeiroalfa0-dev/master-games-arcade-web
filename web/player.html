@@ -2,10 +2,10 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
   <title>Master Games Arcade - Player</title>
   <style>
-    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000;touch-action:none;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent;overscroll-behavior:none}
     #game{width:100vw;height:100vh;background:#000}
     /* Garante que o vídeo do emulador ocupe 100% da área em qualquer
        resolução de monitor (o EmulatorJS mantém a proporção do jogo com
@@ -13,7 +13,14 @@
     #game,.ejs_player,#game canvas,.ejs_player canvas{width:100%!important;height:100%!important;display:block}
     #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none}
     #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
-    #manual-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100001;display:none;background:#08000f;color:#00e5ff;border:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66;padding:16px 24px;font:700 16px monospace;cursor:pointer}
+    #manual-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100001;display:none;background:#08000f;color:#00e5ff;border:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66;padding:16px 24px;font:700 16px monospace;cursor:pointer;touch-action:manipulation}
+    /* Celular/tablet: alvo de toque maior e gamepad virtual sempre visível
+       sobre o vídeo do jogo. */
+    @media (pointer:coarse){
+      #manual-start{padding:22px 28px;font-size:18px}
+      #status{font-size:14px}
+      .ejs_virtualGamepad_parent{z-index:100002!important;display:block!important}
+    }
   </style>
 </head>
 <body>
@@ -384,6 +391,48 @@
       }
     }
   }catch{}
+
+  // ---------------------------------------------------------------
+  // MOBILE: controles de toque
+  // Em telas com toque o EmulatorJS mostra um gamepad virtual. Aqui ele é
+  // forçado como ATIVADO (em tablets o padrão do EmulatorJS vinha desligado)
+  // e recebe um layout de fliperama: alavanca + 6 botões + START e COIN.
+  // input_value segue o RetroPad: 0=B(1) 8=A(2) 1=Y(3) 9=X(4) 10=L(5)
+  // 11=R(6), 3=START, 2=COIN/SELECT, 4..7 = direções.
+  // ---------------------------------------------------------------
+  const isTouch =
+    matchMedia('(pointer:coarse)').matches ||
+    navigator.maxTouchPoints > 0 ||
+    'ontouchstart' in window;
+
+  if(isTouch){
+    window.EJS_defaultOptions = Object.assign(
+      {},
+      window.EJS_defaultOptions,
+      {'virtual-gamepad':'enabled','menu-bar-button':'visible'}
+    );
+
+    window.EJS_VirtualGamepadSettings=[
+      {type:'dpad',id:'dpad',location:'left',left:'50%',top:'50%',joystickInput:false,inputValues:[4,5,6,7]},
+      {type:'button',text:'1',id:'b1',location:'right',left:0,top:78,bold:true,input_value:0},
+      {type:'button',text:'2',id:'b2',location:'right',left:58,top:60,bold:true,input_value:8},
+      {type:'button',text:'3',id:'b3',location:'right',left:116,top:42,bold:true,input_value:1},
+      {type:'button',text:'4',id:'b4',location:'right',left:0,top:2,bold:true,input_value:9},
+      {type:'button',text:'5',id:'b5',location:'right',left:58,top:-16,bold:true,input_value:10},
+      {type:'button',text:'6',id:'b6',location:'right',left:116,top:-34,bold:true,input_value:11},
+      {type:'button',text:'COIN',id:'coin',location:'center',left:-15,fontSize:14,block:true,input_value:2},
+      {type:'button',text:'START',id:'start',location:'center',left:60,fontSize:14,block:true,input_value:3}
+    ];
+
+    log('Dispositivo com toque detectado: gamepad virtual ativado.');
+
+    // No celular a tela cheia só é aceita dentro do toque do usuário; o
+    // primeiro toque na área do jogo já pede tela cheia (armFullscreenOnGesture).
+    document.addEventListener('touchmove',e=>{
+      if(e.touches.length>1)e.preventDefault();
+    },{passive:false});
+    document.addEventListener('gesturestart',e=>e.preventDefault());
+  }
 
   const script=document.createElement('script');
   script.src='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/loader.js';
