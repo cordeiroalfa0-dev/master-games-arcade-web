@@ -7,9 +7,6 @@
   <style>
     html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
     #game{width:100vw;height:100vh;background:#000}
-    /* Garante que o vídeo do emulador ocupe 100% da área em qualquer
-       resolução de monitor (o EmulatorJS mantém a proporção do jogo com
-       faixas pretas nas laterais quando necessário). */
     #game,.ejs_player,#game canvas,.ejs_player canvas{width:100%!important;height:100%!important;display:block}
     #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none}
     #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
@@ -22,6 +19,7 @@
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
 
+<script src="/web/gamepad-manager.js"></script>
 <script>
 (async()=>{
   const q=new URLSearchParams(location.search);
@@ -104,18 +102,13 @@
   window.EJS_color='#00e5ff';
   window.EJS_backgroundColor='#000';
   window.EJS_DEBUG_XX=true;
+  window.EJS_Buttons={gamepad:{visible:true}};
 
   const hide=()=>{
     status.style.display='none';
     manual.style.display='none';
   };
 
-  // ---------------------------------------------------------------
-  // Controles de teclado do PC.
-  // SOMENTE o Jogador 1 é configurado aqui.
-  // P1: ↑ ↓ ← → | Z X C A S D | 1 = Start | 5 = Coin
-  // O Jogador 2 permanece exatamente como já estava configurado.
-  // ---------------------------------------------------------------
   const CONTROLS_FLAG='mga-controls-p1-v2';
   const CONTROLS_BACKUP='mga-controls-p1-backup-v2';
   let mgaControlsApplied=false;
@@ -137,9 +130,6 @@
     }catch{}
   };
 
-  // Índices do EmulatorJS/RetroArch: 8=A/Botão 1, 0=B/Botão 2,
-  // 9=X/Botão 3, 1=Y/Botão 4, 10=L/Botão 5, 11=R/Botão 6.
-  // Start=3 e Select/Coin=2. P2 não é alterado.
   window.EJS_defaultControls=mgaControlsApplied?{}:{
     0:{
       0:{value:'x',value2:'BUTTON_2'},
@@ -226,6 +216,10 @@
     if(startWatchdog)clearTimeout(startWatchdog);
     hide();
     log('Arcade/FBNeo iniciou o jogo');
+    try{
+      const pads=window.MGA_Gamepads?.get();
+      log('Controles USB detectados: '+(pads?.connected||0)+' — EmulatorJS mantém a seleção P1/P2 pelo menu de controles.');
+    }catch{}
     goFullscreen();
 
     try{
@@ -284,7 +278,9 @@
 
   window.EJS_ready=()=>{
     ready=true;
-    log('EmulatorJS pronto; o botão Start Game será acionado somente pelo usuário');
+    const pads=window.MGA_Gamepads?.get();
+    log('EmulatorJS pronto; gamepads conectados: '+(pads?.connected||0));
+    log('O botão Start Game será acionado somente pelo usuário');
     setTimeout(()=>{
       if(!started)showManualStart();
     },1500);
@@ -318,8 +314,6 @@
     }
   },45000);
 
-  // O EmulatorJS grava os controles de cada jogo no armazenamento local.
-  // A configuração padrão acima é aplicada somente uma vez por navegador.
   try{
     const ejsKey='EJS_'+window.EJS_gameName+'-controls';
     if(!localStorage.getItem(ejsKey)){
