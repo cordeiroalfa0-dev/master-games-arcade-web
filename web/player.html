@@ -18,7 +18,6 @@
 (async()=>{
  const q=new URLSearchParams(location.search),rom=q.get('rom'),parentRom=q.get('parent')||'',name=q.get('name')||'Master Games Arcade';
  const status=document.getElementById('status'),debug=document.getElementById('debug'),manual=document.getElementById('manual-start'),logs=[];
- let biosBlobUrl='';
  const log=x=>{logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);if(logs.length>80)logs.shift();debug.textContent=logs.join('\n');console.log('[MGA]',x)};
  const fail=x=>{status.textContent=x;status.style.color='#ff2bd6';debug.style.display='block';manual.style.display='none';log('ERRO: '+x);try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}};
  addEventListener('error',e=>log('window.error: '+(e.message||'erro')));
@@ -29,22 +28,14 @@
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo URL: '+parentUrl);
 
  // O BIOS Neo Geo vem do mesmo catálogo/Google Drive das ROMs.
- // Carregamos o ZIP pela API do próprio site e entregamos um Blob URL ao
- // EmulatorJS. Isso evita que o FBNeo tente localizar o BIOS em outro
- // diretório virtual do navegador.
+ // Para arcade/FBNeo usamos EJS_externalFiles: o EmulatorJS extrai
+ // automaticamente o neogeo.zip diretamente no filesystem virtual.
+ // Isso evita a limitação conhecida do EJS_gameParentUrl nos cores arcade.
  if(parentUrl){
-   try{
-     status.textContent='CARREGANDO BIOS NEO GEO...';
-     const biosResponse=await fetch(parentUrl,{cache:'no-store'});
-     if(!biosResponse.ok)throw new Error(`BIOS neogeo.zip respondeu HTTP ${biosResponse.status}`);
-     const biosBlob=await biosResponse.blob();
-     if(!biosBlob.size)throw new Error('BIOS neogeo.zip está vazio.');
-     biosBlobUrl=URL.createObjectURL(new Blob([biosBlob],{type:'application/zip'}));
-     log(`BIOS Neo Geo carregado: ${biosBlob.size} bytes`);
-   }catch(error){
-     fail('Não foi possível carregar o BIOS neogeo.zip: '+(error?.message||error));
-     return;
-   }
+   window.EJS_externalFiles={
+     '/system/fbneo/': parentUrl
+   };
+   log('BIOS Neo Geo configurado em /system/fbneo/ via EJS_externalFiles');
  }
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
@@ -63,8 +54,9 @@
  window.EJS_color='#00e5ff';
  window.EJS_backgroundColor='#000';
  window.EJS_DEBUG_XX=true;
- // Para Neo Geo, entregamos o mesmo neogeo.zip como BIOS e como parent data.
- if(biosBlobUrl){window.EJS_biosUrl=biosBlobUrl;window.EJS_gameParentUrl=biosBlobUrl;}
+ // Mantemos EJS_biosUrl somente como fallback para cores que consultem
+ // explicitamente o BIOS; o arquivo principal é instalado por externalFiles.
+ if(parentUrl){window.EJS_biosUrl=parentUrl;}
 
  let ready=false,started=false;
  const hide=()=>{status.style.display='none';manual.style.display='none'};
