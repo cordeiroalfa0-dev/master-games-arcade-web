@@ -28,8 +28,16 @@ Migrar o launcher atual para execução no navegador com WebAssembly, preservand
 
 ## Emulador web
 
-A execução WebAssembly usa o build standalone do **MAME Plus! 0.168.2**, sem EmulatorJS
-ou RetroArch. O artefato é publicado em `web/mame0168/` pelo workflow do GitHub Actions.
+A execução principal no navegador usa o core **Arcade do EmulatorJS**, compatível com o
+conjunto **FinalBurn Alpha (FBA) v0.2.97.42**. Esse core não é o MAME Plus! 0.168.2:
+ROMs precisam pertencer ao conjunto FBA indicado e as BIOS exigidas precisam manter os
+nomes esperados pelo core, como `neogeo.zip` e `pgm.zip`. Um ROM set do MAME 0.168.2
+pode funcionar no aplicativo nativo, mas não deve ser misturado com o core Arcade web.
+
+O player fornece as BIOS pela opção oficial `EJS_biosUrl`; não copia a mesma BIOS para
+pastas internas do FBNeo. Para usar MAME Plus! 0.168.2 de verdade no navegador seria
+necessário publicar e manter um build WebAssembly específico desse executável e usar um
+ROM set correspondente, em vez do core Arcade atual.
 
 ## Hospedagem planejada
 

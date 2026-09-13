@@ -26,30 +26,20 @@
  const romUrl=new URL(rom,location.origin).href;
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(biosUrl)log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
 
- // O FB Neo procura BIOS tanto junto da ROM quanto em system/fbneo.
- // EJS_externalFiles extrai o ZIP nos dois locais; gameParentUrl sozinho
- // pode deixar o arquivo compactado fora do diretório que o core consulta.
- if(biosUrl){
-   const bios=new URL(biosUrl,location.origin).href;
-   window.EJS_externalFiles={
-     '/': bios,
-     '/home/web_user/retroarch/userdata/system/fbneo/': bios
-   };
-   window.EJS_biosUrl='';
-   window.EJS_dontExtractBIOS=false;
-   log('BIOS extraído na raiz e em system/fbneo: '+(biosName||biosUrl));
- }else{
-   window.EJS_gameParentUrl='';
-   window.EJS_biosUrl='';
-   window.EJS_externalFiles={};
- }
+ // O core Arcade documentado pelo EmulatorJS recebe a BIOS por EJS_biosUrl.
+ // Não extraia o mesmo ZIP em / e em system/fbneo: isso é fluxo de FBNeo.
+ window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
+ window.EJS_gameParentUrl='';
+ window.EJS_externalFiles={};
+ window.EJS_dontExtractBIOS=false;
+ if(biosUrl) log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
  // ArrayBuffer/Blob da ROM antes do player para evitar download duplicado.
- status.textContent='INICIANDO FBNeo — '+name+'...';
+ status.textContent='INICIANDO Arcade/FBA 0.2.97.42 — '+name+'...';
  window.EJS_player='#game';
- // O catálogo informa ROMs do set FBA 0.2.97.42; esse set é atendido
- // pelo core arcade, enquanto o fbneo atual exige outro ROM set/CRC.
+   // O catálogo informa ROMs do set FBA 0.2.97.42. Não misture com
+   // conjuntos de MAME 0.168, MAME moderno ou FBNeo.
  window.EJS_core='arcade';
  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
    window.EJS_gameUrl=romUrl;
@@ -67,7 +57,7 @@
  const hide=()=>{status.style.display='none';manual.style.display='none'};
  window.EJS_onGameStart=()=>{
    if(started)return;
-   started=true;hide();log('FBNeo iniciou o jogo');
+   started=true;hide();log('Arcade/FBA iniciou o jogo');
    try{
      const fs=window.EJS_emulator?.gameManager?.FS;
      if(fs){
@@ -86,7 +76,7 @@
    const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
    if(b){b.click();log('Start Game acionado');return true}return false;
  };
- const showManualStart=()=>{if(!started){status.style.display='none';manual.style.display='block';log('Aguardando clique do usuário para iniciar o FBNeo')}};
+ const showManualStart=()=>{if(!started){status.style.display='none';manual.style.display='block';log('Aguardando clique do usuário para iniciar o Arcade/FBA')}};
  manual.addEventListener('click',()=>{manual.style.display='none';if(!tryStart())log('Nenhum botão Start Game encontrado após clique')});
  document.addEventListener('click',()=>{if(ready&&!started)tryStart()},true);
  window.EJS_ready=()=>{ready=true;log('EmulatorJS pronto');if(!tryStart()){
@@ -94,8 +84,8 @@
    const t=setInterval(()=>{if(started||tryStart()){clearInterval(t);manual.style.display='none'}},1000);
    setTimeout(()=>clearInterval(t),45000);
  }};
- setTimeout(()=>{if(!ready&&!started)fail('FBNeo não carregou em 30s. Verifique a ROM/BIOS e o endpoint de download.')},30000);
- setTimeout(()=>{if(ready&&!started)fail('EmulatorJS ficou pronto, mas o FBNeo não iniciou a ROM. Clique em INICIAR e, se continuar parado, verifique o erro do FBNeo no Console.')},45000);
+ setTimeout(()=>{if(!ready&&!started)fail('Arcade não carregou em 30s. Verifique a ROM/BIOS e o endpoint de download.')},30000);
+ setTimeout(()=>{if(ready&&!started)fail('EmulatorJS ficou pronto, mas o core Arcade não iniciou a ROM. Confirme o FBA 0.2.97.42 e o nome correto da BIOS.')},45000);
 
  const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
  const key=(k,type)=>{const t=document.querySelector('canvas')||document;t.dispatchEvent(new KeyboardEvent(type,{key:k,code:k.length===1?'Key'+k.toUpperCase():k,bubbles:true,cancelable:true,composed:true}))};

@@ -13,25 +13,27 @@
   const loadCatalog = async () => { if (!catalogPromise) catalogPromise = originalFetch(CATALOG_URL).then((r) => { if (!r.ok) throw new Error("Catálogo de ROMs indisponível"); return r.json(); }); return catalogPromise; };
   const loadTitles = async () => { if (!titlesPromise) titlesPromise = originalFetch(TITLES_URL).then((r) => r.ok ? r.json() : {}).catch(() => ({})); return titlesPromise; };
   function cleanRomName(name) { return String(name || "").replace(/\.(zip|7z|chd)$/i, ""); }
+  // O core `arcade` do EmulatorJS usa exclusivamente o FBA v0.2.97.42.
+  // Não misture regras de BIOS de MAME moderno/Naomi/FBNeo aqui: esses
+  // arquivos pertencem a outros drivers e podem fazer o core falhar antes
+  // mesmo de validar a ROM do jogo.
   const BIOS_RULES = [
-    { bios: "neogeo.zip", games: new Set(["aof3", "bjourney", "breakers", "breakrev", "eightman", "fatfursp", "fatfury3", "garou", "kizuna", "kof2k4se", "kof94", "kof95", "kof96", "kof97", "kof98", "kof99", "kof2000", "kof2001", "kof2002", "kof2003", "lastbld2", "lbowling", "magdrop3", "matrim", "mslug", "mslug2", "mslug3", "mslug3b6", "mslug4", "mslug5", "mslugx", "samsho", "samsho2", "samsho3", "samsho4", "sengoku3", "sonicwi3", "svc", "svcsplus", "twinspri", "wakuwak7", "whp", "neobombe", "kf2k2mp2", "kf2k5uni", "kf10thep", "strhoop", "ssideki3", "ssideki4", "tetrisp"]), },
+    { bios: "neogeo.zip", games: new Set(["aof3", "bjourney", "breakers", "breakrev", "eightman", "fatfursp", "fatfury3", "garou", "kizuna", "kof94", "kof95", "kof96", "kof97", "kof98", "kof99", "kof2000", "kof2001", "kof2002", "kof2003", "lastbld2", "lbowling", "magdrop3", "matrim", "mslug", "mslug2", "mslug3", "mslug4", "mslug5", "mslugx", "samsho", "samsho2", "samsho3", "samsho4", "sengoku3", "sonicwi3", "svc", "twinspri", "wakuwak7", "whp", "neobombe", "strhoop", "ssideki3", "ssideki4", "tetrisp"]) },
     { bios: "pgm.zip", games: new Set(["dbz2", "elvactr", "martmast", "pcktgal", "sailormn", "savagere"]) },
-    { bios: "awbios.zip", games: new Set(["ggx", "ggxx", "kofnw", "kofxi", "mslug6", "salmndr2", "samspsen", "swracer", "tetki"]), },
-    { bios: "ar_bios.zip", games: new Set(["ar_bios", "naomi", "soulclbr", "tekken3", "tektagt"]) },
+    { bios: "isgsm.zip", games: new Set(["isgsm"]) },
   ];
-  const QSoundGames = new Set(["avsp", "avspu", "cawing", "ddsom", "ddtod", "dstlk", "hsf2", "jojobane", "joemacr", "sfa", "sfa2u", "sfa3", "sfz2ald", "sgemf", "spf2t", "ssf2", "ssf2t", "vhunt2", "vsavj", "xmcota", "xmvsfur1", "sfiii", "sfiii2", "sfiii2n", "sfiii3"]);
   const fileBase = (name) => String(name || "").toLowerCase().replace(/\.(zip|7z|chd)$/i, "");
   function biosForGame(name) {
     const base = fileBase(name);
     const rule = BIOS_RULES.find((entry) => entry.games.has(base));
-    return rule?.bios || (QSoundGames.has(base) ? "qsound.zip" : "");
+    return rule?.bios || "";
   }
   async function resolveRom(romName, message) {
     const catalog = await loadCatalog();
     const item = (catalog.files || []).find((entry) => entry?.name === romName);
     if (!item?.id || item.skipDownload) throw new Error(`ROM não disponível para download: ${romName}`);
     const romUrl = `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
-    const biosName = biosForGame(item.name);
+    const biosName = item.bios || item.biosName || biosForGame(item.name);
     const bios = biosName && (catalog.files || []).find((entry) => fileBase(entry?.name) === fileBase(biosName));
     const biosUrl = bios?.id && !bios.skipDownload ? `/api/rom/${encodeURIComponent(bios.id)}/${encodeURIComponent(bios.name)}` : "";
     if (biosName && !biosUrl) console.warn(`[MGA Web] BIOS ${biosName} não foi encontrado no catálogo para ${item.name}.`);
@@ -77,9 +79,9 @@
     const isNativeApi = parsed.origin === NATIVE_API; const isLocalApi = parsed.origin === location.origin && parsed.pathname.startsWith(API_PREFIX); if (!isNativeApi && !isLocalApi) return originalFetch(input, init);
     const path = parsed.pathname; const method = (init?.method || "GET").toUpperCase();
     if (path === "/api/health") return jsonResponse({ ok: true, port: 0, version: "web-wasm", installDir: "", romsDir: "WEB" });
-    if (path === "/api/config" && method === "GET") return jsonResponse({ mamePath: "WEBASSEMBLY", romsDir: "WEB", emulator: "fbneo" });
-    if (path === "/api/config" && method === "POST") return jsonResponse({ ok: true, mamePath: "WEBASSEMBLY", romsDir: "WEB", emulator: "fbneo" });
-    if (path === "/api/check-mame") return jsonResponse({ exists: true, path: "WEBASSEMBLY", currentRompath: "WEB", emulator: "fbneo" });
+    if (path === "/api/config" && method === "GET") return jsonResponse({ mamePath: "WEBASSEMBLY", romsDir: "WEB", emulator: "arcade-fba-0.2.97.42" });
+    if (path === "/api/config" && method === "POST") return jsonResponse({ ok: true, mamePath: "WEBASSEMBLY", romsDir: "WEB", emulator: "arcade-fba-0.2.97.42" });
+    if (path === "/api/check-mame") return jsonResponse({ exists: true, path: "WEBASSEMBLY", currentRompath: "WEB", emulator: "arcade-fba-0.2.97.42" });
     if (path === "/api/art") return jsonResponse({ ok: false, available: false, url: null }, 404);
     if (path === "/api/roms") { const catalog = await loadCatalog(); const roms = (catalog.files || []).map((item) => item.name).filter(Boolean).sort((a, b) => a.localeCompare(b)); return jsonResponse({ roms, path: "WEB", total: roms.length }); }
     if (path === "/api/gamenames") { const titles = await loadTitles(); return jsonResponse({ names: titles, details: {}, total: Object.keys(titles).length }); }
@@ -89,5 +91,5 @@
     if (path === "/api/set-rompath" || path === "/api/reset-controls" || path === "/api/test-mame") return jsonResponse({ ok: true, web: true });
     return originalFetch(input, init);
   };
-  console.info("[MGA Web] Bridge WebAssembly 2.0.0 ativo — FBNeo WebAssembly, ROM por URL .zip.");
+  console.info("[MGA Web] Bridge WebAssembly ativo — EmulatorJS arcade/FBA 0.2.97.42, ROM por URL .zip.");
 })();
