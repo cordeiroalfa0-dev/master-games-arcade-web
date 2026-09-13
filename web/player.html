@@ -67,15 +67,20 @@
 
   // EmulatorJS Arcade utiliza o core FBNeo nesta configuração.
   // A ROM ZIP deve ser compatível com o romset FBNeo.
-  window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
+  // ATENÇÃO: com EJS_dontExtractBIOS=true o EmulatorJS 4.2.3 usa a string da
+  // URL da BIOS como caminho de gravação no sistema de arquivos do core
+  // (FS.writeFile(url)). Por isso ela precisa ser um caminho relativo simples
+  // na raiz, como "/neogeo.zip" — nada de URL absoluta nem query string.
+  const biosFile=(biosName||biosUrl.split('/').pop()||'').split('?')[0].split('#')[0];
+  window.EJS_biosUrl=biosFile?'/'+biosFile:'';
   window.EJS_gameParentUrl='';
   window.EJS_externalFiles={};
 
   // Mantém o ZIP da BIOS intacto para o core fazer o merge com o romset.
   window.EJS_dontExtractBIOS=true;
 
-  if(biosUrl){
-    log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
+  if(window.EJS_biosUrl){
+    log('BIOS configurado via EJS_biosUrl: '+window.EJS_biosUrl);
     try{
       const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
       const len=head.headers.get('content-length');
