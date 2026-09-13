@@ -98,7 +98,10 @@
   // Versão fixada para evitar alterações automáticas no core.
   const EJS_PINNED_VERSION='4.2.3';
   window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
-  window.EJS_startOnLoaded=true;
+  // Desativado: o EmulatorJS cria o próprio botão Start Game. Se o player
+  // clicar automaticamente nele ao mesmo tempo que o EmulatorJS inicializa
+  // o módulo WASM, ocorre o erro "toggleMainLoop undefined".
+  window.EJS_startOnLoaded=false;
   window.EJS_alignStartButton='center';
   window.EJS_language='en-US';
   window.EJS_disableAutoLang=true;
@@ -189,24 +192,14 @@
 
   window.EJS_ready=()=>{
     ready=true;
-    log('EmulatorJS pronto; aguardando o módulo FBNeo terminar de carregar');
+    log('EmulatorJS pronto; o botão Start Game será acionado somente pelo usuário');
 
-    // O EJS_ready pode ocorrer antes de o WASM e a memória estarem prontos.
-    // O atraso evita a corrida que causava toggleMainLoop undefined.
+    // Não chamamos b.click() automaticamente. O EmulatorJS ainda pode estar
+    // finalizando o módulo WASM quando EJS_ready é disparado. O usuário deve
+    // clicar uma única vez no botão Start Game exibido pelo próprio EmulatorJS.
     setTimeout(()=>{
-      if(started)return;
-      if(!tryStart()){
-        showManualStart();
-        const t=setInterval(()=>{
-          if(started){
-            clearInterval(t);
-            return;
-          }
-          if(tryStart())clearInterval(t);
-        },1500);
-        setTimeout(()=>clearInterval(t),45000);
-      }
-    },2500);
+      if(!started)showManualStart();
+    },1500);
   };
 
   addEventListener('error',e=>{
