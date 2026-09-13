@@ -36,7 +36,9 @@
  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
  window.EJS_gameUrl=romUrl;
  window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
- window.EJS_startOnLoad=true;
+ // O nome correto da opção do EmulatorJS é EJS_startOnLoaded.
+ // EJS_startOnLoad não é reconhecido pela versão atual.
+ window.EJS_startOnLoaded=true;
  window.EJS_color='#00e5ff';
  window.EJS_backgroundColor='#000';
  if(parentUrl)window.EJS_gameParentUrl=parentUrl;
@@ -53,6 +55,7 @@
    const t=setInterval(()=>{if(started||tryStart())clearInterval(t)},500);
  }};
  setTimeout(()=>{if(!ready&&!started)fail('FBNeo não carregou em 30s. Verifique a ROM/BIOS e o endpoint de download.')},30000);
+ setTimeout(()=>{if(ready&&!started)fail('EmulatorJS ficou pronto, mas o FBNeo não iniciou a ROM. Verifique o download da ROM no Network.')},45000);
  
  // Controles auxiliares do gabinete.
  const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
