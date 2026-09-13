@@ -54,7 +54,13 @@
  window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
  window.EJS_gameParentUrl='';
  window.EJS_externalFiles={};
- window.EJS_dontExtractBIOS=false;
+ // CORRIGIDO: o core arcade/FBNeo espera o zip da BIOS (ex: neogeo.zip)
+ // intacto dentro da pasta de sistema, para fazer merge com o romset do
+ // jogo. Com dontExtractBIOS=false, o EmulatorJS descompacta o zip em
+ // arquivos soltos e o core deixa de encontrar "neogeo.zip" como container,
+ // reportando os arquivos internos (sp-s3.sp1, sm1.sm1, sfix.sfix,
+ // 000-lo.lo etc.) como "missing" mesmo estando corretos dentro do zip.
+ window.EJS_dontExtractBIOS=true;
  if(biosUrl){
    log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
    // Confere se o arquivo de BIOS realmente responde (200 + tamanho) antes
