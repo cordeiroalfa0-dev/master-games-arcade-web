@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -26,16 +27,32 @@
  const romUrl=new URL(rom,location.origin).href;
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(biosUrl)log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
 
- // O player web usa diretamente o core Arcade/FBA do EmulatorJS.
+ // O player web usa diretamente o core Arcade do EmulatorJS.
  // O build MAME standalone não faz parte deste repositório; não interrompa
  // a inicialização procurando /web/mame0168/mame.js.
- // O core Arcade documentado pelo EmulatorJS recebe a BIOS por EJS_biosUrl.
- // Não extraia o mesmo ZIP em / e em system/fbneo: isso é fluxo de FBNeo.
+ // IMPORTANTE (corrigido em 2026-09-13): EJS_core='arcade' hoje roda sobre
+ // o core FBNeo (libretro), não sobre o FBA 0.2.97.42 antigo — a doc oficial
+ // do EmulatorJS confirma isso (https://emulatorjs.org/docs/systems/arcade/).
+ // Romsets e BIOS precisam bater com o que ESSA build do FBNeo espera, não
+ // com dumps antigos de MAME 0.168.2 sem verificar. A BIOS é entregue via
+ // EJS_biosUrl e precisa ter os nomes internos exatos (ex: sp-s3.sp1) que o
+ // core procura, não só o CRC correto.
  window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
  window.EJS_gameParentUrl='';
  window.EJS_externalFiles={};
  window.EJS_dontExtractBIOS=false;
- if(biosUrl) log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
+ if(biosUrl){
+   log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
+   // Confere se o arquivo de BIOS realmente responde (200 + tamanho) antes
+   // do EmulatorJS tentar buscá-lo. Isso separa "endpoint quebrado/CORS"
+   // de "o core não expôs o arquivo no FS depois de baixar certo".
+   try{
+     const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
+     const len=head.headers.get('content-length');
+     log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(len||'desconhecido')+' bytes');
+     if(!head.ok) log('AVISO: endpoint da BIOS não respondeu OK — o core vai falhar ao montar o arquivo.');
+   }catch(e){log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)')}
+ }
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
  // ArrayBuffer/Blob da ROM antes do player para evitar download duplicado.
@@ -46,7 +63,11 @@
  window.EJS_core='arcade';
  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
    window.EJS_gameUrl=romUrl;
- window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
+ // Fixado em uma versão numerada (em vez de 'stable') para que o core e o
+ // formato de romset esperado não mudem sozinhos por trás do projeto.
+ // Atualize este número apenas quando testar a mudança manualmente.
+ const EJS_PINNED_VERSION='4.2.3';
+ window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
  window.EJS_startOnLoaded=true;
  window.EJS_alignStartButton='center';
  window.EJS_language='en-US';
@@ -96,7 +117,7 @@
  addEventListener('keyup',e=>{if(map[e.code]){e.preventDefault();e.stopImmediatePropagation();key(map[e.code],'keyup')}},true);
  const pads=new Map(),pkeys=[['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'],['i','k','j','l']];
  const poll=()=>{const gs=navigator.getGamepads?navigator.getGamepads():[];for(let p=0;p<2;p++){const g=gs[p];if(!g)continue;const x=+(g.axes?.[0]||0),y=+(g.axes?.[1]||0),s=pads.get(p)||{},w={[pkeys[p][0]]:y<-.35,[pkeys[p][1]]:y>.35,[pkeys[p][2]]:x<-.35,[pkeys[p][3]]:x>.35};for(const [k,v]of Object.entries(w)){if(v===!!s[k])continue;s[k]=v;key(k,v?'keydown':'keyup')}pads.set(p,s)}requestAnimationFrame(poll)};requestAnimationFrame(poll);
- const script=document.createElement('script');script.src='https://cdn.emulatorjs.org/stable/data/loader.js';script.async=true;script.onerror=()=>fail('Não foi possível carregar o EmulatorJS pelo CDN.');document.head.appendChild(script);
+ const script=document.createElement('script');script.src='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/loader.js';script.async=true;script.onerror=()=>fail('Não foi possível carregar o EmulatorJS pelo CDN.');document.head.appendChild(script);
 })();
 </script>
 </body>
