@@ -10,14 +10,6 @@
     #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none}
     #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
     #manual-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100001;display:none;background:#08000f;color:#00e5ff;border:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66;padding:16px 24px;font:700 16px monospace;cursor:pointer}
-    #mga-touch-controls{display:none}
-    @media (pointer:coarse){
-      #mga-touch-controls{position:fixed;right:calc(10px + env(safe-area-inset-right));bottom:calc(10px + env(safe-area-inset-bottom));z-index:100003;display:grid;grid-template-columns:repeat(3,52px);grid-auto-rows:48px;gap:6px;font:700 11px monospace;touch-action:none}
-      #mga-touch-controls button{border:1px solid #00e5ff;border-radius:9px;background:rgba(8,0,15,.88);box-shadow:0 0 10px #00e5ff55;color:#00e5ff;font:inherit;padding:0;touch-action:none;user-select:none;-webkit-tap-highlight-color:transparent}
-      #mga-touch-controls button:active{background:#00e5ff;color:#08000f}
-      #mga-touch-controls .empty{visibility:hidden}
-      #mga-touch-controls .action{color:#ff2bd6;border-color:#ff2bd6;box-shadow:0 0 10px #ff2bd655}
-    }
   </style>
 </head>
 <body>
@@ -25,11 +17,6 @@
   <div id="status">CARREGANDO...</div>
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
-  <div id="mga-touch-controls" aria-label="Controles do jogo">
-    <span class="empty"></span><button data-key="ArrowUp">▲</button><span class="empty"></span>
-    <button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button>
-    <button class="action" data-key="Shift">CRÉDITO</button><button class="action" data-key="Enter">START</button>
-  </div>
 
 <script>
 (async()=>{
@@ -41,7 +28,6 @@
   const status=document.getElementById('status');
   const debug=document.getElementById('debug');
   const manual=document.getElementById('manual-start');
-  const touchControls=document.getElementById('mga-touch-controls');
   const logs=[];
 
   let ready=false;
@@ -85,44 +71,21 @@
   window.EJS_gameParentUrl='';
   window.EJS_externalFiles={};
 
-  const enterFullscreen=()=>{
-    try{
-      if(document.fullscreenElement)return;
-      const el=document.documentElement;
-      const request=el.requestFullscreen||el.webkitRequestFullscreen;
-      if(request){const result=request.call(el,{navigationUI:'hide'});if(result?.catch)result.catch(()=>{});}
-    }catch{}
-  };
-  addEventListener('pointerdown',enterFullscreen,{capture:true,once:true,passive:true});
-  addEventListener('touchstart',enterFullscreen,{capture:true,once:true,passive:true});
-
-  if(matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0){
-    const specs={ArrowUp:38,ArrowDown:40,ArrowLeft:37,ArrowRight:39,Shift:16,Enter:13};
-    const emit=(type,name)=>{
-      const target=document.querySelector('canvas')||document;
-      target.dispatchEvent(new KeyboardEvent(type,{key:name,code:name,keyCode:specs[name],which:specs[name],bubbles:true,cancelable:true,composed:true}));
-    };
-    touchControls.querySelectorAll('button[data-key]').forEach(button=>{
-      const name=button.dataset.key;
-      const release=event=>{event.preventDefault();emit('keyup',name);};
-      button.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();emit('keydown',name);},{passive:false});
-      button.addEventListener('pointerup',release,{passive:false});
-      button.addEventListener('pointercancel',release,{passive:false});
-      button.addEventListener('contextmenu',event=>event.preventDefault());
-    });
-  }
-
   // Mantém o ZIP da BIOS intacto para o core fazer o merge com o romset.
   window.EJS_dontExtractBIOS=true;
 
   if(biosUrl){
     log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
-    // Diagnóstico em segundo plano: nunca bloquear o loader aguardando HEAD.
-    // Em celulares, proxies/CDNs podem deixar essa requisição pendente mesmo
-    // quando o download GET da BIOS funciona normalmente.
-    fetch(window.EJS_biosUrl,{method:'HEAD'})
-      .then(head=>log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(head.headers.get('content-length')||'desconhecido')+' bytes'))
-      .catch(e=>log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (ignorado)'));
+    try{
+      const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
+      const len=head.headers.get('content-length');
+      log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(len||'desconhecido')+' bytes');
+      if(!head.ok){
+        log('AVISO: endpoint da BIOS não respondeu OK — o core pode falhar ao montar o arquivo.');
+      }
+    }catch(e){
+      log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)');
+    }
   }
 
   status.textContent='INICIANDO Arcade (FBNeo) — '+name+'...';
@@ -182,36 +145,73 @@
     try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
   };
 
+  // Inicia somente uma vez. O clique duplicado era capaz de chamar
+  // toggleMainLoop antes de o módulo interno do EmulatorJS estar pronto.
+  const tryStart=()=>{
+    if(started||attempting)return false;
+
+    const els=[...document.querySelectorAll('button,[role="button"]')];
+    log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
+
+    const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
+    if(!b)return false;
+
+    attempting=true;
+    b.click();
+    log('Start Game acionado uma única vez');
+
+    // Libera nova tentativa apenas se o core não iniciou.
+    setTimeout(()=>{
+      if(!started){
+        attempting=false;
+        log('O core ainda não iniciou; nova tentativa poderá ser feita manualmente.');
+      }
+    },5000);
+
+    return true;
+  };
+
+  const showManualStart=()=>{
+    if(!started){
+      status.style.display='none';
+      manual.style.display='block';
+      log('Aguardando clique do usuário para iniciar o Arcade/FBNeo');
+    }
+  };
+
+  manual.addEventListener('click',()=>{
+    manual.style.display='none';
+    if(!tryStart()){
+      log('Nenhum botão Start Game encontrado após clique');
+      showManualStart();
+    }
+  });
+
+  // Não usamos listener global de clique: ele podia capturar o clique
+  // sintético do EmulatorJS e iniciar o core duas vezes.
+
   window.EJS_ready=()=>{
     ready=true;
-    status.style.display='none';
-    manual.style.display='none';
-    log('EmulatorJS pronto; iniciando o core Arcade...');
+    log('EmulatorJS pronto; o botão Start Game será acionado somente pelo usuário');
 
-    // Em alguns celulares o clique no botão visual não chega ao método
-    // interno do EmulatorJS e a tela fica preta. EJS_ready já indica que o
-    // módulo está pronto; aguardamos um ciclo para evitar a corrida
-    // "toggleMainLoop undefined" e chamamos a API oficial uma única vez.
+    // Não chamamos b.click() automaticamente. O EmulatorJS ainda pode estar
+    // finalizando o módulo WASM quando EJS_ready é disparado. O usuário deve
+    // clicar uma única vez no botão Start Game exibido pelo próprio EmulatorJS.
     setTimeout(()=>{
-      if(started||attempting)return;
-      const emulator=window.EJS_emulator;
-      if(!emulator?.startGame){
-        log('API startGame ainda não disponível; aguardando o botão nativo.');
-        return;
-      }
-      attempting=true;
-      try{
-        emulator.startGame();
-        log('startGame() acionado pelo player');
-      }catch(e){
-        attempting=false;
-        log('Falha ao iniciar o core: '+(e?.message||e));
-      }
-    },1200);
+      if(!started)showManualStart();
+    },1500);
   };
 
   addEventListener('error',e=>{
     log('window.error: '+(e.message||'erro mascarado pelo CDN'));
+    if(attempting&&!started&&retriesLeft>0){
+      retriesLeft--;
+      attempting=false;
+      log('Possível corrida de inicialização — tentando novamente em 2.5s ('+retriesLeft+' restantes)');
+      retryTimer=setTimeout(()=>{
+        if(!started)tryStart();
+      },2500);
+    }
   });
 
   addEventListener('unhandledrejection',e=>{
