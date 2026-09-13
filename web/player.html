@@ -117,16 +117,12 @@
 
   if(biosUrl){
     log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
-    try{
-      const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
-      const len=head.headers.get('content-length');
-      log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(len||'desconhecido')+' bytes');
-      if(!head.ok){
-        log('AVISO: endpoint da BIOS não respondeu OK — o core pode falhar ao montar o arquivo.');
-      }
-    }catch(e){
-      log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)');
-    }
+    // Diagnóstico em segundo plano: nunca bloquear o loader aguardando HEAD.
+    // Em celulares, proxies/CDNs podem deixar essa requisição pendente mesmo
+    // quando o download GET da BIOS funciona normalmente.
+    fetch(window.EJS_biosUrl,{method:'HEAD'})
+      .then(head=>log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(head.headers.get('content-length')||'desconhecido')+' bytes'))
+      .catch(e=>log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (ignorado)'));
   }
 
   status.textContent='INICIANDO Arcade (FBNeo) — '+name+'...';
