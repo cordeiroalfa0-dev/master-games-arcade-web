@@ -98,10 +98,7 @@
   // Versão fixada para evitar alterações automáticas no core.
   const EJS_PINNED_VERSION='4.2.3';
   window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
-  // Desativado: o EmulatorJS cria o próprio botão Start Game. Se o player
-  // clicar automaticamente nele ao mesmo tempo que o EmulatorJS inicializa
-  // o módulo WASM, ocorre o erro "toggleMainLoop undefined".
-  window.EJS_startOnLoaded=false;
+  window.EJS_startOnLoaded=true;
   window.EJS_alignStartButton='center';
   window.EJS_language='en-US';
   window.EJS_disableAutoLang=true;
@@ -192,14 +189,33 @@
 
   window.EJS_ready=()=>{
     ready=true;
-    log('EmulatorJS pronto; o botão Start Game será acionado somente pelo usuário');
+    log('EmulatorJS pronto; aguardando o módulo FBNeo terminar de carregar');
 
-    // Não chamamos b.click() automaticamente. O EmulatorJS ainda pode estar
-    // finalizando o módulo WASM quando EJS_ready é disparado. O usuário deve
-    // clicar uma única vez no botão Start Game exibido pelo próprio EmulatorJS.
-    setTimeout(()=>{
-      if(!started)showManualStart();
-    },1500);
+    // CORREÇÃO: não tentamos mais clicar automaticamente com um tempo fixo.
+    // O crescimento de memória do WASM (16MB -> 64MB, visto no aviso
+    // "Enlarging memory arrays") pode acontecer bem depois do EJS_ready,
+    // dependendo de quanto falta pra terminar o download da BIOS/ROM — e
+    // se clicarmos Start Game nesse meio-tempo, a referência interna
+    // toggleMainLoop fica indisponível e o core quebra.
+    // Em vez de adivinhar um tempo, mostramos o botão manual desde já.
+    // Um clique real do usuário só vai acontecer depois que os dados já
+    // tiverem chegado, o que elimina essa corrida por completo.
+    if(!started){
+      showManualStart();
+      const t=setInterval(()=>{
+        if(started){
+          clearInterval(t);
+          return;
+        }
+        // Ainda tenta detectar o botão nativo do EmulatorJS aparecendo
+        // sozinho (alguns cores criam o próprio botão "Play"), mas nunca
+        // força um clique antes da hora.
+        const els=[...document.querySelectorAll('button,[role="button"]')];
+        const nativeBtn=els.find(e=>e!==manual&&/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
+        if(nativeBtn)log('Botão nativo do EmulatorJS detectado — clique nele ou em CLIQUE PARA INICIAR quando o download terminar.');
+      },1500);
+      setTimeout(()=>clearInterval(t),120000);
+    }
   };
 
   addEventListener('error',e=>{
@@ -224,11 +240,14 @@
     }
   },30000);
 
+  // Estendido de 45s para 3min: agora aguardamos um clique manual real do
+  // usuário (ou o botão nativo do EmulatorJS), que pode demorar mais que
+  // 45s em conexões lentas. Isso não é mais sinal de falha por si só.
   setTimeout(()=>{
     if(ready&&!started){
-      fail('EmulatorJS ficou pronto, mas o core Arcade (FBNeo) não iniciou a ROM. Confirme o romset e o BIOS.');
+      fail('EmulatorJS ficou pronto, mas o core Arcade (FBNeo) não iniciou. Clique em "CLIQUE PARA INICIAR". Se o botão não aparecer, confirme o romset e o BIOS.');
     }
-  },45000);
+  },180000);
 
   const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
   const key=(k,type)=>{
