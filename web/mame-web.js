@@ -87,11 +87,14 @@
       throw new Error(`ROM não disponível para download: ${romName}`);
     }
 
-    // O endpoint /api/rom recebe id e name por query string.
-    // Não use /api/rom/{id}/{name}, pois esse não corresponde ao endpoint atual.
+    // IMPORTANTE: a URL da ROM precisa TERMINAR com o nome real do arquivo
+    // (ex.: .../mslug.zip). O EmulatorJS usa o último segmento da URL como
+    // nome do arquivo gravado no sistema de arquivos do core, e o FBNeo
+    // identifica o romset por esse nome. Com `/api/rom?id=...&name=...`
+    // o arquivo era gravado como "rom", sem extensão, e o core não
+    // reconhecia o jogo nem casava com a BIOS.
     const romUrl =
-      `/api/rom?id=${encodeURIComponent(item.id)}` +
-      `&name=${encodeURIComponent(item.name)}`;
+      `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
 
     const biosName =
       item.bios ||
@@ -102,12 +105,14 @@
       (entry) => fileBase(entry?.name) === fileBase(biosName)
     );
 
-    // A BIOS usa endpoint próprio e também recebe os dados por query string.
+    // A BIOS precisa ser servida na RAIZ do site com o nome exato
+    // (ex.: /neogeo.zip). Com EJS_dontExtractBIOS=true o EmulatorJS 4.2.3
+    // grava a BIOS usando a própria URL como caminho no sistema de
+    // arquivos: uma URL com query string ("/api/bios?id=...") gerava um
+    // caminho inválido e a BIOS nunca chegava ao core. O rewrite da Vercel
+    // encaminha /neogeo.zip, /pgm.zip e /isgsm.zip para /api/bios.
     const biosUrl =
-      bios?.id && !bios.skipDownload
-        ? `/api/bios?id=${encodeURIComponent(bios.id)}` +
-          `&name=${encodeURIComponent(bios.name)}`
-        : "";
+      bios && !bios.skipDownload ? `/${bios.name}` : "";
 
     if (biosName && !biosUrl) {
       console.warn(
