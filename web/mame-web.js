@@ -180,10 +180,7 @@
     window.addEventListener("message", onMessage);
 
     iframe.onload = () => {
-      // O player.html já exibe o estado de carregamento e o próprio botão
-      // Start Game. Não mantenha a mensagem do launcher sobre o iframe,
-      // pois ela pode esconder o botão que o usuário precisa clicar.
-      message.style.display = "none";
+      message.textContent = `INICIANDO ${cleanRomName(romName)}...`;
     };
 
     iframe.src = playerUrl.href;
