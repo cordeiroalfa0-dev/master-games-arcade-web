@@ -69,18 +69,10 @@
     log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
   }
 
-  // EmulatorJS Arcade utiliza o core FBNeo nesta configuração.
-  // A ROM ZIP deve ser compatível com o romset FBNeo.
-  // ATENÇÃO: com EJS_dontExtractBIOS=true o EmulatorJS 4.2.3 usa a string da
-  // URL da BIOS como caminho de gravação no sistema de arquivos do core
-  // (FS.writeFile(url)). Por isso ela precisa ser um caminho relativo simples
-  // na raiz, como "/neogeo.zip" — nada de URL absoluta nem query string.
   const biosFile=(biosName||biosUrl.split('/').pop()||'').split('?')[0].split('#')[0];
   window.EJS_biosUrl=biosFile?'/'+biosFile:'';
   window.EJS_gameParentUrl='';
   window.EJS_externalFiles={};
-
-  // Mantém o ZIP da BIOS intacto para o core fazer o merge com o romset.
   window.EJS_dontExtractBIOS=true;
 
   if(window.EJS_biosUrl){
@@ -89,9 +81,7 @@
       const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
       const len=head.headers.get('content-length');
       log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(len||'desconhecido')+' bytes');
-      if(!head.ok){
-        log('AVISO: endpoint da BIOS não respondeu OK — o core pode falhar ao montar o arquivo.');
-      }
+      if(!head.ok)log('AVISO: endpoint da BIOS não respondeu OK — o core pode falhar ao montar o arquivo.');
     }catch(e){
       log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)');
     }
@@ -104,12 +94,8 @@
   window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
   window.EJS_gameUrl=romUrl;
 
-  // Versão fixada para evitar alterações automáticas no core.
   const EJS_PINNED_VERSION='4.2.3';
   window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
-  // Desativado: o EmulatorJS cria o próprio botão Start Game. Se o player
-  // clicar automaticamente nele ao mesmo tempo que o EmulatorJS inicializa
-  // o módulo WASM, ocorre o erro "toggleMainLoop undefined".
   window.EJS_startOnLoaded=false;
   window.EJS_alignStartButton='center';
   window.EJS_language='en-US';
@@ -125,34 +111,22 @@
   };
 
   // ---------------------------------------------------------------
-  // Controles de teclado (valem para TODOS os jogos)
-  // Jogador 1: setas + Z X A S (socos/chutes), Enter = Start, Shift = Coin
-  // Jogador 2: T F G H + J K U I, V = Start, C = Coin
-  //
-  // PERSISTÊNCIA: o mapa padrão só é aplicado na PRIMEIRA vez que o
-  // navegador abre o player. Nas vezes seguintes ele não é reenviado,
-  // para não sobrescrever o que o usuário configurou. O EmulatorJS
-  // grava os controles de cada jogo no armazenamento local do
-  // navegador e os restaura sozinho; como reforço, salvamos uma cópia
-  // extra em cada alteração (EJS_onControlUpdate abaixo). Assim a
-  // configuração NUNCA se perde ao reiniciar — a menos que o usuário
-  // limpe os dados do site no navegador.
+  // Controles de teclado do PC.
+  // SOMENTE o Jogador 1 é configurado aqui.
+  // P1: ↑ ↓ ← → | Z X C A S D | 1 = Start | 5 = Coin
+  // O Jogador 2 permanece exatamente como já estava configurado.
   // ---------------------------------------------------------------
-  const CONTROLS_FLAG='mga-controls-v1';
-  const CONTROLS_BACKUP='mga-controls-backup-v1';
+  const CONTROLS_FLAG='mga-controls-p1-v2';
+  const CONTROLS_BACKUP='mga-controls-p1-backup-v2';
   let mgaControlsApplied=false;
   try{mgaControlsApplied=localStorage.getItem(CONTROLS_FLAG)==='1'}catch{}
   if(mgaControlsApplied){
-    log('Controles já configurados neste navegador — mantendo a configuração gravada.');
+    log('Controles P1 já configurados neste navegador — mantendo a configuração gravada.');
   }else{
     try{localStorage.setItem(CONTROLS_FLAG,'1')}catch{}
-    log('Primeira execução: aplicando mapa de controles padrão.');
+    log('Aplicando configuração padrão do Jogador 1.');
   }
 
-  // Cópia de segurança: sempre que o usuário muda um controle no menu
-  // do emulador, salvamos o mapa completo no armazenamento do site.
-  // Na próxima abertura, se o EmulatorJS não tiver restaurado por conta
-  // própria, reinjetamos a cópia (ver EJS_onGameStart).
   window.EJS_onControlUpdate=()=>{
     try{
       const s=window.EJS_emulator?.controls;
@@ -163,22 +137,25 @@
     }catch{}
   };
 
+  // Índices do EmulatorJS/RetroArch: 8=A/Botão 1, 0=B/Botão 2,
+  // 9=X/Botão 3, 1=Y/Botão 4, 10=L/Botão 5, 11=R/Botão 6.
+  // Start=3 e Select/Coin=2. P2 não é alterado.
   window.EJS_defaultControls=mgaControlsApplied?{}:{
     0:{
-      0:{value:'z',value2:'BUTTON_2'},
+      0:{value:'x',value2:'BUTTON_2'},
       1:{value:'a',value2:'BUTTON_4'},
-      2:{value:'shift',value2:'SELECT'},
-      3:{value:'enter',value2:'START'},
+      2:{value:'5',value2:'SELECT'},
+      3:{value:'1',value2:'START'},
       4:{value:'up arrow',value2:'DPAD_UP'},
       5:{value:'down arrow',value2:'DPAD_DOWN'},
       6:{value:'left arrow',value2:'DPAD_LEFT'},
       7:{value:'right arrow',value2:'DPAD_RIGHT'},
-      8:{value:'x',value2:'BUTTON_1'},
-      9:{value:'s',value2:'BUTTON_3'},
-      10:{value:'q',value2:'LEFT_TOP_SHOULDER'},
-      11:{value:'w',value2:'RIGHT_TOP_SHOULDER'},
-      12:{value:'1',value2:'LEFT_BOTTOM_SHOULDER'},
-      13:{value:'2',value2:'RIGHT_BOTTOM_SHOULDER'},
+      8:{value:'z',value2:'BUTTON_1'},
+      9:{value:'c',value2:'BUTTON_3'},
+      10:{value:'s',value2:'LEFT_TOP_SHOULDER'},
+      11:{value:'d',value2:'RIGHT_TOP_SHOULDER'},
+      12:{value:'',value2:'LEFT_BOTTOM_SHOULDER'},
+      13:{value:'',value2:'RIGHT_BOTTOM_SHOULDER'},
       14:{value:'',value2:'LEFT_STICK'},
       15:{value:'',value2:'RIGHT_STICK'},
       16:{value:'',value2:'LEFT_STICK_X:+1'},
@@ -220,16 +197,9 @@
         if(p&&p.catch)p.catch(err=>log('Tela cheia recusada: '+(err?.message||err)));
         log('Tela cheia solicitada');
       }
-    }catch(e){
-      log('Tela cheia falhou: '+(e?.message||e));
-    }
+    }catch(e){log('Tela cheia falhou: '+(e?.message||e));}
   };
 
-  // O navegador só aceita tela cheia DENTRO do gesto do usuário (clique/toque).
-  // Pedir tela cheia depois que o jogo inicia (EJS_onGameStart) chega tarde
-  // demais e o navegador recusa. Por isso o pedido acontece no mesmo clique
-  // que o usuário dá no botão "Start Game" do EmulatorJS (fase de captura,
-  // antes do clique chegar ao botão), usando qualquer resolução de monitor.
   const gameArea=document.getElementById('game');
   const armFullscreenOnGesture=()=>{
     const onGesture=()=>{
@@ -241,7 +211,6 @@
   armFullscreenOnGesture();
   gameArea.addEventListener('click',()=>goFullscreen(),true);
 
-  // F11 / tecla F alterna tela cheia sem sair do jogo.
   addEventListener('keydown',e=>{
     if(e.key==='F11'||e.code==='F11'){
       e.preventDefault();
@@ -273,36 +242,26 @@
         });
         log(expected+' encontrado no FS: '+(found.length?found.join(' | '):'não exposto pelo wrapper'));
       }
-    }catch(e){
-      log('Diagnóstico FS: '+(e?.message||e));
-    }
+    }catch(e){log('Diagnóstico FS: '+(e?.message||e));}
 
     try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
   };
 
-  // Inicia somente uma vez. O clique duplicado era capaz de chamar
-  // toggleMainLoop antes de o módulo interno do EmulatorJS estar pronto.
   const tryStart=()=>{
     if(started||attempting)return false;
-
     const els=[...document.querySelectorAll('button,[role="button"]')];
     log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
-
     const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
     if(!b)return false;
-
     attempting=true;
     b.click();
     log('Start Game acionado uma única vez');
-
-    // Libera nova tentativa apenas se o core não iniciou.
     setTimeout(()=>{
       if(!started){
         attempting=false;
         log('O core ainda não iniciou; nova tentativa poderá ser feita manualmente.');
       }
     },5000);
-
     return true;
   };
 
@@ -323,16 +282,9 @@
     }
   });
 
-  // Não usamos listener global de clique: ele podia capturar o clique
-  // sintético do EmulatorJS e iniciar o core duas vezes.
-
   window.EJS_ready=()=>{
     ready=true;
     log('EmulatorJS pronto; o botão Start Game será acionado somente pelo usuário');
-
-    // Não chamamos b.click() automaticamente. O EmulatorJS ainda pode estar
-    // finalizando o módulo WASM quando EJS_ready é disparado. O usuário deve
-    // clicar uma única vez no botão Start Game exibido pelo próprio EmulatorJS.
     setTimeout(()=>{
       if(!started)showManualStart();
     },1500);
@@ -366,22 +318,13 @@
     }
   },45000);
 
-  // Os controles de teclado e gamepad são tratados pelo próprio EmulatorJS
-  // através de EJS_defaultControls (mapa acima). Nenhum remapeamento manual.
-
-  // Reforço de persistência: o EmulatorJS grava os controles de cada
-  // jogo no armazenamento local com a chave "EJS_<nome do jogo>-controls".
-  // Se essa chave estiver ausente (ex.: navegador novo ou dados do
-  // emulador limpos), restauramos a partir da nossa cópia de segurança,
-  // que nunca é apagada por ele.
+  // O EmulatorJS grava os controles de cada jogo no armazenamento local.
+  // A configuração padrão acima é aplicada somente uma vez por navegador.
   try{
     const ejsKey='EJS_'+window.EJS_gameName+'-controls';
     if(!localStorage.getItem(ejsKey)){
       const backup=localStorage.getItem(CONTROLS_BACKUP);
-      if(backup){
-        localStorage.setItem(ejsKey,backup);
-        log('Controles restaurados da cópia de segurança do site.');
-      }
+      if(backup)localStorage.setItem(ejsKey,backup);
     }
   }catch{}
 
