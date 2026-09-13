@@ -13,301 +13,169 @@
   </style>
 </head>
 <body>
-  <div id="game"></div>
-  <div id="status">CARREGANDO...</div>
-  <pre id="debug"></pre>
-  <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
-
+<div id="game"></div><div id="status">CARREGANDO...</div><pre id="debug"></pre><button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
 <script>
 (async()=>{
-  const q=new URLSearchParams(location.search);
-  const rom=q.get('rom');
-  const biosUrl=q.get('bios')||'';
-  const biosName=q.get('biosName')||'';
-  const name=q.get('name')||'Master Games Arcade';
-  const status=document.getElementById('status');
-  const debug=document.getElementById('debug');
-  const manual=document.getElementById('manual-start');
-  const logs=[];
+ const q=new URLSearchParams(location.search),rom=q.get('rom'),biosUrl=q.get('bios')||'',biosName=q.get('biosName')||'',name=q.get('name')||'Master Games Arcade';
+ const status=document.getElementById('status'),debug=document.getElementById('debug'),manual=document.getElementById('manual-start'),logs=[];
+ let ready=false,started=false,attempting=false,retriesLeft=3;
+ const log=x=>{logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);if(logs.length>80)logs.shift();debug.textContent=logs.join('\n');console.log('[MGA]',x)};
+ const fail=x=>{status.textContent=x;status.style.color='#ff2bd6';debug.style.display='block';manual.style.display='none';log('ERRO: '+x);try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}};
 
-  let ready=false;
-  let started=false;
-  let attempting=false;
-  let retriesLeft=3;
-  let retryTimer=null;
-  let startWatchdog=null;
+ // CORRIGIDO: o script do EmulatorJS é carregado de outro domínio
+ // (cdn.emulatorjs.org) SEM o atributo crossorigin. Por política de
+ // segurança do navegador, isso faz com que qualquer erro originado
+ // dentro desse script chegue ao window.onerror mascarado como o texto
+ // genérico "Script error.", sem mensagem real nem stack trace. Ou seja:
+ // não dá para confiar no TEXTO do erro pra decidir se foi o
+ // "toggleMainLoop" ou outra coisa — o texto real nunca chega até aqui.
+ // Por isso a lógica de retry abaixo NÃO filtra por mensagem: qualquer
+ // erro global que aconteça enquanto estamos tentando iniciar o jogo
+ // (attempting=true, started=false) é tratado como candidato a "core
+ // ainda estava inicializando" e disparamos um novo tryStart().
+ addEventListener('error',e=>{
+   log('window.error: '+(e.message||'erro (mensagem mascarada por CORS no script do CDN)'));
+   if(attempting&&!started&&retriesLeft>0){
+     retriesLeft--;
+     attempting=false;
+     log('Possível corrida de inicialização do core — tentando de novo em 2.5s ('+retriesLeft+' tentativas restantes)...');
+     setTimeout(()=>{if(!started)tryStart()},2500);
+   }
+ });
+ addEventListener('unhandledrejection',e=>log('unhandledrejection: '+(e.reason?.message||e.reason)));
+ if(!rom){fail('ROM NÃO INFORMADA');return}
+ const romUrl=new URL(rom,location.origin).href;
+ log('Jogo: '+name);log('ROM URL: '+romUrl);if(biosUrl)log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
 
-  const log=x=>{
-    logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);
-    if(logs.length>80)logs.shift();
-    debug.textContent=logs.join('\n');
-    console.log('[MGA]',x);
-  };
+ // O player web usa diretamente o core Arcade do EmulatorJS.
+ // O build MAME standalone não faz parte deste repositório; não interrompa
+ // a inicialização procurando /web/mame0168/mame.js.
+ // IMPORTANTE (corrigido em 2026-09-13): EJS_core='arcade' hoje roda sobre
+ // o core FBNeo (libretro), não sobre o FBA 0.2.97.42 antigo — a doc oficial
+ // do EmulatorJS confirma isso (https://emulatorjs.org/docs/systems/arcade/).
+ // Romsets e BIOS precisam bater com o que ESSA build do FBNeo espera, não
+ // com dumps antigos de MAME 0.168.2 sem verificar. A BIOS é entregue via
+ // EJS_biosUrl e precisa ter os nomes internos exatos (ex: sp-s3.sp1) que o
+ // core procura, não só o CRC correto.
+ window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
+ window.EJS_gameParentUrl='';
+ window.EJS_externalFiles={};
+ // CORRIGIDO: o core arcade/FBNeo espera o zip da BIOS (ex: neogeo.zip)
+ // intacto dentro da pasta de sistema, para fazer merge com o romset do
+ // jogo. Com dontExtractBIOS=false, o EmulatorJS descompacta o zip em
+ // arquivos soltos e o core deixa de encontrar "neogeo.zip" como container,
+ // reportando os arquivos internos (sp-s3.sp1, sm1.sm1, sfix.sfix,
+ // 000-lo.lo etc.) como "missing" mesmo estando corretos dentro do zip.
+ window.EJS_dontExtractBIOS=true;
+ if(biosUrl){
+   log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
+   // Confere se o arquivo de BIOS realmente responde (200 + tamanho) antes
+   // do EmulatorJS tentar buscá-lo. Isso separa "endpoint quebrado/CORS"
+   // de "o core não expôs o arquivo no FS depois de baixar certo".
+   try{
+     const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
+     const len=head.headers.get('content-length');
+     log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(len||'desconhecido')+' bytes');
+     if(!head.ok) log('AVISO: endpoint da BIOS não respondeu OK — o core vai falhar ao montar o arquivo.');
+   }catch(e){log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)')}
+ }
 
-  const fail=x=>{
-    status.textContent=x;
-    status.style.color='#ff2bd6';
-    debug.style.display='block';
-    manual.style.display='none';
-    log('ERRO: '+x);
-    try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}
-  };
+ // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
+ // ArrayBuffer/Blob da ROM antes do player para evitar download duplicado.
+ status.textContent='INICIANDO Arcade (FBNeo) — '+name+'...';
+ window.EJS_player='#game';
+   // O catálogo deve informar ROMs no set que o core FBNeo desta versão
+   // pinada espera. Não misture com sets antigos de MAME 0.168 sem
+   // verificar CRC32 e nome interno do zip primeiro.
+ window.EJS_core='arcade';
+ window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
+   window.EJS_gameUrl=romUrl;
+ // Fixado em uma versão numerada (em vez de 'stable') para que o core e o
+ // formato de romset esperado não mudem sozinhos por trás do projeto.
+ // Atualize este número apenas quando testar a mudança manualmente.
+ const EJS_PINNED_VERSION='4.2.3';
+ window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
+ window.EJS_startOnLoaded=true;
+ window.EJS_alignStartButton='center';
+ window.EJS_language='en-US';
+ window.EJS_disableAutoLang=true;
+ window.EJS_volume=0;
+ window.EJS_color='#00e5ff';
+ window.EJS_backgroundColor='#000';
+ window.EJS_DEBUG_XX=true;
 
-  if(!rom){
-    fail('ROM NÃO INFORMADA');
-    return;
-  }
+ const hide=()=>{status.style.display='none';manual.style.display='none'};
+ window.EJS_onGameStart=()=>{
+   if(started)return;
+   started=true;hide();log('Arcade/FBA iniciou o jogo');
+   try{
+     const fs=window.EJS_emulator?.gameManager?.FS;
+     if(fs){
+       const expected=biosName||'BIOS';
+       const checks=[`/${expected}`,'/home/web_user/retroarch/userdata/system/'+expected,'/home/web_user/retroarch/userdata/system/fbneo/'+expected];
+       const found=checks.filter(p=>{try{fs.stat(p);return true}catch{return false}});
+       log(expected+' encontrado no FS: '+(found.length?found.join(' | '):'não exposto pelo wrapper'));
+     }
+   }catch(e){log('Diagnóstico FS: '+(e?.message||e))}
+   try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
+ };
 
-  const romUrl=new URL(rom,location.origin).href;
-  log('Jogo: '+name);
-  log('ROM URL: '+romUrl);
-  if(biosUrl){
-    log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
-  }
+ const tryStart=()=>{
+   // Evita reentrada: o clique sintético abaixo (b.click()) passa pelo
+   // listener global de clique em capture phase e chamava tryStart() de
+   // novo antes do EmulatorJS terminar de inicializar, clicando 2x em
+   // "Start Game" e quebrando o Module interno (toggleMainLoop undefined).
+   if(attempting)return false;
+   const els=[...document.querySelectorAll('button,[role="button"]')];
+   log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
+   const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
+   if(b){
+     attempting=true;
+     b.click();log('Start Game acionado');
+     setTimeout(()=>{if(!started)attempting=false},3000);
+     return true;
+   }
+   return false;
+ };
+ const showManualStart=()=>{if(!started){status.style.display='none';manual.style.display='block';log('Aguardando clique do usuário para iniciar o Arcade/FBA')}};
+ manual.addEventListener('click',()=>{manual.style.display='none';if(!tryStart())log('Nenhum botão Start Game encontrado após clique')});
+ document.addEventListener('click',()=>{if(ready&&!started)tryStart()},true);
+ window.EJS_ready=()=>{
+   ready=true;log('EmulatorJS pronto');
+   // CORRIGIDO: mesmo depois de EJS_ready disparar, o core pesado
+   // (FBNeo/WASM) ainda pode estar terminando de alocar memória — os
+   // avisos "Enlarging memory arrays" que aparecem no console DEPOIS do
+   // crash de toggleMainLoop confirmam que a inicialização de memória
+   // ainda estava em andamento quando clicamos "Start Game" cedo demais.
+   // Damos uma folga de 400ms antes do primeiro clique automático.
+   setTimeout(()=>{
+     if(!tryStart()){
+       showManualStart();
+       const t=setInterval(()=>{if(started||tryStart()){clearInterval(t);manual.style.display='none'}},1000);
+       setTimeout(()=>clearInterval(t),45000);
+     }
+   },400);
+ };
+ setTimeout(()=>{if(!ready&&!started)fail('Arcade não carregou em 30s. Verifique a ROM/BIOS e o endpoint de download.')},30000);
+ setTimeout(()=>{if(ready&&!started)fail('EmulatorJS ficou pronto, mas o core Arcade (FBNeo) não iniciou a ROM. Confirme o romset e o BIOS.')},45000);
 
-  // EmulatorJS Arcade utiliza o core FBNeo nesta configuração.
-  // A ROM ZIP deve ser compatível com o romset FBNeo.
-  window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
-  window.EJS_gameParentUrl='';
-  window.EJS_externalFiles={};
-
-  // Mantém o ZIP da BIOS intacto para o core fazer o merge com o romset.
-  window.EJS_dontExtractBIOS=true;
-
-  if(biosUrl){
-    log('BIOS configurado via EJS_biosUrl: '+(biosName||biosUrl));
-    try{
-      const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
-      const len=head.headers.get('content-length');
-      log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(len||'desconhecido')+' bytes');
-      if(!head.ok){
-        log('AVISO: endpoint da BIOS não respondeu OK — o core pode falhar ao montar o arquivo.');
-      }
-    }catch(e){
-      log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)');
-    }
-  }
-
-  status.textContent='INICIANDO Arcade (FBNeo) — '+name+'...';
-
-  window.EJS_player='#game';
-  window.EJS_core='arcade';
-  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
-  window.EJS_gameUrl=romUrl;
-
-  // Versão fixada para evitar alterações automáticas no core.
-  const EJS_PINNED_VERSION='4.2.3';
-  window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
-  window.EJS_startOnLoaded=true;
-  window.EJS_alignStartButton='center';
-  window.EJS_language='en-US';
-  window.EJS_disableAutoLang=true;
-  window.EJS_volume=0;
-  window.EJS_color='#00e5ff';
-  window.EJS_backgroundColor='#000';
-  window.EJS_DEBUG_XX=true;
-
-  const hide=()=>{
-    status.style.display='none';
-    manual.style.display='none';
-  };
-
-  window.EJS_onGameStart=()=>{
-    if(started)return;
-    started=true;
-    attempting=false;
-    if(retryTimer)clearTimeout(retryTimer);
-    if(startWatchdog)clearTimeout(startWatchdog);
-    hide();
-    log('Arcade/FBNeo iniciou o jogo');
-
-    try{
-      const fs=window.EJS_emulator?.gameManager?.FS;
-      if(fs){
-        const expected=biosName||'BIOS';
-        const checks=[
-          `/${expected}`,
-          '/home/web_user/retroarch/userdata/system/'+expected,
-          '/home/web_user/retroarch/userdata/system/fbneo/'+expected
-        ];
-        const found=checks.filter(p=>{
-          try{fs.stat(p);return true}catch{return false}
-        });
-        log(expected+' encontrado no FS: '+(found.length?found.join(' | '):'não exposto pelo wrapper'));
-      }
-    }catch(e){
-      log('Diagnóstico FS: '+(e?.message||e));
-    }
-
-    try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
-  };
-
-  // Inicia somente uma vez. O clique duplicado era capaz de chamar
-  // toggleMainLoop antes de o módulo interno do EmulatorJS estar pronto.
-  const tryStart=()=>{
-    if(started||attempting)return false;
-
-    const els=[...document.querySelectorAll('button,[role="button"]')];
-    log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
-
-    const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
-    if(!b)return false;
-
-    attempting=true;
-    b.click();
-    log('Start Game acionado uma única vez');
-
-    // Libera nova tentativa apenas se o core não iniciou.
-    setTimeout(()=>{
-      if(!started){
-        attempting=false;
-        log('O core ainda não iniciou; nova tentativa poderá ser feita manualmente.');
-      }
-    },5000);
-
-    return true;
-  };
-
-  const showManualStart=()=>{
-    if(!started){
-      status.style.display='none';
-      manual.style.display='block';
-      log('Aguardando clique do usuário para iniciar o Arcade/FBNeo');
-    }
-  };
-
-  manual.addEventListener('click',()=>{
-    manual.style.display='none';
-    if(!tryStart()){
-      log('Nenhum botão Start Game encontrado após clique');
-      showManualStart();
-    }
-  });
-
-  // Não usamos listener global de clique: ele podia capturar o clique
-  // sintético do EmulatorJS e iniciar o core duas vezes.
-
-  window.EJS_ready=()=>{
-    ready=true;
-    log('EmulatorJS pronto; aguardando o módulo FBNeo terminar de carregar');
-
-    // CORREÇÃO: não tentamos mais clicar automaticamente com um tempo fixo.
-    // O crescimento de memória do WASM (16MB -> 64MB, visto no aviso
-    // "Enlarging memory arrays") pode acontecer bem depois do EJS_ready,
-    // dependendo de quanto falta pra terminar o download da BIOS/ROM — e
-    // se clicarmos Start Game nesse meio-tempo, a referência interna
-    // toggleMainLoop fica indisponível e o core quebra.
-    // Em vez de adivinhar um tempo, mostramos o botão manual desde já.
-    // Um clique real do usuário só vai acontecer depois que os dados já
-    // tiverem chegado, o que elimina essa corrida por completo.
-    if(!started){
-      showManualStart();
-      const t=setInterval(()=>{
-        if(started){
-          clearInterval(t);
-          return;
-        }
-        // Ainda tenta detectar o botão nativo do EmulatorJS aparecendo
-        // sozinho (alguns cores criam o próprio botão "Play"), mas nunca
-        // força um clique antes da hora.
-        const els=[...document.querySelectorAll('button,[role="button"]')];
-        const nativeBtn=els.find(e=>e!==manual&&/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
-        if(nativeBtn)log('Botão nativo do EmulatorJS detectado — clique nele ou em CLIQUE PARA INICIAR quando o download terminar.');
-      },1500);
-      setTimeout(()=>clearInterval(t),120000);
-    }
-  };
-
-  addEventListener('error',e=>{
-    log('window.error: '+(e.message||'erro mascarado pelo CDN'));
-    if(attempting&&!started&&retriesLeft>0){
-      retriesLeft--;
-      attempting=false;
-      log('Possível corrida de inicialização — tentando novamente em 2.5s ('+retriesLeft+' restantes)');
-      retryTimer=setTimeout(()=>{
-        if(!started)tryStart();
-      },2500);
-    }
-  });
-
-  addEventListener('unhandledrejection',e=>{
-    log('unhandledrejection: '+(e.reason?.message||e.reason));
-  });
-
-  startWatchdog=setTimeout(()=>{
-    if(!ready&&!started){
-      fail('Arcade não carregou em 30s. Verifique a ROM, o BIOS e o endpoint de download.');
-    }
-  },30000);
-
-  // Estendido de 45s para 3min: agora aguardamos um clique manual real do
-  // usuário (ou o botão nativo do EmulatorJS), que pode demorar mais que
-  // 45s em conexões lentas. Isso não é mais sinal de falha por si só.
-  setTimeout(()=>{
-    if(ready&&!started){
-      fail('EmulatorJS ficou pronto, mas o core Arcade (FBNeo) não iniciou. Clique em "CLIQUE PARA INICIAR". Se o botão não aparecer, confirme o romset e o BIOS.');
-    }
-  },180000);
-
-  const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
-  const key=(k,type)=>{
-    const t=document.querySelector('canvas')||document;
-    t.dispatchEvent(new KeyboardEvent(type,{
-      key:k,
-      code:k.length===1?'Key'+k.toUpperCase():k,
-      bubbles:true,
-      cancelable:true,
-      composed:true
-    }));
-  };
-
-  addEventListener('keydown',e=>{
-    if(map[e.code]){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      key(map[e.code],'keydown');
-    }
-  },true);
-
-  addEventListener('keyup',e=>{
-    if(map[e.code]){
-      e.preventDefault();
-      e.stopImmediatePropagation();
-      key(map[e.code],'keyup');
-    }
-  },true);
-
-  const pads=new Map();
-  const pkeys=[['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'],['i','k','j','l']];
-  const poll=()=>{
-    const gs=navigator.getGamepads?navigator.getGamepads():[];
-    for(let p=0;p<2;p++){
-      const g=gs[p];
-      if(!g)continue;
-      const x=+(g.axes?.[0]||0),y=+(g.axes?.[1]||0),s=pads.get(p)||{};
-      const w={
-        [pkeys[p][0]]:y<-.35,
-        [pkeys[p][1]]:y>.35,
-        [pkeys[p][2]]:x<-.35,
-        [pkeys[p][3]]:x>.35
-      };
-      for(const [k,v] of Object.entries(w)){
-        if(v===!!s[k])continue;
-        s[k]=v;
-        key(k,v?'keydown':'keyup');
-      }
-      pads.set(p,s);
-    }
-    requestAnimationFrame(poll);
-  };
-  requestAnimationFrame(poll);
-
-  const script=document.createElement('script');
-  script.src='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/loader.js';
-  script.async=true;
-  script.crossOrigin='anonymous';
-  script.onerror=()=>fail('Não foi possível carregar o EmulatorJS pelo CDN.');
-  document.head.appendChild(script);
+ const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
+ const key=(k,type)=>{const t=document.querySelector('canvas')||document;t.dispatchEvent(new KeyboardEvent(type,{key:k,code:k.length===1?'Key'+k.toUpperCase():k,bubbles:true,cancelable:true,composed:true}))};
+ addEventListener('keydown',e=>{if(map[e.code]){e.preventDefault();e.stopImmediatePropagation();key(map[e.code],'keydown')}},true);
+ addEventListener('keyup',e=>{if(map[e.code]){e.preventDefault();e.stopImmediatePropagation();key(map[e.code],'keyup')}},true);
+ const pads=new Map(),pkeys=[['ArrowUp','ArrowDown','ArrowLeft','ArrowRight'],['i','k','j','l']];
+ const poll=()=>{const gs=navigator.getGamepads?navigator.getGamepads():[];for(let p=0;p<2;p++){const g=gs[p];if(!g)continue;const x=+(g.axes?.[0]||0),y=+(g.axes?.[1]||0),s=pads.get(p)||{},w={[pkeys[p][0]]:y<-.35,[pkeys[p][1]]:y>.35,[pkeys[p][2]]:x<-.35,[pkeys[p][3]]:x>.35};for(const [k,v]of Object.entries(w)){if(v===!!s[k])continue;s[k]=v;key(k,v?'keydown':'keyup')}pads.set(p,s)}requestAnimationFrame(poll)};requestAnimationFrame(poll);
+ const script=document.createElement('script');
+ script.src='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/loader.js';
+ script.async=true;
+ // CORRIGIDO: tenta liberar mensagens de erro reais desse script (em vez
+ // de "Script error." genérico) quando o CDN responder com os headers
+ // CORS corretos. Se o CDN não enviar Access-Control-Allow-Origin, o
+ // navegador ainda vai mascarar — por isso a lógica de retry acima não
+ // depende do texto da mensagem, só do timing (attempting && !started).
+ script.crossOrigin='anonymous';
+ script.onerror=()=>fail('Não foi possível carregar o EmulatorJS pelo CDN.');
+ document.head.appendChild(script);
 })();
 </script>
 </body>
