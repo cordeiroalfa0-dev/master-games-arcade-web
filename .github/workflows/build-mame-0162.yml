@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/build-mame-0162.yml'
+      - 'web/player.html'
   workflow_dispatch:
 
 permissions:
