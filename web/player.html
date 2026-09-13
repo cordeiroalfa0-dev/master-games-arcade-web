@@ -48,7 +48,9 @@
  // ArrayBuffer/Blob da ROM antes do player para evitar download duplicado.
  status.textContent='INICIANDO FBNeo — '+name+'...';
  window.EJS_player='#game';
- window.EJS_core='fbneo';
+ // O catálogo informa ROMs do set FBA 0.2.97.42; esse set é atendido
+ // pelo core arcade, enquanto o fbneo atual exige outro ROM set/CRC.
+ window.EJS_core='arcade';
  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
    window.EJS_gameUrl=romUrl;
  window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
