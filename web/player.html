@@ -40,7 +40,6 @@
      window.Module.preRun.push(()=>{Module.addRunDependency('mame-roms');(async()=>{try{try{FS.mkdir('/roms')}catch{};for(const file of files){const response=await fetch(file.url);if(!response.ok)throw new Error('Falha ao baixar '+file.name);FS.writeFile('/roms/'+file.name,new Uint8Array(await response.arrayBuffer()));}log('MAME: ROM e BIOS montadas em /roms')}catch(e){log('MAME: '+e.message)}finally{Module.removeRunDependency('mame-roms')}})()});
      const script=document.createElement('script');script.src='/web/mame0168/mame.js';script.onload=()=>{status.style.display='none';log('MAME 0.168.2 carregado')};script.onerror=()=>fail('Build do MAME 0.168.2 indisponível.');document.head.appendChild(script);
      return;
-   }
  }catch(e){fail('Não foi possível verificar o MAME 0.168.2: '+e.message);return}
 
  // O core Arcade documentado pelo EmulatorJS recebe a BIOS por EJS_biosUrl.
