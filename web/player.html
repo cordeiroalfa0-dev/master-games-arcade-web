@@ -27,16 +27,16 @@
  const parentUrl=parentRom?new URL(parentRom,location.origin).href:'';
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo URL: '+parentUrl);
 
- // O BIOS Neo Geo vem do mesmo catálogo/Google Drive das ROMs.
- // O FBNeo procura primeiro junto da ROM e também em SYSTEM_DIRECTORY/fbneo.
- // Colocamos o conteúdo extraído nos dois locais para atender as duas formas
- // de resolução usadas pelas versões do RetroArch/FBNeo no EmulatorJS.
+ // O FBNeo/libretro declara o firmware como fbneo/neogeo.zip.
+ // Portanto, NÃO extraímos o BIOS: mantemos o neogeo.zip como ZIP no
+ // filesystem virtual, para que o próprio FBNeo possa abrir o arquivo e
+ // validar os CRCs internos (sp-s3.sp1, sm1.sm1, sfix.sfix, 000-lo.lo).
  if(parentUrl){
    window.EJS_externalFiles={
-     '/': parentUrl,
-     '/home/web_user/retroarch/userdata/system/fbneo/': parentUrl
+     '/neogeo.zip': parentUrl,
+     '/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip': parentUrl
    };
-   log('BIOS Neo Geo configurado no diretório da ROM e em /home/web_user/retroarch/userdata/system/fbneo/');
+   log('BIOS Neo Geo configurado como neogeo.zip na raiz da ROM e em /home/web_user/retroarch/userdata/system/fbneo/');
  }
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
@@ -55,8 +55,6 @@
  window.EJS_color='#00e5ff';
  window.EJS_backgroundColor='#000';
  window.EJS_DEBUG_XX=true;
- // O BIOS já é extraído por EJS_externalFiles. Não usamos EJS_biosUrl
- // para evitar que o mesmo ZIP seja tratado como um arquivo BIOS único.
  window.EJS_biosUrl='';
 
  let ready=false,started=false;
@@ -67,9 +65,9 @@
    try{
      const fs=window.EJS_emulator?.gameManager?.FS;
      if(fs){
-       const checks=['/sp-s3.sp1','/sm1.sm1','/sfix.sfix','/000-lo.lo','/home/web_user/retroarch/userdata/system/fbneo/sp-s3.sp1','/home/web_user/retroarch/userdata/system/fbneo/sm1.sm1','/home/web_user/retroarch/userdata/system/fbneo/sfix.sfix','/home/web_user/retroarch/userdata/system/fbneo/000-lo.lo'];
+       const checks=['/neogeo.zip','/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip'];
        const found=checks.filter(p=>{try{fs.stat(p);return true}catch{return false}});
-       log('BIOS encontrados no FS: '+(found.length?found.join(' | '):'NENHUM'));
+       log('neogeo.zip encontrado no FS: '+(found.length?found.join(' | '):'NENHUM'));
      }
    }catch(e){log('Diagnóstico FS: '+(e?.message||e))}
    try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
