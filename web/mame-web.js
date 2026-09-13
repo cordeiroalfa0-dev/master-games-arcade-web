@@ -35,7 +35,19 @@
     const romUrl = `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
     const biosName = item.bios || item.biosName || biosForGame(item.name);
     const bios = biosName && (catalog.files || []).find((entry) => fileBase(entry?.name) === fileBase(biosName));
-    const biosUrl = bios?.id && !bios.skipDownload ? `/api/rom/${encodeURIComponent(bios.id)}/${encodeURIComponent(bios.name)}` : "";
+    // CORRIGIDO: a URL da BIOS agora usa um endpoint achatado por query
+    // string (/api/bios?id=...&name=...) em vez de segmentos de path
+    // (/api/rom/{id}/{name}). O EmulatorJS até a versão 4.2.3 tem um bug
+    // conhecido em EJS_dontExtractBIOS quando a URL da BIOS tem "/" no
+    // path (corrigido só na 4.3.0-pre, ainda pre-release). Como o core
+    // arcade/FBNeo EXIGE dontExtractBIOS=true pra fazer merge do zip da
+    // BIOS (neogeo.zip, pgm.zip, isgsm.zip) com o romset do jogo, a URL da
+    // BIOS precisa ficar livre desse bug enquanto estivermos pinados na
+    // 4.2.3. A URL da ROM do jogo (romUrl acima) não é afetada por esse
+    // bug e continua com o formato antigo.
+    const biosUrl = bios?.id && !bios.skipDownload
+      ? `/api/bios?id=${encodeURIComponent(bios.id)}&name=${encodeURIComponent(bios.name)}`
+      : "";
     if (biosName && !biosUrl) console.warn(`[MGA Web] BIOS ${biosName} não foi encontrado no catálogo para ${item.name}.`);
     message.textContent = `CARREGANDO ${item.name}...`;
     return { item, url: romUrl, biosUrl, biosName };
@@ -73,7 +85,7 @@
       (async () => { try { const { item, url, biosUrl, biosName } = await resolveRom(romName, message); player = createWebPlayer(item.name, url, message, overlay, biosUrl, biosName); resolve(); } catch (error) { message.textContent = error?.message || "Falha ao iniciar a ROM."; reject(error); } })();
     });
   }
-  window.MGA_WEB = Object.freeze({ launch: showWebPlayer, version: "1.5.1" });
+  window.MGA_WEB = Object.freeze({ launch: showWebPlayer, version: "1.5.2" });
   window.fetch = async function (input, init) {
     const rawUrl = typeof input === "string" ? input : input?.url || ""; let parsed; try { parsed = new URL(rawUrl, location.href); } catch { return originalFetch(input, init); }
     const isNativeApi = parsed.origin === NATIVE_API; const isLocalApi = parsed.origin === location.origin && parsed.pathname.startsWith(API_PREFIX); if (!isNativeApi && !isLocalApi) return originalFetch(input, init);
