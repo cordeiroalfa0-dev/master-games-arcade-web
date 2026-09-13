@@ -7,18 +7,19 @@
   <style>
     html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
     #game{width:100vw;height:100vh;background:#000}
-    #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap}
+    #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none}
     #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
+    #manual-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100001;display:none;background:#08000f;color:#00e5ff;border:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66;padding:16px 24px;font:700 16px monospace;cursor:pointer}
   </style>
 </head>
 <body>
-<div id="game"></div><div id="status">CARREGANDO...</div><pre id="debug"></pre>
+<div id="game"></div><div id="status">CARREGANDO...</div><pre id="debug"></pre><button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
 <script>
 (()=>{
  const q=new URLSearchParams(location.search),rom=q.get('rom'),parentRom=q.get('parent')||'',name=q.get('name')||'Master Games Arcade';
- const status=document.getElementById('status'),debug=document.getElementById('debug'),logs=[];
- const log=x=>{logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);if(logs.length>60)logs.shift();debug.textContent=logs.join('\n');console.log('[MGA]',x)};
- const fail=x=>{status.textContent=x;status.style.color='#ff2bd6';debug.style.display='block';log('ERRO: '+x);try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}};
+ const status=document.getElementById('status'),debug=document.getElementById('debug'),manual=document.getElementById('manual-start'),logs=[];
+ const log=x=>{logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);if(logs.length>80)logs.shift();debug.textContent=logs.join('\n');console.log('[MGA]',x)};
+ const fail=x=>{status.textContent=x;status.style.color='#ff2bd6';debug.style.display='block';manual.style.display='none';log('ERRO: '+x);try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}};
  addEventListener('error',e=>log('window.error: '+(e.message||'erro')));
  addEventListener('unhandledrejection',e=>log('unhandledrejection: '+(e.reason?.message||e.reason)));
  if(!rom){fail('ROM NÃO INFORMADA');return}
@@ -26,36 +27,47 @@
  const parentUrl=parentRom?new URL(parentRom,location.origin).href:'';
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('Parent/BIOS URL: '+parentUrl);
  
- // Não fazemos download da ROM para ArrayBuffer/Blob antes do EmulatorJS.
- // O player recebe a URL HTTP do endpoint da Vercel e o próprio EmulatorJS
- // administra o download e o carregamento do ZIP/CHD. Isso evita baixar a
- // ROM duas vezes e evita que jogos grandes desapareçam da tela.
+ // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
+ // ArrayBuffer/Blob da ROM antes do player para evitar download duplicado.
  status.textContent='INICIANDO FBNeo — '+name+'...';
  window.EJS_player='#game';
  window.EJS_core='fbneo';
  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
  window.EJS_gameUrl=romUrl;
  window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
- // O nome correto da opção do EmulatorJS é EJS_startOnLoaded.
- // EJS_startOnLoad não é reconhecido pela versão atual.
  window.EJS_startOnLoaded=true;
+ window.EJS_alignStartButton='center';
+ window.EJS_language='en-US';
+ window.EJS_disableAutoLang=true;
+ window.EJS_volume=0;
  window.EJS_color='#00e5ff';
  window.EJS_backgroundColor='#000';
+ window.EJS_DEBUG_XX=true;
  if(parentUrl)window.EJS_gameParentUrl=parentUrl;
  
  let ready=false,started=false;
- const hide=()=>{status.style.display='none'};
+ const hide=()=>{status.style.display='none';manual.style.display='none'};
  window.EJS_onGameStart=()=>{if(started)return;started=true;hide();log('FBNeo iniciou o jogo');try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}};
+ 
+ // O botão Start Game do EmulatorJS pode ser criado fora de #game.
+ // Procuramos no documento inteiro e também tentamos novamente após
+ // interação real do usuário, caso o navegador bloqueie o autoplay.
  const tryStart=()=>{
-   const els=[...document.querySelectorAll('#game button,#game [role="button"]')];
-   const b=els.find(e=>/^\s*start game\s*$/i.test(e.textContent||''));
+   const els=[...document.querySelectorAll('button,[role="button"]')];
+   log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
+   const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
    if(b){b.click();log('Start Game acionado');return true}return false;
  };
+ const showManualStart=()=>{if(!started){status.style.display='none';manual.style.display='block';log('Aguardando clique do usuário para iniciar o FBNeo')}};
+ manual.addEventListener('click',()=>{manual.style.display='none';if(!tryStart())log('Nenhum botão Start Game encontrado após clique')});
+ document.addEventListener('click',()=>{if(ready&&!started)tryStart()},true);
  window.EJS_ready=()=>{ready=true;log('EmulatorJS pronto');if(!tryStart()){
-   const t=setInterval(()=>{if(started||tryStart())clearInterval(t)},500);
+   showManualStart();
+   const t=setInterval(()=>{if(started||tryStart()){clearInterval(t);manual.style.display='none'}},1000);
+   setTimeout(()=>clearInterval(t),45000);
  }};
  setTimeout(()=>{if(!ready&&!started)fail('FBNeo não carregou em 30s. Verifique a ROM/BIOS e o endpoint de download.')},30000);
- setTimeout(()=>{if(ready&&!started)fail('EmulatorJS ficou pronto, mas o FBNeo não iniciou a ROM. Verifique o download da ROM no Network.')},45000);
+ setTimeout(()=>{if(ready&&!started)fail('EmulatorJS ficou pronto, mas o FBNeo não iniciou a ROM. Clique em INICIAR e, se continuar parado, verifique o erro do FBNeo no Console.')},45000);
  
  // Controles auxiliares do gabinete.
  const map={Numpad8:'i',Numpad2:'k',Numpad4:'j',Numpad6:'l'};
