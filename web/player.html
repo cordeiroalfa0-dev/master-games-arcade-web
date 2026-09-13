@@ -31,7 +31,7 @@
  // com FBNeo, que exige hashes e dumps diferentes.
  try{
    const probe=await fetch('/web/mame0168/mame.js',{method:'HEAD',cache:'no-store'});
-   if(probe.ok){
+   if(!probe.ok){fail('MAME 0.168.2 ainda não foi publicado em /web/mame0168/. O FBNeo foi desativado para evitar incompatibilidade com ROMs MAME.');return;}
      status.textContent='INICIANDO MAME 0.168.2 — '+name+'...';
      const files=[{url:romUrl,name:name.replace(/[^a-z0-9_.-]/gi,'')+'.zip'}];
      if(biosUrl)files.push({url:new URL(biosUrl,location.origin).href,name:biosName||'neogeo.zip'});
@@ -41,8 +41,7 @@
      const script=document.createElement('script');script.src='/web/mame0168/mame.js';script.onload=()=>{status.style.display='none';log('MAME 0.168.2 carregado')};script.onerror=()=>fail('Build do MAME 0.168.2 indisponível.');document.head.appendChild(script);
      return;
    }
-   log('Build MAME 0.168.2 ainda não publicado; usando core Arcade/FBA como fallback');
- }catch(e){log('Sonda MAME falhou: '+e.message)}
+ }catch(e){fail('Não foi possível verificar o MAME 0.168.2: '+e.message);return}
 
  // O core Arcade documentado pelo EmulatorJS recebe a BIOS por EJS_biosUrl.
  // Não extraia o mesmo ZIP em / e em system/fbneo: isso é fluxo de FBNeo.
