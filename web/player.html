@@ -28,13 +28,15 @@
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo URL: '+parentUrl);
 
  // O BIOS Neo Geo vem do mesmo catálogo/Google Drive das ROMs.
- // O FBNeo procura o BIOS dentro do diretório system/fbneo do RetroArch.
- // O caminho abaixo é o filesystem virtual usado pelo EmulatorJS para o RetroArch.
+ // O FBNeo procura primeiro junto da ROM e também em SYSTEM_DIRECTORY/fbneo.
+ // Colocamos o conteúdo extraído nos dois locais para atender as duas formas
+ // de resolução usadas pelas versões do RetroArch/FBNeo no EmulatorJS.
  if(parentUrl){
    window.EJS_externalFiles={
-     '/home/chronos/user/RetroArch/system/fbneo/': parentUrl
+     '/': parentUrl,
+     '/home/web_user/retroarch/userdata/system/fbneo/': parentUrl
    };
-   log('BIOS Neo Geo configurado em /home/chronos/user/RetroArch/system/fbneo/ via EJS_externalFiles');
+   log('BIOS Neo Geo configurado no diretório da ROM e em /home/web_user/retroarch/userdata/system/fbneo/');
  }
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
@@ -53,13 +55,25 @@
  window.EJS_color='#00e5ff';
  window.EJS_backgroundColor='#000';
  window.EJS_DEBUG_XX=true;
- // Mantemos EJS_biosUrl somente como fallback para cores que consultem
- // explicitamente o BIOS; o arquivo principal é instalado por externalFiles.
- if(parentUrl){window.EJS_biosUrl=parentUrl;}
+ // O BIOS já é extraído por EJS_externalFiles. Não usamos EJS_biosUrl
+ // para evitar que o mesmo ZIP seja tratado como um arquivo BIOS único.
+ window.EJS_biosUrl='';
 
  let ready=false,started=false;
  const hide=()=>{status.style.display='none';manual.style.display='none'};
- window.EJS_onGameStart=()=>{if(started)return;started=true;hide();log('FBNeo iniciou o jogo');try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}};
+ window.EJS_onGameStart=()=>{
+   if(started)return;
+   started=true;hide();log('FBNeo iniciou o jogo');
+   try{
+     const fs=window.EJS_emulator?.gameManager?.FS;
+     if(fs){
+       const checks=['/sp-s3.sp1','/sm1.sm1','/sfix.sfix','/000-lo.lo','/home/web_user/retroarch/userdata/system/fbneo/sp-s3.sp1','/home/web_user/retroarch/userdata/system/fbneo/sm1.sm1','/home/web_user/retroarch/userdata/system/fbneo/sfix.sfix','/home/web_user/retroarch/userdata/system/fbneo/000-lo.lo'];
+       const found=checks.filter(p=>{try{fs.stat(p);return true}catch{return false}});
+       log('BIOS encontrados no FS: '+(found.length?found.join(' | '):'NENHUM'));
+     }
+   }catch(e){log('Diagnóstico FS: '+(e?.message||e))}
+   try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
+ };
 
  const tryStart=()=>{
    const els=[...document.querySelectorAll('button,[role="button"]')];
