@@ -41,23 +41,6 @@
         log(`ERRO: ${text}`);
       };
 
-      const u16 = (a, o) => a[o] | (a[o + 1] << 8);
-      const u32 = (a, o) => (a[o] | (a[o + 1] << 8) | (a[o + 2] << 16) | (a[o + 3] << 24)) >>> 0;
-      const put16 = (a, o, v) => { a[o] = v & 255; a[o + 1] = v >>> 8; };
-      const put32 = (a, o, v) => { a[o] = v & 255; a[o + 1] = v >>> 8; a[o + 2] = v >>> 16; a[o + 3] = v >>> 24; };
-      const crc32 = (a) => { let c = ~0; for (const b of a) { c ^= b; for (let i = 0; i < 8; i++) c = (c >>> 1) ^ ((c & 1) ? 0xedb88320 : 0); } return (~c) >>> 0; };
-      async function zipEntries(bytes) {
-        let eocd = -1; for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 65557); i--) if (u32(bytes, i) === 0x06054b50) { eocd = i; break; }
-        if (eocd < 0) throw Error("ZIP sem diretório central");
-        const count = u16(bytes, eocd + 10), cdOffset = u32(bytes, eocd + 16); let o = cdOffset; const out = [];
-        for (let i = 0; i < count; i++) { if (u32(bytes, o) !== 0x02014b50) throw Error("ZIP inválido"); const method = u16(bytes, o + 10), size = u32(bytes, o + 24), csize = u32(bytes, o + 20), nl = u16(bytes, o + 28), xl = u16(bytes, o + 30), cl = u16(bytes, o + 32), name = new TextDecoder().decode(bytes.slice(o + 46, o + 46 + nl)), local = u32(bytes, o + 42), ln = u16(bytes, local + 26), lx = u16(bytes, local + 28), raw = bytes.slice(local + 30 + ln, local + 30 + ln + csize); let data = raw; if (method === 8) data = new Uint8Array(await new Response(new Blob([raw]).stream().pipeThrough(new DecompressionStream("deflate-raw"))).arrayBuffer()); if (method !== 0 && method !== 8 || data.length !== size) throw Error(`Arquivo ZIP inválido: ${name}`); out.push({ name, data }); o += 46 + nl + xl + cl; }
-        return out;
-      }
-      async function combinedZip(game, bios) {
-        const files = [...await zipEntries(game), ...(await zipEntries(bios)).map((x) => ({ ...x, name: x.name.toLowerCase() === "asia-s3.rom" ? "sp-s3.sp1" : x.name }))]; const locals = [], central = []; let offset = 0;
-        for (const file of files) { const name = new TextEncoder().encode(file.name), h = new Uint8Array(30 + name.length + file.data.length), crc = crc32(file.data); put32(h, 0, 0x04034b50); put16(h, 4, 20); put32(h, 14, crc); put32(h, 18, file.data.length); put32(h, 22, file.data.length); put16(h, 26, name.length); h.set(name, 30); h.set(file.data, 30 + name.length); locals.push(h); central.push({ name, crc, size: file.data.length, offset }); offset += h.length; }
-        const dirs = central.map((x) => { const h = new Uint8Array(46 + x.name.length); put32(h, 0, 0x02014b50); put16(h, 4, 20); put16(h, 6, 20); put32(h, 16, x.crc); put32(h, 20, x.size); put32(h, 24, x.size); put16(h, 28, x.name.length); put32(h, 42, x.offset); h.set(x.name, 46); return h; }), cdSize = dirs.reduce((n, x) => n + x.length, 0), end = new Uint8Array(22); put32(end, 0, 0x06054b50); put16(end, 8, central.length); put16(end, 10, central.length); put32(end, 12, cdSize); put32(end, 16, offset); return new Uint8Array(await new Blob([...locals, ...dirs, end]).arrayBuffer());
-      }
 
       window.addEventListener("error", (event) => {
         log(`window.error: ${event.message || "erro desconhecido"}`);
@@ -91,12 +74,21 @@
 
           const contentType = (response.headers.get("content-type") || "").toLowerCase();
           const contentLength = response.headers.get("content-length") || "desconhecido";
-          let bytes = new Uint8Array(await response.arrayBuffer());
+          const bytes = new Uint8Array(await response.arrayBuffer());
+
+          // IMPORTANTE: o FBNeo (core "arcade"/"fbneo" do EmulatorJS) já sabe
+          // combinar o ZIP do jogo com o ZIP de BIOS via EJS_gameParentUrl.
+          // Fazer merge manual de ZIP (renomeando arquivos "na mão") corrompe
+          // o conjunto de BIOS esperado pelo core e faz o FBNeo travar
+          // silenciosamente em "INICIANDO FBNeo". Aqui só baixamos o BIOS
+          // sem alterá-lo e deixamos o core cuidar da combinação.
+          let biosObjectUrl = "";
           if (parentUrl) {
             const biosResponse = await fetch(new URL(parentUrl, location.origin), { cache: "no-store", credentials: "same-origin" });
             if (!biosResponse.ok) throw new Error(`BIOS Neo Geo respondeu HTTP ${biosResponse.status}`);
-            bytes = await combinedZip(bytes, new Uint8Array(await biosResponse.arrayBuffer()));
-            log(`Pacote FBNeo combinado; asia-s3.rom renomeado para sp-s3.sp1 (${bytes.length} bytes)`);
+            const biosBytes = new Uint8Array(await biosResponse.arrayBuffer());
+            biosObjectUrl = URL.createObjectURL(new Blob([biosBytes], { type: "application/zip" }));
+            log(`BIOS Neo Geo baixada sem modificações (${biosBytes.length} bytes)`);
           }
 
           log(`Download: ${bytes.length} bytes; Content-Type: ${contentType || "desconhecido"}; Header: ${contentLength}`);
@@ -129,10 +121,39 @@
           window.EJS_core = "fbneo";
           window.EJS_gameName = cleanName;
           window.EJS_gameUrl = romObjectUrl;
+          if (biosObjectUrl) {
+            window.EJS_gameParentUrl = biosObjectUrl;
+            log("BIOS associada via EJS_gameParentUrl");
+          }
           window.EJS_pathtodata = "https://cdn.emulatorjs.org/stable/data/";
           window.EJS_startOnLoad = true;
           window.EJS_color = "#00e5ff";
           window.EJS_backgroundColor = "#000";
+
+          // A tela "INICIANDO FBNeo..." (#status) cobre o canvas com
+          // z-index alto e, antes deste patch, NUNCA era escondida: nada
+          // ouvia o carregamento do EmulatorJS, então a UI parecia travada
+          // mesmo quando o emulador terminava de iniciar por baixo dela.
+          let gameStarted = false;
+          const hideStatusOverlay = () => {
+            if (gameStarted) return;
+            gameStarted = true;
+            status.style.display = "none";
+            try { window.parent.postMessage({ type: "mga-emulator-started" }, location.origin); } catch {}
+            log("EmulatorJS/FBNeo reportou início do jogo; overlay removido");
+          };
+          window.EJS_onGameStart = hideStatusOverlay;
+          window.EJS_ready = () => log("EmulatorJS pronto (EJS_ready)");
+
+          // Watchdog: se o FBNeo não confirmar o início em 30s (ex.: BIOS
+          // incompatível, CORS bloqueando o core, ROM/BIOS não reconhecidas),
+          // mostramos um erro em vez de deixar a tela travada para sempre.
+          setTimeout(() => {
+            if (!gameStarted) {
+              fail("FBNeo não iniciou em 30s. Verifique se o ZIP da ROM e o neogeo.zip da BIOS são compatíveis com o core FBNeo do EmulatorJS.");
+            }
+          }, 30000);
+
           log("Core selecionado: FinalBurn Neo (FBNeo)");
 
           const numpadMap = {
