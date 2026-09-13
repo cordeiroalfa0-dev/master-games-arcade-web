@@ -28,14 +28,13 @@
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo URL: '+parentUrl);
 
  // O BIOS Neo Geo vem do mesmo catálogo/Google Drive das ROMs.
- // Para arcade/FBNeo usamos EJS_externalFiles: o EmulatorJS extrai
- // automaticamente o neogeo.zip diretamente no filesystem virtual.
- // Isso evita a limitação conhecida do EJS_gameParentUrl nos cores arcade.
+ // O FBNeo procura o BIOS dentro do diretório system/fbneo do RetroArch.
+ // O caminho abaixo é o filesystem virtual usado pelo EmulatorJS para o RetroArch.
  if(parentUrl){
    window.EJS_externalFiles={
-     '/system/fbneo/': parentUrl
+     '/home/chronos/user/RetroArch/system/fbneo/': parentUrl
    };
-   log('BIOS Neo Geo configurado em /system/fbneo/ via EJS_externalFiles');
+   log('BIOS Neo Geo configurado em /home/chronos/user/RetroArch/system/fbneo/ via EJS_externalFiles');
  }
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
