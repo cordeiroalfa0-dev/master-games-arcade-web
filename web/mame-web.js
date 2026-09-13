@@ -13,10 +13,10 @@
   const loadCatalog = async () => { if (!catalogPromise) catalogPromise = originalFetch(CATALOG_URL).then((r) => { if (!r.ok) throw new Error("Catálogo de ROMs indisponível"); return r.json(); }); return catalogPromise; };
   const loadTitles = async () => { if (!titlesPromise) titlesPromise = originalFetch(TITLES_URL).then((r) => r.ok ? r.json() : {}).catch(() => ({})); return titlesPromise; };
   function cleanRomName(name) { return String(name || "").replace(/\.(zip|7z|chd)$/i, ""); }
-  // O core `arcade` do EmulatorJS usa exclusivamente o FBA v0.2.97.42.
-  // Não misture regras de BIOS de MAME moderno/Naomi/FBNeo aqui: esses
-  // arquivos pertencem a outros drivers e podem fazer o core falhar antes
-  // mesmo de validar a ROM do jogo.
+  // O core `arcade` do EmulatorJS hoje roda sobre o FBNeo (libretro), não
+  // sobre o FBA v0.2.97.42 antigo (ver player.html para detalhes). Os pares
+  // ROM/BIOS abaixo precisam ser os que ESSA build do FBNeo espera —
+  // confira CRC32 e nome interno do zip antes de trocar qualquer entrada.
   const BIOS_RULES = [
     { bios: "neogeo.zip", games: new Set(["aof3", "bjourney", "breakers", "breakrev", "eightman", "fatfursp", "fatfury3", "garou", "kizuna", "kof94", "kof95", "kof96", "kof97", "kof98", "kof99", "kof2000", "kof2001", "kof2002", "kof2003", "lastbld2", "lbowling", "magdrop3", "matrim", "mslug", "mslug2", "mslug3", "mslug4", "mslug5", "mslugx", "samsho", "samsho2", "samsho3", "samsho4", "sengoku3", "sonicwi3", "svc", "twinspri", "wakuwak7", "whp", "neobombe", "strhoop", "ssideki3", "ssideki4", "tetrisp"]) },
     { bios: "pgm.zip", games: new Set(["dbz2", "elvactr", "martmast", "pcktgal", "sailormn", "savagere"]) },
