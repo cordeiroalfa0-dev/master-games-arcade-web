@@ -13,22 +13,32 @@
   const loadCatalog = async () => { if (!catalogPromise) catalogPromise = originalFetch(CATALOG_URL).then((r) => { if (!r.ok) throw new Error("Catálogo de ROMs indisponível"); return r.json(); }); return catalogPromise; };
   const loadTitles = async () => { if (!titlesPromise) titlesPromise = originalFetch(TITLES_URL).then((r) => r.ok ? r.json() : {}).catch(() => ({})); return titlesPromise; };
   function cleanRomName(name) { return String(name || "").replace(/\.(zip|7z|chd)$/i, ""); }
+  const BIOS_RULES = [
+    { bios: "neogeo.zip", games: new Set(["aof3", "bjourney", "breakers", "breakrev", "eightman", "fatfursp", "fatfury3", "garou", "kizuna", "kof2k4se", "kof94", "kof95", "kof96", "kof97", "kof98", "kof99", "kof2000", "kof2001", "kof2002", "kof2003", "lastbld2", "lbowling", "magdrop3", "matrim", "mslug", "mslug2", "mslug3", "mslug3b6", "mslug4", "mslug5", "mslugx", "samsho", "samsho2", "samsho3", "samsho4", "sengoku3", "sonicwi3", "svc", "svcsplus", "twinspri", "wakuwak7", "whp", "neobombe", "kf2k2mp2", "kf2k5uni", "kf10thep", "strhoop", "ssideki3", "ssideki4", "tetrisp"]), },
+    { bios: "pgm.zip", games: new Set(["dbz2", "elvactr", "martmast", "pcktgal", "sailormn", "savagere"]) },
+    { bios: "awbios.zip", games: new Set(["ggx", "ggxx", "kofnw", "kofxi", "mslug6", "salmndr2", "samspsen", "swracer", "tetki"]), },
+    { bios: "ar_bios.zip", games: new Set(["ar_bios", "naomi", "soulclbr", "tekken3", "tektagt"]) },
+  ];
+  const QSoundGames = new Set(["avsp", "avspu", "cawing", "ddsom", "ddtod", "dstlk", "hsf2", "jojobane", "joemacr", "sfa", "sfa2u", "sfa3", "sfz2ald", "sgemf", "spf2t", "ssf2", "ssf2t", "vhunt2", "vsavj", "xmcota", "xmvsfur1", "sfiii", "sfiii2", "sfiii2n", "sfiii3"]);
+  const fileBase = (name) => String(name || "").toLowerCase().replace(/\.(zip|7z|chd)$/i, "");
+  function biosForGame(name) {
+    const base = fileBase(name);
+    const rule = BIOS_RULES.find((entry) => entry.games.has(base));
+    return rule?.bios || (QSoundGames.has(base) ? "qsound.zip" : "");
+  }
   async function resolveRom(romName, message) {
     const catalog = await loadCatalog();
     const item = (catalog.files || []).find((entry) => entry?.name === romName);
     if (!item?.id || item.skipDownload) throw new Error(`ROM não disponível para download: ${romName}`);
     const romUrl = `/api/rom/${encodeURIComponent(item.id)}/${encodeURIComponent(item.name)}`;
-    const neoGeoGames = new Set(["aof3.zip", "bjourney.zip", "breakers.zip", "breakrev.zip", "eightman.zip", "fatfursp.zip", "fatfury3.zip", "garou.zip", "kizuna.zip", "kof2k4se.zip", "kof94.zip", "kof95.zip", "kof96.zip", "kof97.zip", "kof98.zip", "kof99.zip", "kof2000.zip", "kof2001.zip", "kof2002.zip", "kof2003.zip", "lastbld2.zip", "lbowling.zip", "magdrop3.zip", "matrim.zip", "mslug.zip", "mslug2.zip", "mslug3.zip", "mslug3b6.zip", "mslug4.zip", "mslug5.zip", "mslugx.zip", "samsho.zip", "samsho2.zip", "samsho3.zip", "samsho4.zip", "sengoku3.zip", "sonicwi3.zip", "twinspri.zip"]);
-    let parentUrl = "";
-    if (neoGeoGames.has(String(item.name).toLowerCase())) {
-      const bios = (catalog.files || []).find((entry) => String(entry?.name || "").toLowerCase() === "neogeo.zip");
-      if (bios?.id && !bios.skipDownload) parentUrl = `/api/rom/${encodeURIComponent(bios.id)}/neogeo.zip`;
-      else console.warn("[MGA Web] BIOS neogeo.zip não foi encontrado no catálogo.");
-    }
+    const biosName = biosForGame(item.name);
+    const bios = biosName && (catalog.files || []).find((entry) => fileBase(entry?.name) === fileBase(biosName));
+    const biosUrl = bios?.id && !bios.skipDownload ? `/api/rom/${encodeURIComponent(bios.id)}/${encodeURIComponent(bios.name)}` : "";
+    if (biosName && !biosUrl) console.warn(`[MGA Web] BIOS ${biosName} não foi encontrado no catálogo para ${item.name}.`);
     message.textContent = `CARREGANDO ${item.name}...`;
-    return { item, url: romUrl, parentUrl };
+    return { item, url: romUrl, biosUrl, biosName };
   }
-  function createWebPlayer(romName, romUrl, message, overlay, parentUrl = "") {
+  function createWebPlayer(romName, romUrl, message, overlay, biosUrl = "", biosName = "") {
     const iframe = document.createElement("iframe");
     iframe.title = `Master Games Arcade - ${cleanRomName(romName)}`;
     iframe.allow = "autoplay; fullscreen; gamepad";
@@ -37,7 +47,8 @@
     const playerUrl = new URL("/web/player.html", location.origin);
     playerUrl.searchParams.set("rom", romUrl);
     playerUrl.searchParams.set("name", cleanRomName(romName));
-    if (parentUrl) playerUrl.searchParams.set("parent", parentUrl);
+    if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
+    if (biosName) playerUrl.searchParams.set("biosName", biosName);
     let closed = false;
     const closePlayer = () => { if (closed) return; closed = true; window.removeEventListener("message", onMessage); iframe.src = "about:blank"; iframe.remove(); overlay.remove(); };
     const onMessage = (event) => { if (event.origin !== location.origin || event.source !== iframe.contentWindow) return; if (event.data?.type === "mga-emulator-started") message.remove(); if (event.data?.type === "mga-emulator-exit") closePlayer(); if (event.data?.type === "mga-emulator-error") message.textContent = event.data.message || "Erro ao iniciar o jogo."; };
@@ -57,7 +68,7 @@
       const close = document.createElement("button"); close.type = "button"; close.textContent = "✕ FECHAR"; close.style.cssText = "pointer-events:auto;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;padding:7px 12px;cursor:pointer;font-weight:bold;font-family:Arial,sans-serif;"; bar.appendChild(close);
       const message = document.createElement("div"); message.id = "mga-rom-message"; message.textContent = `PREPARANDO ${romName}...`; message.style.cssText = "position:absolute;inset:0;z-index:10;display:grid;place-items:center;background:#000;color:#00e5ff;font-family:monospace;font-size:16px;font-weight:bold;text-align:center;padding:24px;box-sizing:border-box;text-shadow:0 0 8px #00e5ff;pointer-events:none;";
       overlay.append(area, message, bar); document.body.appendChild(overlay); let player; close.onclick = () => player?.closePlayer();
-      (async () => { try { const { item, url, parentUrl } = await resolveRom(romName, message); player = createWebPlayer(item.name, url, message, overlay, parentUrl); resolve(); } catch (error) { message.textContent = error?.message || "Falha ao iniciar a ROM."; reject(error); } })();
+      (async () => { try { const { item, url, biosUrl, biosName } = await resolveRom(romName, message); player = createWebPlayer(item.name, url, message, overlay, biosUrl, biosName); resolve(); } catch (error) { message.textContent = error?.message || "Falha ao iniciar a ROM."; reject(error); } })();
     });
   }
   window.MGA_WEB = Object.freeze({ launch: showWebPlayer, version: "1.5.1" });

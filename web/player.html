@@ -16,7 +16,7 @@
 <div id="game"></div><div id="status">CARREGANDO...</div><pre id="debug"></pre><button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
 <script>
 (async()=>{
- const q=new URLSearchParams(location.search),rom=q.get('rom'),parentRom=q.get('parent')||'',name=q.get('name')||'Master Games Arcade';
+ const q=new URLSearchParams(location.search),rom=q.get('rom'),biosUrl=q.get('bios')||'',biosName=q.get('biosName')||'',name=q.get('name')||'Master Games Arcade';
  const status=document.getElementById('status'),debug=document.getElementById('debug'),manual=document.getElementById('manual-start'),logs=[];
  const log=x=>{logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);if(logs.length>80)logs.shift();debug.textContent=logs.join('\n');console.log('[MGA]',x)};
  const fail=x=>{status.textContent=x;status.style.color='#ff2bd6';debug.style.display='block';manual.style.display='none';log('ERRO: '+x);try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}};
@@ -24,21 +24,15 @@
  addEventListener('unhandledrejection',e=>log('unhandledrejection: '+(e.reason?.message||e.reason)));
  if(!rom){fail('ROM NÃO INFORMADA');return}
  const romUrl=new URL(rom,location.origin).href;
- const parentUrl=parentRom?new URL(parentRom,location.origin).href:'';
- log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo origem: '+parentUrl);
+ log('Jogo: '+name);log('ROM URL: '+romUrl);if(biosUrl)log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
 
- // O EmulatorJS 4.2.3, com EJS_dontExtractBIOS=true, grava o BIOS
- // exatamente no caminho informado em EJS_biosUrl. Por isso usamos
- // /neogeo.zip como URL local. O Vercel reescreve esse caminho para o
- // endpoint da ROM no Google Drive, mantendo o ZIP inteiro no FS.
- if(parentUrl){
-   window.EJS_biosUrl='/neogeo.zip';
-   window.EJS_dontExtractBIOS=true;
-   log('BIOS Neo Geo configurado em /neogeo.zip sem extração');
- }else{
-   window.EJS_biosUrl='';
-   window.EJS_dontExtractBIOS=false;
- }
+ // O FB Neo usa EJS_gameParentUrl para arquivos dependentes do jogo
+ // (neogeo.zip, pgm.zip, qsound.zip etc.). EJS_biosUrl fica definido
+ // também para versões do EmulatorJS que tratam a BIOS como arquivo direto.
+ window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
+ window.EJS_gameParentUrl=window.EJS_biosUrl;
+ window.EJS_dontExtractBIOS=false;
+ if(biosUrl) log('BIOS configurado via EJS_gameParentUrl/EJS_biosUrl: '+(biosName||biosUrl));
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
  // ArrayBuffer/Blob da ROM antes do player para evitar download duplicado.
@@ -46,7 +40,7 @@
  window.EJS_player='#game';
  window.EJS_core='fbneo';
  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
- window.EJS_gameUrl=romUrl;
+   window.EJS_gameUrl=romUrl;
  window.EJS_pathtodata='https://cdn.emulatorjs.org/stable/data/';
  window.EJS_startOnLoaded=true;
  window.EJS_alignStartButton='center';
@@ -65,9 +59,10 @@
    try{
      const fs=window.EJS_emulator?.gameManager?.FS;
      if(fs){
-       const checks=['/neogeo.zip','/home/web_user/retroarch/userdata/system/neogeo.zip','/home/web_user/retroarch/userdata/system/fbneo/neogeo.zip'];
+       const expected=biosName||'BIOS';
+       const checks=[`/${expected}`,'/home/web_user/retroarch/userdata/system/'+expected,'/home/web_user/retroarch/userdata/system/fbneo/'+expected];
        const found=checks.filter(p=>{try{fs.stat(p);return true}catch{return false}});
-       log('neogeo.zip encontrado no FS: '+(found.length?found.join(' | '):'NENHUM'));
+       log(expected+' encontrado no FS: '+(found.length?found.join(' | '):'não exposto pelo wrapper'));
      }
    }catch(e){log('Diagnóstico FS: '+(e?.message||e))}
    try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
