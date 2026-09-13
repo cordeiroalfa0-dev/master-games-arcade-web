@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -94,11 +93,23 @@
    try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
  };
 
+ let attempting=false;
  const tryStart=()=>{
+   // Evita reentrada: o clique sintético abaixo (b.click()) passa pelo
+   // listener global de clique em capture phase e chamava tryStart() de
+   // novo antes do EmulatorJS terminar de inicializar, clicando 2x em
+   // "Start Game" e quebrando o Module interno (toggleMainLoop undefined).
+   if(attempting)return false;
    const els=[...document.querySelectorAll('button,[role="button"]')];
    log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
    const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
-   if(b){b.click();log('Start Game acionado');return true}return false;
+   if(b){
+     attempting=true;
+     b.click();log('Start Game acionado');
+     setTimeout(()=>{if(!started)attempting=false},3000);
+     return true;
+   }
+   return false;
  };
  const showManualStart=()=>{if(!started){status.style.display='none';manual.style.display='block';log('Aguardando clique do usuário para iniciar o Arcade/FBA')}};
  manual.addEventListener('click',()=>{manual.style.display='none';if(!tryStart())log('Nenhum botão Start Game encontrado após clique')});
