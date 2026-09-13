@@ -25,19 +25,16 @@
  if(!rom){fail('ROM NÃO INFORMADA');return}
  const romUrl=new URL(rom,location.origin).href;
  const parentUrl=parentRom?new URL(parentRom,location.origin).href:'';
- log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo URL: '+parentUrl);
+ log('Jogo: '+name);log('ROM URL: '+romUrl);if(parentUrl)log('BIOS Neo Geo origem: '+parentUrl);
 
- // O EmulatorJS 4.2.x possui um detalhe importante no tratamento de BIOS:
- // quando EJS_biosUrl recebe uma URL completa, dontExtractBIOS tenta gravar
- // essa URL como caminho no FS. Para Neo Geo precisamos que o arquivo físico
- // se chame exatamente /neogeo.zip. EJS_paths permite manter o nome lógico
- // "neogeo.zip" e buscar os bytes na nossa URL do Google Drive/proxy.
+ // O EmulatorJS 4.2.3, com EJS_dontExtractBIOS=true, grava o BIOS
+ // exatamente no caminho informado em EJS_biosUrl. Por isso usamos
+ // /neogeo.zip como URL local. O Vercel reescreve esse caminho para o
+ // endpoint da ROM no Google Drive, mantendo o ZIP inteiro no FS.
  if(parentUrl){
-   window.EJS_biosUrl='neogeo.zip';
-   window.EJS_paths=window.EJS_paths||{};
-   window.EJS_paths['neogeo.zip']=parentUrl;
+   window.EJS_biosUrl='/neogeo.zip';
    window.EJS_dontExtractBIOS=true;
-   log('BIOS Neo Geo configurado como /neogeo.zip sem extração');
+   log('BIOS Neo Geo configurado em /neogeo.zip sem extração');
  }else{
    window.EJS_biosUrl='';
    window.EJS_dontExtractBIOS=false;
