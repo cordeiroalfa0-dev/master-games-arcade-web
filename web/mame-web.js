@@ -213,6 +213,9 @@
       const bar = document.createElement("div");
       bar.style.cssText =
         "position:absolute;top:0;left:0;right:0;height:44px;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 14px;box-sizing:border-box;background:linear-gradient(180deg,#08000f 0%,rgba(8,0,15,.78) 72%,transparent 100%);color:#fff;pointer-events:none;";
+      if (matchMedia("(pointer: coarse)").matches) {
+        bar.style.display = "none";
+      }
 
       const brand = document.createElement("strong");
       brand.textContent = "MASTER GAMES ARCADE";

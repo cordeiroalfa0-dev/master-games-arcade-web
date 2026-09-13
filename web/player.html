@@ -10,6 +10,14 @@
     #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none}
     #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
     #manual-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100001;display:none;background:#08000f;color:#00e5ff;border:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66;padding:16px 24px;font:700 16px monospace;cursor:pointer}
+    #mga-touch-controls{display:none}
+    @media (pointer:coarse){
+      #mga-touch-controls{position:fixed;right:calc(10px + env(safe-area-inset-right));bottom:calc(10px + env(safe-area-inset-bottom));z-index:100003;display:grid;grid-template-columns:repeat(3,52px);grid-auto-rows:48px;gap:6px;font:700 11px monospace;touch-action:none}
+      #mga-touch-controls button{border:1px solid #00e5ff;border-radius:9px;background:rgba(8,0,15,.88);box-shadow:0 0 10px #00e5ff55;color:#00e5ff;font:inherit;padding:0;touch-action:none;user-select:none;-webkit-tap-highlight-color:transparent}
+      #mga-touch-controls button:active{background:#00e5ff;color:#08000f}
+      #mga-touch-controls .empty{visibility:hidden}
+      #mga-touch-controls .action{color:#ff2bd6;border-color:#ff2bd6;box-shadow:0 0 10px #ff2bd655}
+    }
   </style>
 </head>
 <body>
@@ -17,6 +25,11 @@
   <div id="status">CARREGANDO...</div>
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
+  <div id="mga-touch-controls" aria-label="Controles do jogo">
+    <span class="empty"></span><button data-key="ArrowUp">▲</button><span class="empty"></span>
+    <button data-key="ArrowLeft">◀</button><button data-key="ArrowDown">▼</button><button data-key="ArrowRight">▶</button>
+    <button class="action" data-key="Shift">CRÉDITO</button><button class="action" data-key="Enter">START</button>
+  </div>
 
 <script>
 (async()=>{
@@ -28,6 +41,7 @@
   const status=document.getElementById('status');
   const debug=document.getElementById('debug');
   const manual=document.getElementById('manual-start');
+  const touchControls=document.getElementById('mga-touch-controls');
   const logs=[];
 
   let ready=false;
@@ -70,6 +84,33 @@
   window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
   window.EJS_gameParentUrl='';
   window.EJS_externalFiles={};
+
+  const enterFullscreen=()=>{
+    try{
+      if(document.fullscreenElement)return;
+      const el=document.documentElement;
+      const request=el.requestFullscreen||el.webkitRequestFullscreen;
+      if(request){const result=request.call(el,{navigationUI:'hide'});if(result?.catch)result.catch(()=>{});}
+    }catch{}
+  };
+  addEventListener('pointerdown',enterFullscreen,{capture:true,once:true,passive:true});
+  addEventListener('touchstart',enterFullscreen,{capture:true,once:true,passive:true});
+
+  if(matchMedia('(pointer:coarse)').matches||navigator.maxTouchPoints>0){
+    const specs={ArrowUp:38,ArrowDown:40,ArrowLeft:37,ArrowRight:39,Shift:16,Enter:13};
+    const emit=(type,name)=>{
+      const target=document.querySelector('canvas')||document;
+      target.dispatchEvent(new KeyboardEvent(type,{key:name,code:name,keyCode:specs[name],which:specs[name],bubbles:true,cancelable:true,composed:true}));
+    };
+    touchControls.querySelectorAll('button[data-key]').forEach(button=>{
+      const name=button.dataset.key;
+      const release=event=>{event.preventDefault();emit('keyup',name);};
+      button.addEventListener('pointerdown',event=>{event.preventDefault();event.stopPropagation();emit('keydown',name);},{passive:false});
+      button.addEventListener('pointerup',release,{passive:false});
+      button.addEventListener('pointercancel',release,{passive:false});
+      button.addEventListener('contextmenu',event=>event.preventDefault());
+    });
+  }
 
   // Mantém o ZIP da BIOS intacto para o core fazer o merge com o romset.
   window.EJS_dontExtractBIOS=true;
