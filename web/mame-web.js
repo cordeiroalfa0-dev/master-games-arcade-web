@@ -227,6 +227,26 @@
         "pointer-events:auto;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;padding:7px 12px;cursor:pointer;font-weight:bold;font-family:Arial,sans-serif;";
       bar.appendChild(close);
 
+      const fullscreen = document.createElement("button");
+      fullscreen.type = "button";
+      fullscreen.textContent = "⛶ TELA CHEIA";
+      fullscreen.setAttribute("aria-label", "Ativar tela cheia");
+      fullscreen.style.cssText =
+        "pointer-events:auto;background:#08000f;border:1px solid #00e5ff;box-shadow:0 0 10px #00e5ff55;color:#00e5ff;padding:7px 10px;cursor:pointer;font-weight:bold;font-family:Arial,sans-serif;margin-left:auto;margin-right:8px;display:none;";
+      bar.insertBefore(fullscreen, close);
+      if (matchMedia("(pointer: coarse)").matches) fullscreen.style.display = "block";
+      const requestFullscreen = () => {
+        const target = overlay;
+        const request = target.requestFullscreen || target.webkitRequestFullscreen;
+        if (!request) return;
+        try {
+          const result = request.call(target, { navigationUI: "hide" });
+          if (result?.catch) result.catch(() => {});
+        } catch {}
+      };
+      fullscreen.onclick = requestFullscreen;
+      overlay.addEventListener("pointerdown", requestFullscreen, { once: true, capture: true });
+
       const message = document.createElement("div");
       message.id = "mga-rom-message";
       message.textContent = `PREPARANDO ${romName}...`;

@@ -115,6 +115,23 @@
     manual.style.display='none';
   };
 
+  // No celular, o navegador só permite fullscreen durante um gesto real do
+  // usuário. O primeiro toque no player é o momento mais confiável para
+  // entrar em tela cheia, inclusive ao tocar no Start Game.
+  const enterFullscreen=()=>{
+    try{
+      if(document.fullscreenElement)return;
+      const el=document.documentElement;
+      const request=el.requestFullscreen||el.webkitRequestFullscreen;
+      if(request){
+        const result=request.call(el,{navigationUI:'hide'});
+        if(result?.catch)result.catch(()=>{});
+      }
+    }catch{}
+  };
+  addEventListener('pointerdown',enterFullscreen,{capture:true,once:true,passive:true});
+  addEventListener('touchstart',enterFullscreen,{capture:true,once:true,passive:true});
+
   window.EJS_onGameStart=()=>{
     if(started)return;
     started=true;
