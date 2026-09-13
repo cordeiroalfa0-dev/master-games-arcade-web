@@ -45,49 +45,24 @@
 
   // O core arcade do EmulatorJS utiliza FBNeo nesta configuração.
   // Cada ROM precisa pertencer ao romset compatível com a versão do core.
-  //
-  // MESMO AJUSTE DA BIOS DA NEO GEO PARA TODAS AS OUTRAS BIOS:
-  // a BIOS é sempre servida na RAIZ do site com o nome exato do arquivo
-  // (ex.: /neogeo.zip, /pgm.zip, /qsound.zip), o player usa EJS_biosUrl com
-  // esse caminho simples e EJS_dontExtractBIOS=true mantém o ZIP intacto
-  // para o FBNeo fazer o merge com o romset. Sem o rewrite da raiz em
-  // vercel.json a BIOS nunca chega ao core.
   const BIOS_RULES = [
     {
       bios: "neogeo.zip",
       games: new Set([
-        "androdun", "aof3", "bjourney", "breakers", "breakrev", "eightman",
-        "fatfursp", "fatfury3", "garou", "kf10thep", "kf2k2mp2", "kf2k5uni",
-        "kizuna", "kof2k4se", "kof94", "kof95", "kof96", "kof97", "kof98",
-        "kof99", "kof2000", "kof2001", "kof2002", "kof2003", "lastbld2",
-        "lbowling", "magdrop3", "matrim", "mslug", "mslug2", "mslug3",
-        "mslug3b6", "mslug4", "mslug5", "mslugx", "neobombe", "ninjamas",
-        "pbobblen", "preisle2", "rbffspec", "rotd", "samsh5sp", "samsho",
-        "samsho2", "samsho3", "samsho4", "savagere", "sengoku3", "shocktr2",
-        "sonicwi2", "sonicwi3", "spinmast", "ssideki3", "ssideki4",
-        "strhoop", "svc", "svcsplus", "tetrisp", "twinspri", "wakuwak7",
-        "whp", "zedblade"
+        "aof3", "bjourney", "breakers", "breakrev", "eightman",
+        "fatfursp", "fatfury3", "garou", "kizuna", "kof94", "kof95",
+        "kof96", "kof97", "kof98", "kof99", "kof2000", "kof2001",
+        "kof2002", "kof2003", "lastbld2", "lbowling", "magdrop3",
+        "matrim", "mslug", "mslug2", "mslug3", "mslug4", "mslug5",
+        "mslugx", "samsho", "samsho2", "samsho3", "samsho4", "sengoku3",
+        "sonicwi3", "svc", "twinspri", "wakuwak7", "whp", "neobombe",
+        "strhoop", "ssideki3", "ssideki4", "tetrisp"
       ])
     },
     {
-      // CPS1 com QSound e TODOS os jogos de CPU CPS2 dependem da ROM do DSP
-      // QSound, que nos romsets atuais fica no device set qsound.zip.
-      bios: "qsound.zip",
-      games: new Set([
-        "avsp", "avspu", "csclub", "ddsom", "ddtod", "dino", "dstlk", "hsf2",
-        "msh", "mshu", "mshvsf", "mvsc", "nwarru", "punisher", "sfa", "sfa2",
-        "sfa2u", "sfa3", "sfz2ald", "sgemf", "slammast", "spf2t", "ssf2",
-        "ssf2t", "vhunt2", "vsav", "vsavj", "wof", "xmcota", "xmvsf",
-        "xmvsfur1"
-      ])
-    },
-    {
-      // Placa PGM (IGS): a BIOS pgm.zip é obrigatória em todos os sets.
       bios: "pgm.zip",
       games: new Set([
-        "ddp2", "dmnfrnt", "drgw2", "dw2001", "dw3", "killbld", "kov",
-        "kov2", "kovplus", "kovsh", "martmast", "olds", "oldsplus",
-        "orlegend", "photoy2k", "purpland", "puzzli2", "py2k2", "theglad"
+        "dbz2", "elvactr", "martmast", "pcktgal", "sailormn", "savagere"
       ])
     },
     {
@@ -96,20 +71,8 @@
     }
   ];
 
-  // CPS3 (Street Fighter III, JoJo, Warzard): no romset MAME/FBNeo a BIOS da
-  // placa já vem DENTRO do ZIP de cada jogo (ex.: sfiii3 traz o próprio
-  // bios .29f400.u2). Não existe cps3.zip para ser servido na raiz, então
-  // esses jogos não recebem EJS_biosUrl e também não devem gerar aviso de
-  // "BIOS não encontrada". Se o jogo não iniciar, o que falta é o set
-  // "nocd" completo (ou o CHD do CD correspondente), não uma BIOS externa.
-  const SELF_CONTAINED_BIOS = new Set([
-    "sfiii", "sfiii2", "sfiii2n", "sfiii3", "sfiii3n", "sfiii3nr1",
-    "jojo", "jojoba", "jojoban", "jojobane", "jojon", "redearth", "warzard"
-  ]);
-
   const biosForGame = (name) => {
     const base = fileBase(name);
-    if (SELF_CONTAINED_BIOS.has(base)) return "";
     const rule = BIOS_RULES.find((entry) => entry.games.has(base));
     return rule?.bios || "";
   };
@@ -142,19 +105,14 @@
       (entry) => fileBase(entry?.name) === fileBase(biosName)
     );
 
-    // O player recebe a BIOS pela rota dinâmica anterior, que mantém a
-    // resolução do catálogo no backend e funciona com o fluxo padrão do
-    // EmulatorJS para ZIPs de BIOS.
+    // A BIOS precisa ser servida na RAIZ do site com o nome exato
+    // (ex.: /neogeo.zip). Com EJS_dontExtractBIOS=true o EmulatorJS 4.2.3
+    // grava a BIOS usando a própria URL como caminho no sistema de
+    // arquivos: uma URL com query string ("/api/bios?id=...") gerava um
+    // caminho inválido e a BIOS nunca chegava ao core. O rewrite da Vercel
+    // encaminha /neogeo.zip, /pgm.zip e /isgsm.zip para /api/bios.
     const biosUrl =
-      bios && !bios.skipDownload
-        ? `/api/bios?name=${encodeURIComponent(bios.name)}`
-        : "";
-
-    if (!biosName && SELF_CONTAINED_BIOS.has(fileBase(item.name))) {
-      console.info(
-        `[MGA Web] ${item.name} (CPS3) usa a BIOS embutida no próprio romset.`
-      );
-    }
+      bios && !bios.skipDownload ? `/${bios.name}` : "";
 
     if (biosName && !biosUrl) {
       console.warn(
@@ -305,7 +263,7 @@
 
   window.MGA_WEB = Object.freeze({
     launch: showWebPlayer,
-    version: "1.6.0"
+    version: "1.5.3"
   });
 
   window.fetch = async function(input, init) {
