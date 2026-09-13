@@ -145,73 +145,19 @@
     try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
   };
 
-  // Inicia somente uma vez. O clique duplicado era capaz de chamar
-  // toggleMainLoop antes de o módulo interno do EmulatorJS estar pronto.
-  const tryStart=()=>{
-    if(started||attempting)return false;
-
-    const els=[...document.querySelectorAll('button,[role="button"]')];
-    log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
-
-    const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
-    if(!b)return false;
-
-    attempting=true;
-    b.click();
-    log('Start Game acionado uma única vez');
-
-    // Libera nova tentativa apenas se o core não iniciou.
-    setTimeout(()=>{
-      if(!started){
-        attempting=false;
-        log('O core ainda não iniciou; nova tentativa poderá ser feita manualmente.');
-      }
-    },5000);
-
-    return true;
-  };
-
-  const showManualStart=()=>{
-    if(!started){
-      status.style.display='none';
-      manual.style.display='block';
-      log('Aguardando clique do usuário para iniciar o Arcade/FBNeo');
-    }
-  };
-
-  manual.addEventListener('click',()=>{
-    manual.style.display='none';
-    if(!tryStart()){
-      log('Nenhum botão Start Game encontrado após clique');
-      showManualStart();
-    }
-  });
-
-  // Não usamos listener global de clique: ele podia capturar o clique
-  // sintético do EmulatorJS e iniciar o core duas vezes.
-
   window.EJS_ready=()=>{
     ready=true;
-    log('EmulatorJS pronto; o botão Start Game será acionado somente pelo usuário');
-
-    // Não chamamos b.click() automaticamente. O EmulatorJS ainda pode estar
-    // finalizando o módulo WASM quando EJS_ready é disparado. O usuário deve
-    // clicar uma única vez no botão Start Game exibido pelo próprio EmulatorJS.
-    setTimeout(()=>{
-      if(!started)showManualStart();
-    },1500);
+    // O EmulatorJS exibe seu próprio botão Start Game. Não o acionamos por
+    // script: um segundo clique durante a inicialização causa
+    // "toggleMainLoop undefined". O usuário deve clicar uma única vez no
+    // botão nativo quando ele aparecer.
+    status.style.display='none';
+    manual.style.display='none';
+    log('EmulatorJS pronto; clique uma única vez no botão nativo Start Game');
   };
 
   addEventListener('error',e=>{
     log('window.error: '+(e.message||'erro mascarado pelo CDN'));
-    if(attempting&&!started&&retriesLeft>0){
-      retriesLeft--;
-      attempting=false;
-      log('Possível corrida de inicialização — tentando novamente em 2.5s ('+retriesLeft+' restantes)');
-      retryTimer=setTimeout(()=>{
-        if(!started)tryStart();
-      },2500);
-    }
   });
 
   addEventListener('unhandledrejection',e=>{
