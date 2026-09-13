@@ -43,7 +43,10 @@
  window.EJS_color='#00e5ff';
  window.EJS_backgroundColor='#000';
  window.EJS_DEBUG_XX=true;
- if(parentUrl)window.EJS_gameParentUrl=parentUrl;
+ // Para Neo Geo, o arquivo neogeo.zip é BIOS, não ROM pai.
+ // O EJS_gameParentUrl sozinho não funciona de forma confiável nos
+ // cores arcade/FBNeo; por isso também informamos a BIOS explicitamente.
+ if(parentUrl){window.EJS_biosUrl=parentUrl;window.EJS_gameParentUrl=parentUrl;}
  
  let ready=false,started=false;
  const hide=()=>{status.style.display='none';manual.style.display='none'};
