@@ -34,6 +34,30 @@
       "destination": "/api/bios?name=nmk004.zip"
     },
     {
+      "source": "/qsound.zip",
+      "destination": "/api/bios?name=qsound.zip"
+    },
+    {
+      "source": "/ar_bios.zip",
+      "destination": "/api/bios?name=ar_bios.zip"
+    },
+    {
+      "source": "/awbios.zip",
+      "destination": "/api/bios?name=awbios.zip"
+    },
+    {
+      "source": "/kabuki.zip",
+      "destination": "/api/bios?name=kabuki.zip"
+    },
+    {
+      "source": "/cchip.zip",
+      "destination": "/api/bios?name=cchip.zip"
+    },
+    {
+      "source": "/pgmbios.zip",
+      "destination": "/api/bios?name=pgmbios.zip"
+    },
+    {
       "source": "/assets/:match*",
       "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/assets/:match*"
     },
