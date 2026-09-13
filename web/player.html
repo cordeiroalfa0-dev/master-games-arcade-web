@@ -26,13 +26,24 @@
  const romUrl=new URL(rom,location.origin).href;
  log('Jogo: '+name);log('ROM URL: '+romUrl);if(biosUrl)log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
 
- // O FB Neo usa EJS_gameParentUrl para arquivos dependentes do jogo
- // (neogeo.zip, pgm.zip, qsound.zip etc.). EJS_biosUrl fica definido
- // também para versões do EmulatorJS que tratam a BIOS como arquivo direto.
- window.EJS_biosUrl=biosUrl?new URL(biosUrl,location.origin).href:'';
- window.EJS_gameParentUrl=window.EJS_biosUrl;
- window.EJS_dontExtractBIOS=false;
- if(biosUrl) log('BIOS configurado via EJS_gameParentUrl/EJS_biosUrl: '+(biosName||biosUrl));
+ // O FB Neo procura BIOS tanto junto da ROM quanto em system/fbneo.
+ // EJS_externalFiles extrai o ZIP nos dois locais; gameParentUrl sozinho
+ // pode deixar o arquivo compactado fora do diretório que o core consulta.
+ if(biosUrl){
+   const bios=new URL(biosUrl,location.origin).href;
+   window.EJS_externalFiles={
+     '/': bios,
+     '/home/web_user/retroarch/userdata/system/fbneo/': bios
+   };
+   window.EJS_gameParentUrl=bios;
+   window.EJS_biosUrl='';
+   window.EJS_dontExtractBIOS=false;
+   log('BIOS extraído na raiz e em system/fbneo: '+(biosName||biosUrl));
+ }else{
+   window.EJS_gameParentUrl='';
+   window.EJS_biosUrl='';
+   window.EJS_externalFiles={};
+ }
 
  // A URL da ROM é entregue diretamente ao EmulatorJS. Não fazemos um
  // ArrayBuffer/Blob da ROM antes do player para evitar download duplicado.
