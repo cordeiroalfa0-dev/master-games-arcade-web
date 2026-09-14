@@ -298,6 +298,12 @@
   window.EJS_ready=()=>{
     ready=true;
     log('EmulatorJS pronto; o jogo será iniciado automaticamente');
+    // Algumas versões do EmulatorJS exibem o menu RetroArch mesmo com
+    // startOnLoad=true. Acione o botão interno uma vez como fallback, antes
+    // de ocultar a camada de controles.
+    setTimeout(()=>{
+      if(!started&&!attempting) tryStart();
+    },700);
     hideEmulatorUi();
     setTimeout(hideEmulatorUi,300);
     setTimeout(hideEmulatorUi,1500);
