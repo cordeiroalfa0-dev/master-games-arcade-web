@@ -93,10 +93,23 @@
     }
   }
 
-  status.textContent='INICIANDO Arcade (FBNeo) — '+name+'...';
+  // Jogos CPS2 precisam de arquivo .key nos romsets para o FBNeo (core "arcade").
+  // Os romsets hospedados são de época anterior a essa exigência, então os jogos
+  // CPS2 usam o core fbalpha2012_cps2, que tem as chaves de decriptação embutidas.
+  const CPS2_GAMES=new Set([
+    'avsp','avspu','ddsom','ddtod','dino','dstlk','hsf2','megaman2','msh','mshvsf',
+    'mvsc','nwarr','nwarru','sfa','sfa2','sfa2u','sfa3','sfz2al','sfz2ald','sgemf',
+    'spf2t','ssf2','ssf2t','vhunt2','vsav','vsavj','xmcota','xmvsf','xmvsfe',
+    'xmvsfu','xmvsfur1','xmvsfj','armwar','cybots','gigawing','mmatrix','progear'
+  ]);
+  const romBase=name.replace(/\.(zip|7z|chd)$/i,'').toLowerCase();
+  const core=CPS2_GAMES.has(romBase)?'fbalpha2012_cps2':'arcade';
+  const coreLabel=core==='arcade'?'Arcade (FBNeo)':'CPS2 (FBAlpha 2012)';
+
+  status.textContent='INICIANDO '+coreLabel+' — '+name+'...';
 
   window.EJS_player='#game';
-  window.EJS_core='arcade';
+  window.EJS_core=core;
   window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
   window.EJS_gameUrl=romUrl;
 
