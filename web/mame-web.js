@@ -86,6 +86,15 @@
       ])
     },
     {
+      bios: "qsound.zip",
+      games: new Set([
+        "avsp", "avspu", "ddsom", "ddtod", "dstlk", "hsf2", "msh",
+        "mshvsf", "mvsc", "nwarru", "sfa", "sfa2u", "sfa3", "sfz2ald",
+        "sgemf", "spf2t", "ssf2", "ssf2t", "vhunt2", "vsavj", "xmcota",
+        "xmvsfur1"
+      ])
+    },
+    {
       bios: "isgsm.zip",
       games: new Set(["isgsm"])
     }

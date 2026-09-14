@@ -14,6 +14,10 @@
       "destination": "/api/bios?name=isgsm.zip"
     },
     {
+      "source": "/qsound.zip",
+      "destination": "/api/bios?name=qsound.zip"
+    },
+    {
       "source": "/decocass.zip",
       "destination": "/api/bios?name=decocass.zip"
     },
