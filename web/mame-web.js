@@ -4,8 +4,14 @@
 (() => {
   const API_PREFIX = "/api/";
   const NATIVE_API = "http://localhost:7777";
-  const CATALOG_URL = "/roms-catalog.json";
-  const TITLES_URL = "/game-titles.json";
+  const CATALOG_URLS = [
+    "/roms-catalog.json",
+    "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/roms-manifest.json"
+  ];
+  const TITLES_URLS = [
+    "/game-titles.json",
+    "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/client/game-titles.json"
+  ];
   const originalFetch = window.fetch.bind(window);
   let catalogPromise;
   let titlesPromise;
@@ -16,20 +22,30 @@
       headers: { "Content-Type": "application/json; charset=utf-8" }
     });
 
+  const fetchFirstJson = async (urls, errorMessage) => {
+    let lastError;
+    for (const url of urls) {
+      try {
+        const response = await originalFetch(url);
+        if (!response.ok) throw new Error(`${response.status}`);
+        return await response.json();
+      } catch (error) {
+        lastError = error;
+      }
+    }
+    throw new Error(errorMessage + (lastError ? ` (${lastError.message})` : ""));
+  };
+
   const loadCatalog = async () => {
     if (!catalogPromise) {
-      catalogPromise = originalFetch(CATALOG_URL).then((response) => {
-        if (!response.ok) throw new Error("Catálogo de ROMs indisponível");
-        return response.json();
-      });
+      catalogPromise = fetchFirstJson(CATALOG_URLS, "Catálogo de ROMs indisponível");
     }
     return catalogPromise;
   };
 
   const loadTitles = async () => {
     if (!titlesPromise) {
-      titlesPromise = originalFetch(TITLES_URL)
-        .then((response) => response.ok ? response.json() : {})
+      titlesPromise = fetchFirstJson(TITLES_URLS, "Nomes dos jogos indisponíveis")
         .catch(() => ({}));
     }
     return titlesPromise;
@@ -55,14 +71,18 @@
         "kof2002", "kof2003", "lastbld2", "lbowling", "magdrop3",
         "matrim", "mslug", "mslug2", "mslug3", "mslug4", "mslug5",
         "mslugx", "samsho", "samsho2", "samsho3", "samsho4", "sengoku3",
-        "sonicwi3", "svc", "twinspri", "wakuwak7", "whp", "neobombe",
-        "strhoop", "ssideki3", "ssideki4", "tetrisp"
+        "sonicwi2", "sonicwi3", "svc", "svcsplus", "twinspri", "wakuwak7",
+        "whp", "neobombe", "rbffspec", "rotd", "samsh5sp", "ninjamas",
+        "kf2k2mp2", "kf2k5uni", "kf10thep", "kof2k4se", "strhoop",
+        "ssideki3", "ssideki4", "tetrisp", "spinmast", "zedblade",
+        "shocktr2", "sengoku3", "matrim", "puzzled", "kizuna", "pbobblen",
+        "doubledr", "sailormn"
       ])
     },
     {
       bios: "pgm.zip",
       games: new Set([
-        "dbz2", "elvactr", "martmast", "pcktgal", "sailormn", "savagere"
+        "dbz2", "martmast", "pcktgal", "sailormn", "savagere"
       ])
     },
     {
@@ -76,6 +96,15 @@
     const rule = BIOS_RULES.find((entry) => entry.games.has(base));
     return rule?.bios || "";
   };
+
+  const SYSTEM_FILES = new Set([
+    "ar_bios.zip", "awbios.zip", "naomi.zip", "neogeo.zip", "nss.zip",
+    "pgm.zip", "qsound.zip", "isgsm.zip", "dir.txt"
+  ]);
+
+  const isPlayableRom = (name) =>
+    /\.(zip|7z|chd)$/i.test(String(name || "")) &&
+    !SYSTEM_FILES.has(String(name || "").toLowerCase());
 
   async function resolveRom(romName, message) {
     const catalog = await loadCatalog();
@@ -334,12 +363,11 @@
 
     if (path === "/api/roms") {
       const catalog = await loadCatalog();
-      const biosFiles = new Set(["neogeo.zip", "pgm.zip", "isgsm.zip"]);
 
       const roms = (catalog.files || [])
         .map((item) => item.name)
         .filter(Boolean)
-        .filter((name) => !biosFiles.has(fileBase(name)))
+        .filter(isPlayableRom)
         .sort((a, b) => a.localeCompare(b));
 
       return jsonResponse({
