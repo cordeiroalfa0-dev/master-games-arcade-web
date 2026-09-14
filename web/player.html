@@ -1,0 +1,327 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Master Games Arcade - Player</title>
+  <style>
+    html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#000}
+    #game{width:100vw;height:100vh;background:#000}
+    #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none}
+    #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
+    #manual-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100001;display:none;background:#08000f;color:#00e5ff;border:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66;padding:16px 24px;font:700 16px monospace;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div id="game"></div>
+  <div id="status">CARREGANDO...</div>
+  <pre id="debug"></pre>
+  <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
+
+<script>
+(async()=>{
+  const q=new URLSearchParams(location.search);
+  const rom=q.get('rom');
+  const biosUrl=q.get('bios')||'';
+  const biosName=q.get('biosName')||'';
+  const name=q.get('name')||'Master Games Arcade';
+  const status=document.getElementById('status');
+  const debug=document.getElementById('debug');
+  const manual=document.getElementById('manual-start');
+  const logs=[];
+
+  let ready=false;
+  let started=false;
+  let attempting=false;
+  let retriesLeft=3;
+  let retryTimer=null;
+  let startWatchdog=null;
+
+  const log=x=>{
+    logs.push(`[${new Date().toLocaleTimeString()}] ${x}`);
+    if(logs.length>80)logs.shift();
+    debug.textContent=logs.join('\n');
+    console.log('[MGA]',x);
+  };
+
+  const fail=x=>{
+    status.textContent=x;
+    status.style.color='#ff2bd6';
+    debug.style.display='block';
+    manual.style.display='none';
+    log('ERRO: '+x);
+    try{parent.postMessage({type:'mga-emulator-error',message:x},location.origin)}catch{}
+  };
+
+  if(!rom){
+    fail('ROM NÃO INFORMADA');
+    return;
+  }
+
+  const romUrl=new URL(rom,location.origin).href;
+  log('Jogo: '+name);
+  log('ROM URL: '+romUrl);
+  if(biosUrl){
+    log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
+  }
+
+  // EmulatorJS Arcade utiliza o core FBNeo nesta configuração.
+  // A ROM ZIP deve ser compatível com o romset FBNeo.
+  // ATENÇÃO: com EJS_dontExtractBIOS=true o EmulatorJS 4.2.3 usa a string da
+  // URL da BIOS como caminho de gravação no sistema de arquivos do core
+  // (FS.writeFile(url)). Por isso ela precisa ser um caminho relativo simples
+  // na raiz, como "/neogeo.zip" — nada de URL absoluta nem query string.
+  const biosFile=(biosName||biosUrl.split('/').pop()||'').split('?')[0].split('#')[0];
+  window.EJS_biosUrl=biosFile?'/'+biosFile:'';
+  window.EJS_gameParentUrl='';
+  window.EJS_externalFiles={};
+
+  // Mantém o ZIP da BIOS intacto para o core fazer o merge com o romset.
+  window.EJS_dontExtractBIOS=true;
+
+  if(window.EJS_biosUrl){
+    log('BIOS configurado via EJS_biosUrl: '+window.EJS_biosUrl);
+    try{
+      const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
+      const len=head.headers.get('content-length');
+      log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(len||'desconhecido')+' bytes');
+      if(!head.ok){
+        log('AVISO: endpoint da BIOS não respondeu OK — o core pode falhar ao montar o arquivo.');
+      }
+    }catch(e){
+      log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)');
+    }
+  }
+
+  status.textContent='INICIANDO Arcade (FBNeo) — '+name+'...';
+
+  window.EJS_player='#game';
+  window.EJS_core='arcade';
+  window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
+  window.EJS_gameUrl=romUrl;
+
+  // Versão fixada para evitar alterações automáticas no core.
+  const EJS_PINNED_VERSION='4.2.3';
+  window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
+  // Desativado: o EmulatorJS cria o próprio botão Start Game. Se o player
+  // clicar automaticamente nele ao mesmo tempo que o EmulatorJS inicializa
+  // o módulo WASM, ocorre o erro "toggleMainLoop undefined".
+  window.EJS_startOnLoaded=false;
+  window.EJS_alignStartButton='center';
+  window.EJS_language='en-US';
+  window.EJS_disableAutoLang=true;
+  window.EJS_volume=0;
+  window.EJS_color='#00e5ff';
+  window.EJS_backgroundColor='#000';
+  window.EJS_DEBUG_XX=true;
+
+  const hide=()=>{
+    status.style.display='none';
+    manual.style.display='none';
+  };
+
+  // ---------------------------------------------------------------
+  // Controles de teclado (valem para TODOS os jogos)
+  // Jogador 1: setas + Z X A S (socos/chutes), Enter = Start, Shift = Coin
+  // Jogador 2: T F G H + J K U I, V = Start, C = Coin
+  // ---------------------------------------------------------------
+  window.EJS_defaultControls={
+    0:{
+      0:{value:'z',value2:'BUTTON_2'},
+      1:{value:'a',value2:'BUTTON_4'},
+      2:{value:'shift',value2:'SELECT'},
+      3:{value:'enter',value2:'START'},
+      4:{value:'up arrow',value2:'DPAD_UP'},
+      5:{value:'down arrow',value2:'DPAD_DOWN'},
+      6:{value:'left arrow',value2:'DPAD_LEFT'},
+      7:{value:'right arrow',value2:'DPAD_RIGHT'},
+      8:{value:'x',value2:'BUTTON_1'},
+      9:{value:'s',value2:'BUTTON_3'},
+      10:{value:'q',value2:'LEFT_TOP_SHOULDER'},
+      11:{value:'w',value2:'RIGHT_TOP_SHOULDER'},
+      12:{value:'1',value2:'LEFT_BOTTOM_SHOULDER'},
+      13:{value:'2',value2:'RIGHT_BOTTOM_SHOULDER'},
+      14:{value:'',value2:'LEFT_STICK'},
+      15:{value:'',value2:'RIGHT_STICK'},
+      16:{value:'',value2:'LEFT_STICK_X:+1'},
+      17:{value:'',value2:'LEFT_STICK_X:-1'},
+      18:{value:'',value2:'LEFT_STICK_Y:+1'},
+      19:{value:'',value2:'LEFT_STICK_Y:-1'},
+      20:{value:'',value2:'RIGHT_STICK_X:+1'},
+      21:{value:'',value2:'RIGHT_STICK_X:-1'},
+      22:{value:'',value2:'RIGHT_STICK_Y:+1'},
+      23:{value:'',value2:'RIGHT_STICK_Y:-1'},
+      24:{value:''},25:{value:''},26:{value:''},27:{},28:{},29:{}
+    },
+    1:{
+      0:{value:'j',value2:'BUTTON_2'},
+      1:{value:'u',value2:'BUTTON_4'},
+      2:{value:'c',value2:'SELECT'},
+      3:{value:'v',value2:'START'},
+      4:{value:'t',value2:'DPAD_UP'},
+      5:{value:'g',value2:'DPAD_DOWN'},
+      6:{value:'f',value2:'DPAD_LEFT'},
+      7:{value:'h',value2:'DPAD_RIGHT'},
+      8:{value:'k',value2:'BUTTON_1'},
+      9:{value:'i',value2:'BUTTON_3'},
+      10:{value:'o',value2:'LEFT_TOP_SHOULDER'},
+      11:{value:'p',value2:'RIGHT_TOP_SHOULDER'},
+      12:{value:'3',value2:'LEFT_BOTTOM_SHOULDER'},
+      13:{value:'4',value2:'RIGHT_BOTTOM_SHOULDER'}
+    },
+    2:{},3:{}
+  };
+
+  const goFullscreen=()=>{
+    try{
+      const el=document.documentElement;
+      if(document.fullscreenElement)return;
+      const req=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;
+      if(req){
+        const p=req.call(el,{navigationUI:'hide'});
+        if(p&&p.catch)p.catch(err=>log('Tela cheia recusada: '+(err?.message||err)));
+        log('Tela cheia solicitada');
+      }
+    }catch(e){
+      log('Tela cheia falhou: '+(e?.message||e));
+    }
+  };
+
+  // F11 / tecla F alterna tela cheia sem sair do jogo.
+  addEventListener('keydown',e=>{
+    if(e.key==='F11'||e.code==='F11'){
+      e.preventDefault();
+      document.fullscreenElement?document.exitFullscreen():goFullscreen();
+    }
+  });
+
+  window.EJS_onGameStart=()=>{
+    if(started)return;
+    started=true;
+    attempting=false;
+    if(retryTimer)clearTimeout(retryTimer);
+    if(startWatchdog)clearTimeout(startWatchdog);
+    hide();
+    log('Arcade/FBNeo iniciou o jogo');
+    goFullscreen();
+
+    try{
+      const fs=window.EJS_emulator?.gameManager?.FS;
+      if(fs){
+        const expected=biosName||'BIOS';
+        const checks=[
+          `/${expected}`,
+          '/home/web_user/retroarch/userdata/system/'+expected,
+          '/home/web_user/retroarch/userdata/system/fbneo/'+expected
+        ];
+        const found=checks.filter(p=>{
+          try{fs.stat(p);return true}catch{return false}
+        });
+        log(expected+' encontrado no FS: '+(found.length?found.join(' | '):'não exposto pelo wrapper'));
+      }
+    }catch(e){
+      log('Diagnóstico FS: '+(e?.message||e));
+    }
+
+    try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
+  };
+
+  // Inicia somente uma vez. O clique duplicado era capaz de chamar
+  // toggleMainLoop antes de o módulo interno do EmulatorJS estar pronto.
+  const tryStart=()=>{
+    if(started||attempting)return false;
+
+    const els=[...document.querySelectorAll('button,[role="button"]')];
+    log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
+
+    const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
+    if(!b)return false;
+
+    attempting=true;
+    b.click();
+    log('Start Game acionado uma única vez');
+
+    // Libera nova tentativa apenas se o core não iniciou.
+    setTimeout(()=>{
+      if(!started){
+        attempting=false;
+        log('O core ainda não iniciou; nova tentativa poderá ser feita manualmente.');
+      }
+    },5000);
+
+    return true;
+  };
+
+  const showManualStart=()=>{
+    if(!started){
+      status.style.display='none';
+      manual.style.display='block';
+      log('Aguardando clique do usuário para iniciar o Arcade/FBNeo');
+    }
+  };
+
+  manual.addEventListener('click',()=>{
+    manual.style.display='none';
+    goFullscreen();
+    if(!tryStart()){
+      log('Nenhum botão Start Game encontrado após clique');
+      showManualStart();
+    }
+  });
+
+  // Não usamos listener global de clique: ele podia capturar o clique
+  // sintético do EmulatorJS e iniciar o core duas vezes.
+
+  window.EJS_ready=()=>{
+    ready=true;
+    log('EmulatorJS pronto; o botão Start Game será acionado somente pelo usuário');
+
+    // Não chamamos b.click() automaticamente. O EmulatorJS ainda pode estar
+    // finalizando o módulo WASM quando EJS_ready é disparado. O usuário deve
+    // clicar uma única vez no botão Start Game exibido pelo próprio EmulatorJS.
+    setTimeout(()=>{
+      if(!started)showManualStart();
+    },1500);
+  };
+
+  addEventListener('error',e=>{
+    log('window.error: '+(e.message||'erro mascarado pelo CDN'));
+    if(attempting&&!started&&retriesLeft>0){
+      retriesLeft--;
+      attempting=false;
+      log('Possível corrida de inicialização — tentando novamente em 2.5s ('+retriesLeft+' restantes)');
+      retryTimer=setTimeout(()=>{
+        if(!started)tryStart();
+      },2500);
+    }
+  });
+
+  addEventListener('unhandledrejection',e=>{
+    log('unhandledrejection: '+(e.reason?.message||e.reason));
+  });
+
+  startWatchdog=setTimeout(()=>{
+    if(!ready&&!started){
+      fail('Arcade não carregou em 30s. Verifique a ROM, o BIOS e o endpoint de download.');
+    }
+  },30000);
+
+  setTimeout(()=>{
+    if(ready&&!started){
+      fail('EmulatorJS ficou pronto, mas o core Arcade (FBNeo) não iniciou a ROM. Confirme o romset e o BIOS.');
+    }
+  },45000);
+
+  // Os controles de teclado e gamepad são tratados pelo próprio EmulatorJS
+  // através de EJS_defaultControls (mapa acima). Nenhum remapeamento manual.
+
+  const script=document.createElement('script');
+  script.src='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/loader.js';
+  script.async=true;
+  script.crossOrigin='anonymous';
+  script.onerror=()=>fail('Não foi possível carregar o EmulatorJS pelo CDN.');
+  document.head.appendChild(script);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,61 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    {
+      "source": "/neogeo.zip",
+      "destination": "/api/bios?name=neogeo.zip"
+    },
+    {
+      "source": "/pgm.zip",
+      "destination": "/api/bios?name=pgm.zip"
+    },
+    {
+      "source": "/isgsm.zip",
+      "destination": "/api/bios?name=isgsm.zip"
+    },
+    {
+      "source": "/decocass.zip",
+      "destination": "/api/bios?name=decocass.zip"
+    },
+    {
+      "source": "/skns.zip",
+      "destination": "/api/bios?name=skns.zip"
+    },
+    {
+      "source": "/cvs.zip",
+      "destination": "/api/bios?name=cvs.zip"
+    },
+    {
+      "source": "/midssio.zip",
+      "destination": "/api/bios?name=midssio.zip"
+    },
+    {
+      "source": "/nmk004.zip",
+      "destination": "/api/bios?name=nmk004.zip"
+    },
+    {
+      "source": "/assets/:match*",
+      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/assets/:match*"
+    },
+    {
+      "source": "/favicon.png",
+      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/favicon.png"
+    },
+    {
+      "source": "/fonts/:match*",
+      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/fonts/:match*"
+    },
+    {
+      "source": "/intro_bg.mp4",
+      "destination": "https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/dist/intro_bg.mp4"
+    },
+    {
+      "source": "/roms-catalog.json",
+      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/roms-manifest.json"
+    },
+    {
+      "source": "/game-titles.json",
+      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/client/game-titles.json"
+    }
+  ]
+}
