@@ -121,7 +121,11 @@
 
   // Versão fixada para evitar alterações automáticas no core.
   const EJS_PINNED_VERSION='4.2.3';
-  window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
+  // Self-hosted: EmulatorJS 4.2.3 + cores FBNeo/FBAlpha2012 CPS2 vivem em
+  // /web/emulatorjs-data/ dentro do próprio repo (sem depender do CDN
+  // público). O CDN só é usado como failsafe automático (emulator.js já
+  // tenta cdn.emulatorjs.org sozinho se algum arquivo local faltar).
+  window.EJS_pathtodata='/web/emulatorjs-data/';
   // Iniciar automaticamente: o usuário deve ver diretamente o jogo, sem a
   // tela/botão do EmulatorJS.
   window.EJS_startOnLoaded=true;
@@ -344,10 +348,18 @@
   // através de EJS_defaultControls (mapa acima). Nenhum remapeamento manual.
 
   const script=document.createElement('script');
-  script.src='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/loader.js';
+  script.src=window.EJS_pathtodata+'loader.js';
   script.async=true;
-  script.crossOrigin='anonymous';
-  script.onerror=()=>fail('Não foi possível carregar o EmulatorJS pelo CDN.');
+  script.onerror=()=>{
+    log('loader.js local falhou — tentando fallback pelo CDN oficial.');
+    window.EJS_pathtodata='https://cdn.emulatorjs.org/'+EJS_PINNED_VERSION+'/data/';
+    const fallback=document.createElement('script');
+    fallback.src=window.EJS_pathtodata+'loader.js';
+    fallback.async=true;
+    fallback.crossOrigin='anonymous';
+    fallback.onerror=()=>fail('Não foi possível carregar o EmulatorJS (local nem CDN).');
+    document.head.appendChild(fallback);
+  };
   document.head.appendChild(script);
 })();
 </script>
