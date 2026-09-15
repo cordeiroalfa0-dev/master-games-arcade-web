@@ -39,3 +39,9 @@ Esse teste confirma a presença do player, dos manifestos locais, dos cores FBNe
 8. Identificação estável de até quatro gamepads.
 9. Eventos de conexão, desconexão e retorno da aba para controles.
 10. Atalhos F9 para diagnóstico, F11 para tela cheia e Escape para sair do player.
+
+## Melhorias de vídeo
+
+O player também oferece dez ajustes visuais persistentes, sem modificar o core ou a ROM: escala inteira de pixels, proporção automática, proporção 4:3, modo esticado, scanlines, vinheta CRT, paleta normal, paleta âmbar, paleta fria e paleta suave. Brilho, contraste e saturação podem ser ajustados durante a execução.
+
+Atalhos: `F2` scanlines, `F3` escala inteira, `F4` proporção, `F5` paleta, `F6` brilho, `F7` contraste, `F8` saturação, `F10` vinheta e `H`/`?` diagnóstico dos ajustes. As preferências são guardadas em `localStorage`.

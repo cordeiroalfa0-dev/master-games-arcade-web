@@ -18,6 +18,7 @@ assert.match(bridge, /\/api\/gamepads/);
 assert.match(bridge, /AbortController/);
 assert.match(player, /F9/);
 assert.match(player, /mga-emulator-exit/);
+for (const token of ['video-aspect-43','video-stretch','video-integer','video-scanlines','video-vignette','video-amber','video-cool','video-soft','VISUAL_KEY','visualHelp']) assert.match(player, new RegExp(token));
 assert.match(gamepads, /stableKey/);
 assert.match(gamepads, /visibilitychange/);
 assert.ok(Array.isArray(manifest.files), 'roms-manifest.json precisa conter files');
