@@ -209,12 +209,23 @@
     }
   };
 
-  // F11 / tecla F alterna tela cheia sem sair do jogo.
+  // F11 alterna tela cheia; F9 mostra diagnóstico; Escape fecha o player.
   addEventListener('keydown',e=>{
     if(e.key==='F11'||e.code==='F11'){
       e.preventDefault();
       document.fullscreenElement?document.exitFullscreen():goFullscreen();
     }
+    if(e.key==='F9'||e.code==='F9'){
+      e.preventDefault();
+      const debug=document.getElementById('debug');
+      if(debug) debug.style.display=debug.style.display==='none'?'block':'none';
+    }
+    if(e.key==='Escape'&&!e.target.matches('input,textarea,button')){
+      try{parent.postMessage({type:'mga-emulator-exit'},location.origin)}catch{}
+    }
+  });
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden) log('Player retomado após retorno à aba.');
   });
 
   window.EJS_onGameStart=()=>{

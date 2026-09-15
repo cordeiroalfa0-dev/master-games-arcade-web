@@ -26,3 +26,16 @@ node tests/web-integrity.mjs
 ```
 
 Esse teste confirma a presença do player, dos manifestos locais, dos cores FBNeo e das rotas essenciais.
+
+## Melhorias integradas
+
+1. Catálogo local com fallback externo.
+2. Mapa local de títulos amigáveis.
+3. Timeout de 12 segundos para carregamento de dados.
+4. Cache controlado para evitar catálogo desatualizado.
+5. Histórico dos jogos recentes no navegador.
+6. Favoritos persistidos localmente.
+7. API web para consultar favoritos e recentes.
+8. Identificação estável de até quatro gamepads.
+9. Eventos de conexão, desconexão e retorno da aba para controles.
+10. Atalhos F9 para diagnóstico, F11 para tela cheia e Escape para sair do player.

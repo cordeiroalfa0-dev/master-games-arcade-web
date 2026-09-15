@@ -15,6 +15,31 @@
   const originalFetch = window.fetch.bind(window);
   let catalogPromise;
   let titlesPromise;
+  const STORAGE = {
+    recent: 'mga-recent-games-v1',
+    favorites: 'mga-favorite-games-v1'
+  };
+
+  const readList = (key) => {
+    try {
+      const value = JSON.parse(localStorage.getItem(key) || '[]');
+      return Array.isArray(value) ? value.filter(Boolean) : [];
+    } catch { return []; }
+  };
+  const writeList = (key, list) => {
+    try { localStorage.setItem(key, JSON.stringify([...new Set(list)].slice(0, 100))); } catch {}
+  };
+  const rememberRecent = (name) => {
+    const value = String(name || '').trim();
+    if (value) writeList(STORAGE.recent, [value, ...readList(STORAGE.recent)]);
+  };
+  const toggleFavorite = (name) => {
+    const value = String(name || '').trim();
+    const current = readList(STORAGE.favorites);
+    const next = current.includes(value) ? current.filter((item) => item !== value) : [value, ...current];
+    writeList(STORAGE.favorites, next);
+    return next;
+  };
 
   const jsonResponse = (data, status = 200) =>
     new Response(JSON.stringify(data), {
@@ -26,7 +51,10 @@
     let lastError;
     for (const url of urls) {
       try {
-        const response = await originalFetch(url);
+        const controller = new AbortController();
+        const timer = setTimeout(() => controller.abort(), 12000);
+        const response = await originalFetch(url, { cache: 'no-store', signal: controller.signal });
+        clearTimeout(timer);
         if (!response.ok) throw new Error(`${response.status}`);
         return await response.json();
       } catch (error) {
@@ -159,6 +187,7 @@
     }
 
     message.textContent = `CARREGANDO ${item.name}...`;
+    rememberRecent(item.name);
 
     return {
       item,
@@ -414,6 +443,25 @@
         details: {},
         total: Object.keys(names).length
       });
+    }
+
+    if (path === "/api/games/recent" && method === "GET") {
+      return jsonResponse({ ok: true, games: readList(STORAGE.recent) });
+    }
+
+    if (path === "/api/games/favorites" && method === "GET") {
+      return jsonResponse({ ok: true, games: readList(STORAGE.favorites) });
+    }
+
+    if (path === "/api/games/favorites" && method === "POST") {
+      let body = {};
+      try { body = JSON.parse(init.body || "{}"); } catch {}
+      const games = toggleFavorite(body.name || body.romName);
+      return jsonResponse({ ok: true, games });
+    }
+
+    if (path === "/api/gamepads" && method === "GET") {
+      return jsonResponse({ ok: true, ...(window.MGA_Gamepads?.get?.() || { connected: 0, players: [] }) });
     }
 
     if (path === "/api/launch" && method === "POST") {
