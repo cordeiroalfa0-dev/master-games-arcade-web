@@ -143,11 +143,27 @@
     /\.(zip|7z|chd)$/i.test(String(name || "")) &&
     !SYSTEM_FILES.has(String(name || "").toLowerCase());
 
+  const compatibilityFor = (name, files) => {
+    const biosName = biosForGame(name);
+    const bios = biosName && files.find((entry) => fileBase(entry?.name) === fileBase(biosName));
+    return {
+      rom: name,
+      bios: biosName || null,
+      biosAvailable: !!bios && !bios.skipDownload,
+      biosUrl: bios && !bios.skipDownload ? `/${bios.name}` : null,
+      core: /^(avsp|ddsom|ddtod|dstlk|hsf2|msh|mshvsf|mvsc|sfa|sfa2|sfa3|sfz2al|sgemf|spf2t|ssf2|ssf2t|vhunt2|vsav|xmcota|xmvsf|progear)\.zip$/i.test(name) ? 'fbalpha2012_cps2' : 'arcade'
+    };
+  };
+
   async function resolveRom(romName, message) {
     const catalog = await loadCatalog();
     const files = Array.isArray(catalog.files) ? catalog.files : [];
 
-    const item = files.find((entry) => entry?.name === romName);
+    let item = files.find((entry) => entry?.name === romName);
+    if (item?.duplicateOf) {
+      const original = files.find((entry) => entry?.name === item.duplicateOf && !entry.skipDownload);
+      if (original) item = original;
+    }
 
     if (!item?.id || item.skipDownload) {
       throw new Error(`ROM não disponível para download: ${romName}`);
@@ -406,6 +422,7 @@
       const catalog = await loadCatalog();
 
       const roms = (catalog.files || [])
+        .filter((item) => !item?.skipDownload && !item?.duplicateOf)
         .map((item) => item.name)
         .filter(Boolean)
         .filter(isPlayableRom)
@@ -443,6 +460,26 @@
         details: {},
         total: Object.keys(names).length
       });
+    }
+
+    if (path === "/api/roms/check" && method === "GET") {
+      const catalog = await loadCatalog();
+      const requested = parsed.searchParams.get("name") || "";
+      const files = Array.isArray(catalog.files) ? catalog.files : [];
+      const item = files.find((entry) => entry?.name === requested);
+      if (!item) return jsonResponse({ ok: false, error: "ROM não encontrada no catálogo." }, 404);
+      const resolved = item.duplicateOf || item.name;
+      return jsonResponse({ ok: true, available: !item.skipDownload, duplicateOf: item.duplicateOf || null, resolved, ...compatibilityFor(resolved, files) });
+    }
+
+    if (path === "/api/bios/status" && method === "GET") {
+      const catalog = await loadCatalog();
+      const files = Array.isArray(catalog.files) ? catalog.files : [];
+      const bios = [...new Set(BIOS_RULES.map((rule) => rule.bios))].map((name) => {
+        const entry = files.find((file) => file?.name === name);
+        return { name, available: !!entry && !entry.skipDownload, id: entry?.id || null };
+      });
+      return jsonResponse({ ok: true, bios });
     }
 
     if (path === "/api/games/recent" && method === "GET") {

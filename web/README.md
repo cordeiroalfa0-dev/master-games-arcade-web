@@ -45,3 +45,7 @@ Esse teste confirma a presença do player, dos manifestos locais, dos cores FBNe
 O player também oferece dez ajustes visuais persistentes, sem modificar o core ou a ROM: escala inteira de pixels, proporção automática, proporção 4:3, modo esticado, scanlines, vinheta CRT, paleta normal, paleta âmbar, paleta fria e paleta suave. Brilho, contraste e saturação podem ser ajustados durante a execução.
 
 Atalhos: `F2` scanlines, `F3` escala inteira, `F4` proporção, `F5` paleta, `F6` brilho, `F7` contraste, `F8` saturação, `F10` vinheta e `H`/`?` diagnóstico dos ajustes. As preferências são guardadas em `localStorage`.
+
+## Melhorias de ROMs e BIOS
+
+Foram incorporadas cinco práticas confirmadas no histórico do projeto original: duplicatas marcadas no manifesto deixam de aparecer como jogos independentes; uma ROM duplicada é resolvida para o arquivo original; `/api/roms/check` informa disponibilidade, duplicata, core e BIOS esperada; `/api/bios/status` lista a disponibilidade das BIOS conhecidas; e a entrega de ROM suporta `HEAD`, `Range`, CORS preflight e nomes de arquivo validados. Essas regras preservam as correções do projeto original para Neo Geo, CPS2/FBAlpha 2012 e BIOS por caminho na raiz.
