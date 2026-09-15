@@ -23,13 +23,25 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
 <div id="insertCoin"><div class="coin">INSERT COIN</div><div class="hint">PRESSIONE QUALQUER TECLA PARA CONTINUAR</div></div><div id="cursor"></div>
 <script>
 let canEnter=false;
+let fullscreenRequested=false;
 const video=document.getElementById('bgVideo');
+function requestArcadeFullscreen(){
+  if(fullscreenRequested||document.fullscreenElement)return;
+  const request=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;
+  if(!request)return;
+  fullscreenRequested=true;
+  try{
+    const result=request.call(document.documentElement);
+    if(result?.catch)result.catch(()=>{fullscreenRequested=false});
+  }catch{fullscreenRequested=false}
+}
 function transition(){if(canEnter)return;document.getElementById('introContent').classList.add('hidden');video.style.opacity='0';document.getElementById('bgImage').style.opacity='1';setTimeout(()=>{document.getElementById('insertCoin').classList.add('show');canEnter=true},1800)}
 video.addEventListener('ended',transition);video.addEventListener('error',()=>setTimeout(transition,3000));
 setTimeout(()=>document.getElementById('introContent').classList.add('show'),100);
 setTimeout(()=>{document.querySelector('.subtitle').classList.add('show');document.querySelector('.title').classList.add('show');document.querySelector('.version').classList.add('show')},300);
 setTimeout(()=>{if(video.readyState>=2)video.play().catch(()=>{});},100);
-document.addEventListener('keydown',()=>{if(canEnter){canEnter=false;sessionStorage.setItem('mga.introSeen','1');location.href='/?launcher=1'}});
+document.addEventListener('keydown',()=>{requestArcadeFullscreen();if(canEnter){canEnter=false;sessionStorage.setItem('mga.introSeen','1');location.href='/?launcher=1'}});
+document.addEventListener('pointerdown',()=>{requestArcadeFullscreen();if(canEnter){canEnter=false;sessionStorage.setItem('mga.introSeen','1');location.href='/?launcher=1'}});
 document.addEventListener('mousemove',e=>{const c=document.getElementById('cursor');c.style.left=e.clientX+'px';c.style.top=e.clientY+'px'});
 </script>
 </body></html>
