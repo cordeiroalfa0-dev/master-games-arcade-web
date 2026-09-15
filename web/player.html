@@ -158,6 +158,14 @@
   window.EJS_player='#game';
   window.EJS_core=core;
   window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
+  // Cada ROM precisa de um perfil próprio. Antes, todos os jogos arcade
+  // compartilhavam o perfil "ejs-arcade-settings"; um core salvo ou inválido
+  // podia fazer o próximo título abrir apenas o menu do EmulatorJS.
+  let gameId=0;
+  for(const char of romBase) gameId=((gameId*31)+char.charCodeAt(0))>>>0;
+  window.EJS_gameID=gameId||1;
+  // Define o core esperado mesmo quando há configurações antigas salvas.
+  window.EJS_defaultOptions={retroarch_core:core==='arcade'?'fbneo':'fbalpha2012_cps2'};
   window.EJS_gameUrl=romUrl;
 
   // Versão fixada para evitar alterações automáticas no core.

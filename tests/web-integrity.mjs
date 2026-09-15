@@ -12,6 +12,8 @@ const titles = JSON.parse(fs.readFileSync(path.join(root, 'game-titles.json'), '
 
 assert.match(player, /EJS_pathtodata=['"]\/web\/emulatorjs-data\//);
 assert.match(player, /fbneo|arcade/i);
+assert.match(player, /EJS_gameID/);
+assert.match(player, /EJS_defaultOptions/);
 assert.match(bridge, /\/api\/rom\//);
 assert.match(bridge, /mga-recent-games-v1/);
 assert.match(bridge, /mga-favorite-games-v1/);
