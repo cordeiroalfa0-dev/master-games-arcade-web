@@ -25,4 +25,8 @@ if (!source.includes("CONTROL_PROFILE_VERSION='mga-players-credits-v2'")) {
   throw new Error('O perfil corrigido não invalida configurações antigas');
 }
 
+for (const key of ["shift:[0,2]", "enter:[0,3]", "'5':[0,2]", "'1':[0,3]", "c:[1,2]", "v:[1,3]", "'6':[1,2]", "'2':[1,3]"]) {
+  if (!source.includes(key)) throw new Error(`Atalho arcade ausente: ${key}`);
+}
+
 console.log('PASS player-controls: créditos e starts independentes por jogador');

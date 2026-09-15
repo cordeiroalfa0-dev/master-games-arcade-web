@@ -254,6 +254,27 @@
     2:{},3:{}
   };
 
+  // Alguns cores CPS2 não encaminham de forma consistente SELECT/START pelo
+  // listener interno do EmulatorJS. Envie esses quatro comandos diretamente
+  // ao jogador correspondente. Mantemos os atalhos antigos (Shift/Enter e
+  // C/V) e também os padrões de gabinete (5/1 e 6/2).
+  const arcadeSystemKeys={
+    shift:[0,2], enter:[0,3], '1':[0,3], '5':[0,2],
+    c:[1,2], v:[1,3], '2':[1,3], '6':[1,2]
+  };
+  const forwardArcadeSystemKey=e=>{
+    if(!started||e.repeat)return;
+    const mapping=arcadeSystemKeys[String(e.key||'').toLowerCase()];
+    if(!mapping)return;
+    const manager=window.EJS_emulator?.gameManager;
+    if(!manager?.simulateInput)return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    manager.simulateInput(mapping[0],mapping[1],e.type==='keyup'?0:1);
+  };
+  document.addEventListener('keydown',forwardArcadeSystemKey,true);
+  document.addEventListener('keyup',forwardArcadeSystemKey,true);
+
   const goFullscreen=()=>{
     try{
       const el=document.documentElement;
