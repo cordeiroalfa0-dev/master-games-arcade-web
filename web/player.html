@@ -307,20 +307,38 @@
 
   // Inicia somente uma vez. O clique duplicado era capaz de chamar
   // toggleMainLoop antes de o módulo interno do EmulatorJS estar pronto.
+  const findStartButton=()=>{
+    // Só o botão de início real do EmulatorJS (tela de start), nunca os
+    // botões da barra de controles (play/pause etc.), que chamam
+    // toggleMainLoop antes de o core existir.
+    const real=document.querySelector(
+      '.ejs_start_button,.ejs_startbutton,#ejs_start_button,.ejs_start_screen button,[class*="ejs-start"] button,[class*="ejs_start"] button'
+    );
+    if(real) return real;
+    const els=[...document.querySelectorAll('.ejs_start_screen button,.ejs_start_screen [role="button"]')];
+    return els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()))||null;
+  };
+
   const tryStart=()=>{
     if(started||attempting)return false;
 
-    const els=[...document.querySelectorAll('button,[role="button"]')];
-    log('Botões disponíveis: '+els.map(e=>(e.textContent||'').trim()).filter(Boolean).join(' | '));
+    // Com início automático ligado não clicamos em nada: o EmulatorJS
+    // inicia sozinho e qualquer clique cairia na barra de controles.
+    if(window.EJS_startOnLoaded){
+      log('Início automático ativo; nenhum clique sintético será feito.');
+      return false;
+    }
 
-    const b=els.find(e=>/^\s*(start game|start|play)\s*$/i.test((e.textContent||'').trim()));
-    if(!b)return false;
+    const b=findStartButton();
+    if(!b){
+      log('Botão de início real do EmulatorJS ainda não existe.');
+      return false;
+    }
 
     attempting=true;
     b.click();
-    log('Start Game acionado uma única vez');
+    log('Botão de início real acionado uma única vez');
 
-    // Libera nova tentativa apenas se o core não iniciou.
     setTimeout(()=>{
       if(!started){
         attempting=false;
@@ -342,9 +360,15 @@
   manual.addEventListener('click',()=>{
     manual.style.display='none';
     goFullscreen();
-    if(!tryStart()){
-      log('Nenhum botão Start Game encontrado após clique');
-      showManualStart();
+    const b=findStartButton();
+    if(b&&!started){
+      attempting=true;
+      b.click();
+      log('Início manual: botão real do EmulatorJS acionado');
+      setTimeout(()=>{if(!started)attempting=false;},5000);
+    }else{
+      log('Sem botão de início real; aguardando o início automático do core.');
+      if(!started) showManualStart();
     }
   });
 
@@ -364,7 +388,7 @@
     // startOnLoad=true. Acione o botão interno uma vez como fallback, antes
     // de ocultar a camada de controles.
     setTimeout(()=>{
-      if(!started&&!attempting) tryStart();
+      if(!started&&!attempting&&!window.EJS_startOnLoaded) tryStart();
     },700);
     hideEmulatorUi();
     setTimeout(hideEmulatorUi,300);
@@ -373,7 +397,7 @@
 
   addEventListener('error',e=>{
     log('window.error: '+(e.message||'erro mascarado pelo CDN'));
-    if(attempting&&!started&&retriesLeft>0){
+    if(attempting&&!started&&retriesLeft>0&&!window.EJS_startOnLoaded){
       retriesLeft--;
       attempting=false;
       log('Possível corrida de inicialização — tentando novamente em 2.5s ('+retriesLeft+' restantes)');
