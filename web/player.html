@@ -13,7 +13,9 @@
     #game canvas,#game video{max-width:100vw!important;max-height:100vh!important;object-fit:contain}
     #game canvas,#game video{image-rendering:pixelated;image-rendering:crisp-edges;filter:brightness(var(--video-brightness)) contrast(var(--video-contrast)) saturate(var(--video-saturation));}
     body.video-aspect-43 #game canvas,body.video-aspect-43 #game video{width:min(100vw,133.333vh)!important;height:min(75vw,100vh)!important;object-fit:contain}
-    body.video-stretch #game canvas,body.video-stretch #game video{width:100vw!important;height:100vh!important;object-fit:fill}
+    /* Preenche a viewport inteira. Em telas widescreen o arcade 4:3 é
+       esticado horizontalmente para eliminar as margens pretas laterais. */
+    body.video-stretch #game canvas,body.video-stretch #game video{width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;object-fit:fill}
     body.video-integer #game canvas,body.video-integer #game video{image-rendering:pixelated;transform:translateZ(0)}
     body.video-scanlines #game::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:99998;background:repeating-linear-gradient(to bottom,rgba(0,0,0,0) 0,rgba(0,0,0,0) 2px,rgba(0,0,0,.16) 3px,rgba(0,0,0,.16) 4px);mix-blend-mode:multiply}
     body.video-vignette #game::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:99997;background:radial-gradient(ellipse at center,transparent 58%,rgba(0,0,0,.42) 100%)}
@@ -66,9 +68,12 @@
   };
 
   const VISUAL_KEY='mga-video-profile-v1';
-  const visualDefaults={aspect:'auto',integer:true,scanlines:false,vignette:true,palette:'normal',brightness:1,contrast:1,saturation:1};
+  const visualDefaults={aspect:'stretch',integer:true,scanlines:false,vignette:true,palette:'normal',brightness:1,contrast:1,saturation:1};
   let visual={...visualDefaults};
   try{visual={...visual, ...JSON.parse(localStorage.getItem(VISUAL_KEY)||'{}')}}catch{}
+  // Perfis antigos usavam "auto" (contain), que deixava barras laterais.
+  // Migra somente esse modo; preferências explícitas 4:3/stretch continuam.
+  if(visual.aspect==='auto')visual.aspect='stretch';
   const applyVisual=()=>{
     document.body.classList.toggle('video-auto',visual.aspect==='auto');
     document.body.classList.toggle('video-aspect-43',visual.aspect==='4:3');
