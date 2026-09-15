@@ -25,6 +25,10 @@ if (!source.includes("CONTROL_PROFILE_VERSION='mga-players-credits-v2'")) {
   throw new Error('O perfil corrigido não invalida configurações antigas');
 }
 
+for (const feature of ["VISUAL_KEY='mga-video-profile-v2'", "pixelEnhancement=true", "'sabr'", "e.key==='F1'"]) {
+  if (!source.includes(feature)) throw new Error(`Melhoria visual ausente: ${feature}`);
+}
+
 for (const key of ["shift:[0,2]", "enter:[0,3]", "'5':[0,2]", "'1':[0,3]", "c:[1,2]", "v:[1,3]", "'6':[1,2]", "'2':[1,3]"]) {
   if (!source.includes(key)) throw new Error(`Atalho arcade ausente: ${key}`);
 }

@@ -42,9 +42,9 @@ Esse teste confirma a presença do player, dos manifestos locais, dos cores FBNe
 
 ## Melhorias de vídeo
 
-O player também oferece dez ajustes visuais persistentes, sem modificar o core ou a ROM: escala inteira de pixels, proporção automática, proporção 4:3, modo esticado, scanlines, vinheta CRT, paleta normal, paleta âmbar, paleta fria e paleta suave. Brilho, contraste e saturação podem ser ajustados durante a execução.
+O player também oferece ajustes visuais persistentes, sem modificar o core, a ROM ou a BIOS: escala inteira de pixels, proporção automática, proporção 4:3, modo esticado, shader SABR para suavização inteligente de sprites pixelados, scanlines, vinheta CRT, paleta normal, paleta âmbar, paleta fria e paleta suave. O perfil inicial usa brilho, contraste e saturação levemente aprimorados; todos podem ser ajustados durante a execução.
 
-Atalhos: `F2` scanlines, `F3` escala inteira, `F4` proporção, `F5` paleta, `F6` brilho, `F7` contraste, `F8` saturação, `F10` vinheta e `H`/`?` diagnóstico dos ajustes. As preferências são guardadas em `localStorage`.
+Atalhos: `F1` liga/desliga o shader SABR, `F2` scanlines, `F3` escala inteira, `F4` proporção, `F5` paleta, `F6` brilho, `F7` contraste, `F8` saturação, `F10` vinheta e `H`/`?` diagnóstico dos ajustes. As preferências são guardadas em `localStorage`.
 
 ## Melhorias de ROMs e BIOS
 
