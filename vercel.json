@@ -52,14 +52,6 @@
     {
       "source": "/intro_bg.mp4",
       "destination": "https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/dist/intro_bg.mp4"
-    },
-    {
-      "source": "/roms-catalog.json",
-      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/roms-manifest.json"
-    },
-    {
-      "source": "/game-titles.json",
-      "destination": "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/dist/client/game-titles.json"
     }
   ]
 }

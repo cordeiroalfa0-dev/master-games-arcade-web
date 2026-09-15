@@ -1,0 +1,881 @@
+{
+  "total": 175,
+  "updated": 174,
+  "report": [
+    {
+      "rom": "1942",
+      "title": "1942 (Revision B)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "1943",
+      "title": "1943: The Battle of Midway (Euro)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "3wonders",
+      "title": "Three Wonders (World 910520)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "adults",
+      "title": "Adults Only (Ukraine, V. 43.23)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "aladmdb",
+      "title": "Aladdin (bootleg of Mega Drive version)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "altbeast",
+      "title": "Altered Beast (set 8) (8751 317-0078)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "androdun",
+      "title": "Andro Dunos (NGM-049 ~ NGH-049)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "aof3",
+      "title": "Art of Fighting 3 - The Path of the Warrior / Art of Fighting - Ryuuko no Ken Gaiden",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ar_bios",
+      "title": "Arcadia System BIOS",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "avsp",
+      "title": "Alien vs. Predator (Europe 940520)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "avspu",
+      "title": "Alien vs. Predator (USA 940520)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "awbios",
+      "title": "Atomiswave BIOS",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "bjourney",
+      "title": "Blue's Journey / Raguy (ALM-001 ~ ALH-001)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "breakrev",
+      "title": "Breakers Revenge",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "btoads",
+      "title": "Battletoads",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "bub68705",
+      "title": "Bubble Bobble (bootleg with 68705)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "cap-33s-2",
+      "title": "cap-33s-2",
+      "source": "fallback"
+    },
+    {
+      "rom": "captcommb",
+      "title": "Captain Commando (bootleg)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "cawing",
+      "title": "Carrier Air Wing (World 901012)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "contra",
+      "title": "Contra (US / Asia, set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "csclub",
+      "title": "Capcom Sports Club (Europe 971017)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ctribe",
+      "title": "The Combatribes (US, rev 2, set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "dbz2",
+      "title": "Dragon Ball Z 2 - Super Battle",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ddragon",
+      "title": "Double Dragon (World set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ddragon2",
+      "title": "Double Dragon II: The Revenge (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ddragon3",
+      "title": "Double Dragon 3: The Rosetta Stone (US)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ddsom",
+      "title": "Dungeons & Dragons: Shadow over Mystara (Europe 960619)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ddtod",
+      "title": "Dungeons & Dragons: Tower of Doom (Europe 940412)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "deadconx",
+      "title": "Dead Connection (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "dino",
+      "title": "Cadillacs and Dinosaurs (World 930201)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "dinoj",
+      "title": "Cadillacs: Kyouryuu Shin Seiki (Japan 930201)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "doubledr",
+      "title": "Double Dragon (Neo-Geo)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "dstlk",
+      "title": "Darkstalkers: The Night Warriors (Europe 940705)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "eightman",
+      "title": "Eight Man (NGM-025 ~ NGH-025)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "elvactr",
+      "title": "Elevator Action Returns (Ver 2.2O 1995/02/20)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "fatfursp",
+      "title": "Fatal Fury Special / Garou Densetsu Special (NGM-058 ~ NGH-058, set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "fatfury3",
+      "title": "Fatal Fury 3 - Road to the Final Victory / Garou Densetsu 3 - Haruka-naru Tatakai (NGM-069 ~ NGH-069)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ffight",
+      "title": "Final Fight (World, set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ffight2b",
+      "title": "Final Fight 2 (SNES bootleg)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ga2",
+      "title": "Golden Axe: The Revenge of Death Adder (World, Rev B)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "galaga",
+      "title": "Galaga (Namco rev. B)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "galaga88",
+      "title": "Galaga '88",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "garou",
+      "title": "Garou - Mark of the Wolves (NGM-2530)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ghouls",
+      "title": "Ghouls'n Ghosts (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "goldnaxe",
+      "title": "Golden Axe (set 6, US) (8751 317-123A)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "hsf2",
+      "title": "Hyper Street Fighter II: The Anniversary Edition (USA 040202)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "joemacr",
+      "title": "Joe & Mac Returns (World, Master Version 1.1, 1994.05.27)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "jojobane",
+      "title": "JoJo's Bizarre Adventure (Euro 990927, NO CD)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kf10thep",
+      "title": "The King of Fighters 10th Anniversary Extra Plus (bootleg of The King of Fighters 2002)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kf2k2mp2",
+      "title": "The King of Fighters 2002 Magic Plus II (bootleg)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kf2k5uni",
+      "title": "The King of Fighters 10th Anniversary 2005 Unique (bootleg of The King of Fighters 2002)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kinst",
+      "title": "Killer Instinct",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kinst",
+      "title": "Killer Instinct",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kinst2",
+      "title": "Killer Instinct 2",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kinst2",
+      "title": "Killer Instinct 2",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kizuna",
+      "title": "Kizuna Encounter - Super Tag Battle / Fu'un Super Tag Battle",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "knights",
+      "title": "Knights of the Round (World 911127)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof2000",
+      "title": "The King of Fighters 2000 (NGM-2570 ~ NGH-2570)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof2001",
+      "title": "The King of Fighters 2001 (NGM-262?)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof2002",
+      "title": "The King of Fighters 2002 (NGM-2650 ~ NGH-2650)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof2003",
+      "title": "The King of Fighters 2003 (NGM-2710, Export)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof2k4se",
+      "title": "The King of Fighters Special Edition 2004 (bootleg of The King of Fighters 2002)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof94",
+      "title": "The King of Fighters '94 (NGM-055 ~ NGH-055)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof95",
+      "title": "The King of Fighters '95 (NGM-084)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof96",
+      "title": "The King of Fighters '96 (NGM-214)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof97",
+      "title": "The King of Fighters '97 (NGM-2320)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof98",
+      "title": "The King of Fighters '98 - The Slugfest / King of Fighters '98 - Dream Match Never Ends (NGM-2420)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "kof99",
+      "title": "The King of Fighters '99 - Millennium Battle (NGM-2510)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "lastbld2",
+      "title": "The Last Blade 2 / Bakumatsu Roman - Dai Ni Maku Gekka no Kenshi (NGM-2430 ~ NGH-2430)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "lbowling",
+      "title": "League Bowling (NGM-019 ~ NGH-019)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "magdrop3",
+      "title": "Magical Drop III",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "majtitl2",
+      "title": "Major Title 2 (World, set 1, 017 sound CPU)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "martmast",
+      "title": "Martial Masters / Xing Yi Quan (ver. 104, 102, 102US)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "matrim",
+      "title": "Matrimelee / Shin Gouketsuji Ichizoku Toukon (NGM-2660 ~ NGH-2660)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "megaman",
+      "title": "Mega Man: The Power Battle (CPS1, USA 951006)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "megaman2",
+      "title": "Mega Man 2: The Power Fighters (USA 960708)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mk",
+      "title": "Mortal Kombat (rev 5.0 T-Unit 03/19/93)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mk2",
+      "title": "Mortal Kombat II (rev L3.1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mk4",
+      "title": "Mortal Kombat 4 (version 3.0)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "moomesa",
+      "title": "Wild West C.O.W.-Boys of Moo Mesa (ver EAB)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mp_sor2",
+      "title": "Streets of Rage II (Mega Play)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "msh",
+      "title": "Marvel Super Heroes (Europe 951024)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mshvsf",
+      "title": "Marvel Super Heroes Vs. Street Fighter (Europe 970625)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mslug",
+      "title": "Metal Slug - Super Vehicle-001",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mslug2",
+      "title": "Metal Slug 2 - Super Vehicle-001/II (NGM-2410 ~ NGH-2410)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mslug3",
+      "title": "Metal Slug 3 (NGM-2560)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mslug3b6",
+      "title": "Metal Slug 6 (bootleg of Metal Slug 3)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mslug4",
+      "title": "Metal Slug 4 (NGM-2630)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mslug5",
+      "title": "Metal Slug 5 (NGM-2680)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mslugx",
+      "title": "Metal Slug X - Super Vehicle-001 (NGM-2500 ~ NGH-2500)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mvsc",
+      "title": "Marvel Vs. Capcom: Clash of Super Heroes (Europe 980123)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "mwalk",
+      "title": "Michael Jackson's Moonwalker (World) (FD1094/8751 317-0159)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "naomi",
+      "title": "NAOMI BIOS",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "nbajam",
+      "title": "NBA Jam (rev 3.01 4/07/93)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "neobombe",
+      "title": "Neo Bomberman",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "neogeo",
+      "title": "Neo-Geo MV-6F",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ninjamas",
+      "title": "Ninja Master's - Haoh-ninpo-cho",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "nss",
+      "title": "Nintendo Super System BIOS",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "nwarru",
+      "title": "Night Warriors: Darkstalkers' Revenge (USA 950406)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "outrun",
+      "title": "Out Run (sitdown/upright, Rev B)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "pacplus",
+      "title": "Pac-Man Plus",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "pbobblen",
+      "title": "Puzzle Bobble / Bust-A-Move (Neo-Geo, NGM-083)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "pcktgal",
+      "title": "Pocket Gal (Japan)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "pgm",
+      "title": "PGM (Polygame Master) System BIOS",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "prehisle",
+      "title": "Prehistoric Isle in 1930 (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "preisle2",
+      "title": "Prehistoric Isle 2",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "punisher",
+      "title": "The Punisher (World 930422)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "qbert",
+      "title": "Q*bert (US set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "qsound",
+      "title": "QSound",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "rampage",
+      "title": "Rampage (Rev 3, 8/27/86)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "rbffspec",
+      "title": "Real Bout Fatal Fury Special / Real Bout Garou Densetsu Special",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "robocop2",
+      "title": "Robocop 2 (Euro/Asia v0.10)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "rotd",
+      "title": "Rage of the Dragons (NGM-2640?)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "rtype",
+      "title": "R-Type (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "rtype2",
+      "title": "R-Type II (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "rtypeleo",
+      "title": "R-Type Leo (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sailormn",
+      "title": "Bishoujo Senshi Sailor Moon (Version 95/03/22B, Japan)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "samsh5sp",
+      "title": "Samurai Shodown V Special / Samurai Spirits Zero Special (NGM-2720)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "samsho",
+      "title": "Samurai Shodown / Samurai Spirits (NGM-045)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "samsho2",
+      "title": "Samurai Shodown II / Shin Samurai Spirits - Haohmaru Jigokuhen (NGM-063 ~ NGH-063)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "samsho3",
+      "title": "Samurai Shodown III / Samurai Spirits - Zankurou Musouken (NGM-087)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "samsho4",
+      "title": "Samurai Shodown IV - Amakusa's Revenge / Samurai Spirits - Amakusa Kourin (NGM-222 ~ NGH-222)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "savagere",
+      "title": "Savage Reign / Fu'un Mokushiroku - Kakutou Sousei",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sdodgeb",
+      "title": "Super Dodge Ball / Kunio no Nekketsu Toukyuu Densetsu",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sengoku3",
+      "title": "Sengoku 3 / Sengoku Densho 2001 (set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sf2ce",
+      "title": "Street Fighter II': Champion Edition (World 920513)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sf2m7",
+      "title": "Street Fighter II': Champion Edition (M7, bootleg)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sf2m8",
+      "title": "Street Fighter II': Champion Edition (M8, bootleg)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sfa3",
+      "title": "Street Fighter Alpha 3 (Europe 980904)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sfex2pa",
+      "title": "Street Fighter EX2 Plus (Asia 990611)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sfexpu1",
+      "title": "Street Fighter EX Plus (USA 970311)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sfiii3",
+      "title": "Street Fighter III 3rd Strike: Fight for the Future (Europe 990608)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sfz2ald",
+      "title": "Street Fighter Zero 2 Alpha (Asia 960826 Phoenix Edition) (bootleg)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sgemf",
+      "title": "Super Gem Fighter: Mini Mix (USA 970904)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "shdancer",
+      "title": "Shadow Dancer (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "shinobi",
+      "title": "Shinobi (set 6, System 16A) (unprotected)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "shinobi1",
+      "title": "Shinobi (set 1, System 16A) (FD1094 317-0050)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "shocktr2",
+      "title": "Shock Troopers - 2nd Squad",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "simpsons",
+      "title": "The Simpsons (4 Players World, set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "snowbro2",
+      "title": "Snow Bros. 2 - With New Elves / Otenki Paradise (Hanafram)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "snowbros",
+      "title": "Snow Bros. - Nick & Tom (set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sonic2mb",
+      "title": "Sonic The Hedgehog 2 (bootleg of Mega Drive version)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sonicwi2",
+      "title": "Aero Fighters 2 / Sonic Wings 2",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "sonicwi3",
+      "title": "Aero Fighters 3 / Sonic Wings 3",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "soulclbr",
+      "title": "Soul Calibur (World, SOC12/VER.A2)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "spang",
+      "title": "Super Pang (World 900914)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "spf2t",
+      "title": "Super Puzzle Fighter II Turbo (Europe 960529)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "spidman",
+      "title": "Spider-Man: The Videogame (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "spinmast",
+      "title": "Spin Master / Miracle Adventure",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ssf2t",
+      "title": "Super Street Fighter II Turbo (World 940223)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ssideki3",
+      "title": "Super Sidekicks 3 - The Next Glory / Tokuten Ou 3 - Eikou e no Chousen",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ssideki4",
+      "title": "The Ultimate 11 - The SNK Football Championship / Tokuten Ou - Honoo no Libero",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "ssriders",
+      "title": "Sunset Riders (4 Players ver EAC)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "strhoop",
+      "title": "Street Hoop / Street Slam / Dunk Dream (DEM-004 ~ DEH-004)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "suprmrio",
+      "title": "Vs. Super Mario Bros. (set SM4-4 E)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "svc",
+      "title": "SNK vs. Capcom - SVC Chaos (NGM-2690 ~ NGH-2690)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "svcsplus",
+      "title": "SNK vs. Capcom - SVC Chaos Super Plus (bootleg)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "tekken3",
+      "title": "Tekken 3 (World, TET2/VER.E1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "tektagt",
+      "title": "Tekken Tag Tournament (World, TEG2/VER.C1, set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "tetrisp",
+      "title": "Tetris Plus (ver 1.0)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "tmnt2",
+      "title": "Teenage Mutant Ninja Turtles: Turtles in Time (4 Players ver UAA)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "tmnt22pu",
+      "title": "Teenage Mutant Ninja Turtles: Turtles in Time (2 Players ver UDA)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "toki",
+      "title": "Toki (World, set 1)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "tumblep",
+      "title": "Tumble Pop (World)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "twinspri",
+      "title": "Twinkle Star Sprites",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "umk3",
+      "title": "Ultimate Mortal Kombat 3 (rev 1.2)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "vhunt2",
+      "title": "Vampire Hunter 2: Darkstalkers Revenge (Japan 970929)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "vsavj",
+      "title": "Vampire Savior: The Lord of Vampire (Japan 970519)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "wakuwak7",
+      "title": "Waku Waku 7",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "whp",
+      "title": "World Heroes Perfect",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "wonder3",
+      "title": "Wonder 3 (Japan 910520)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "wwfmania",
+      "title": "WWF: Wrestlemania (rev 1.30 08/10/95)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "xmcota",
+      "title": "X-Men: Children of the Atom (Europe 950331)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "xmvsfur1",
+      "title": "X-Men Vs. Street Fighter (USA 961004)",
+      "source": "Arcade Database"
+    },
+    {
+      "rom": "zedblade",
+      "title": "Zed Blade / Operation Ragnarok",
+      "source": "Arcade Database"
+    }
+  ]
+}

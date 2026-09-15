@@ -39,6 +39,12 @@ pastas internas do FBNeo. Para usar MAME Plus! 0.168.2 de verdade no navegador s
 necessário publicar e manter um build WebAssembly específico desse executável e usar um
 ROM set correspondente, em vez do core Arcade atual.
 
+## Recursos integrados
+
+O catálogo `roms-manifest.json`, o endpoint estático `roms-catalog.json` e o mapa de títulos `game-titles.json` são mantidos localmente para reduzir dependências externas. O EmulatorJS e os cores FBNeo são self-hosted em `web/emulatorjs-data/`, com fallback controlado para o CDN oficial.
+
+Antes de publicar, execute `node tests/web-integrity.mjs` para verificar os manifestos, o player e os assets WebAssembly.
+
 ## Hospedagem planejada
 
 Frontend: Vercel.
@@ -47,4 +53,4 @@ ROMs: armazenamento separado/CDN, evitando colocar vários GB de ROMs dentro do 
 
 ## Fonte
 
-O projeto reconstruído enviado anteriormente será usado como referência visual e funcional. O repositório original `master-games-arcade-system` permanece separado e não deve ser alterado durante esta migração.
+O projeto reconstruído enviado anteriormente é usado como referência visual e funcional. O repositório original `master-games-arcade-system` permanece separado e não é alterado durante esta migração.
