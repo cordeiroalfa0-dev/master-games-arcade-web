@@ -53,5 +53,25 @@
       "source": "/intro_bg.mp4",
       "destination": "https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/dist/intro_bg.mp4"
     }
+  ],
+  "headers": [
+    {
+      "source": "/web/player.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    },
+    {
+      "source": "/web/mame-web.js",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
+        }
+      ]
+    }
   ]
 }
