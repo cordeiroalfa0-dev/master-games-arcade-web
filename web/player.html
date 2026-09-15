@@ -281,10 +281,13 @@
     const mapping=arcadeSystemKeys[String(e.key||'').toLowerCase()];
     if(!mapping)return;
     const manager=window.EJS_emulator?.gameManager;
-    if(!manager?.simulateInput)return;
+    // EmulatorJS expõe o cwrap em gameManager.functions; algumas versões
+    // também oferecem o método direto. Use ambos para manter compatibilidade.
+    const simulateInput=manager?.functions?.simulateInput||manager?.simulateInput;
+    if(typeof simulateInput!=='function')return;
     e.preventDefault();
     e.stopImmediatePropagation();
-    manager.simulateInput(mapping[0],mapping[1],e.type==='keyup'?0:1);
+    simulateInput.call(manager,mapping[0],mapping[1],e.type==='keyup'?0:1);
   };
   document.addEventListener('keydown',forwardArcadeSystemKey,true);
   document.addEventListener('keyup',forwardArcadeSystemKey,true);

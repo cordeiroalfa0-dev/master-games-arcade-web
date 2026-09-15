@@ -25,7 +25,7 @@ if (!source.includes("CONTROL_PROFILE_VERSION='mga-players-credits-v2'")) {
   throw new Error('O perfil corrigido não invalida configurações antigas');
 }
 
-for (const feature of ["VISUAL_KEY='mga-video-profile-v2'", "pixelEnhancement=true", "'sabr'", "e.key==='F1'"]) {
+for (const feature of ["VISUAL_KEY='mga-video-profile-v2'", "pixelEnhancement=true", "'sabr'", "e.key==='F1'", "manager?.functions?.simulateInput"]) {
   if (!source.includes(feature)) throw new Error(`Melhoria visual ausente: ${feature}`);
 }
 
