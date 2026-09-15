@@ -167,7 +167,11 @@
   // compartilhavam o perfil "ejs-arcade-settings"; um core salvo ou inválido
   // podia fazer o próximo título abrir apenas o menu do EmulatorJS.
   let gameId=0;
-  for(const char of romBase) gameId=((gameId*31)+char.charCodeAt(0))>>>0;
+  // O perfil anterior podia ter salvo START/SELECT compartilhados entre os
+  // jogadores. Mudar a assinatura força o EmulatorJS a usar os controles
+  // corrigidos sem apagar volume ou outras preferências do usuário.
+  const CONTROL_PROFILE_VERSION='mga-players-credits-v2';
+  for(const char of `${CONTROL_PROFILE_VERSION}:${romBase}`) gameId=((gameId*31)+char.charCodeAt(0))>>>0;
   window.EJS_gameID=gameId||1;
   // Define o core esperado mesmo quando há configurações antigas salvas.
   window.EJS_defaultOptions={retroarch_core:core==='arcade'?'fbneo':'fbalpha2012_cps2'};
@@ -198,8 +202,10 @@
 
   // ---------------------------------------------------------------
   // Controles de teclado (valem para TODOS os jogos)
-  // Jogador 1: setas + Z X A S (socos/chutes), Enter = Start, Shift = Coin
-  // Jogador 2: T F G H + J K U I, V = Start, C = Coin
+  // Jogador 1: setas + Z X A S (socos/chutes), Enter = Start, Shift = Coin.
+  // Jogador 2: T F G H + J K U I, V = Start, C = Coin. As teclas de
+  // SELECT/START são deliberadamente diferentes: P2 só entra depois de
+  // inserir o crédito dele e pressionar o próprio START.
   // ---------------------------------------------------------------
   window.EJS_defaultControls={
     0:{
