@@ -50,13 +50,16 @@
     #difficulty-setup select{width:100%;padding:7px;background:#08000f;border:1px solid #00e5ff55;color:#fff;font:11px monospace}
     #difficulty-setup .controls-note{color:#999;font-size:10px;line-height:1.45}
     /* Controles touch: ficam na faixa inferior e deixam o centro do jogo livre. */
-    #game .ejs_virtualGamepad_parent{z-index:20;bottom:0;height:clamp(118px,24vh,178px);pointer-events:none}
+    #game .ejs_virtualGamepad_parent{z-index:20;top:auto!important;bottom:0;height:clamp(118px,24vh,178px);pointer-events:none}
     #game .ejs_virtualGamepad_parent>div{pointer-events:auto}
     #game .ejs_virtualGamepad_left{bottom:max(10px,env(safe-area-inset-bottom));left:max(10px,env(safe-area-inset-left));width:142px;height:142px}
     #game .ejs_virtualGamepad_right{bottom:max(10px,env(safe-area-inset-bottom));right:max(10px,env(safe-area-inset-right));width:148px;height:148px}
     #game .ejs_virtualGamepad_bottom{bottom:max(10px,env(safe-area-inset-bottom));height:38px}
     #game .ejs_virtualGamepad_top{display:none}
     #game .ejs_virtualGamepad_button{touch-action:none}
+    @media (hover:none) and (pointer:coarse){
+      #game .ejs_virtualGamepad_parent{display:block!important}
+    }
     @media (orientation:landscape) and (max-height:600px){
       #game .ejs_virtualGamepad_parent{height:94px}
       #game .ejs_virtualGamepad_left{bottom:max(6px,env(safe-area-inset-bottom));left:max(8px,env(safe-area-inset-left));width:96px;height:96px;transform:scale(.72);transform-origin:bottom left}
