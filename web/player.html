@@ -49,6 +49,37 @@
     #difficulty-setup label{display:flex;align-items:center;gap:7px;padding:7px;background:#ffffff08;border:1px solid #ffffff12;cursor:pointer}
     #difficulty-setup select{width:100%;padding:7px;background:#08000f;border:1px solid #00e5ff55;color:#fff;font:11px monospace}
     #difficulty-setup .controls-note{color:#999;font-size:10px;line-height:1.45}
+    /* Controles touch: ficam na faixa inferior e deixam o centro do jogo livre. */
+    #game .ejs_virtualGamepad_parent{z-index:20;bottom:0;height:clamp(118px,24vh,178px);pointer-events:none}
+    #game .ejs_virtualGamepad_parent>div{pointer-events:auto}
+    #game .ejs_virtualGamepad_left{bottom:max(10px,env(safe-area-inset-bottom));left:max(10px,env(safe-area-inset-left));width:142px;height:142px}
+    #game .ejs_virtualGamepad_right{bottom:max(10px,env(safe-area-inset-bottom));right:max(10px,env(safe-area-inset-right));width:148px;height:148px}
+    #game .ejs_virtualGamepad_bottom{bottom:max(10px,env(safe-area-inset-bottom));height:38px}
+    #game .ejs_virtualGamepad_top{display:none}
+    #game .ejs_virtualGamepad_button{touch-action:none}
+    @media (orientation:landscape) and (max-height:600px){
+      #game .ejs_virtualGamepad_parent{height:94px}
+      #game .ejs_virtualGamepad_left{bottom:max(6px,env(safe-area-inset-bottom));left:max(8px,env(safe-area-inset-left));width:96px;height:96px;transform:scale(.72);transform-origin:bottom left}
+      #game .ejs_virtualGamepad_right{bottom:max(6px,env(safe-area-inset-bottom));right:max(8px,env(safe-area-inset-right));width:100px;height:100px;transform:scale(.72);transform-origin:bottom right}
+      #game .ejs_virtualGamepad_bottom{bottom:max(5px,env(safe-area-inset-bottom));transform:scale(.72);transform-origin:bottom center}
+      #difficulty-setup{padding:10px max(12px,env(safe-area-inset-left)) 10px}
+      #difficulty-setup .difficulty-card{width:min(620px,100%);max-height:calc(100vh - 20px);overflow:auto;padding:12px 16px}
+      #difficulty-setup h1{font-size:16px;margin-bottom:5px}
+      #difficulty-setup p{margin-bottom:9px;font-size:10px;line-height:1.25}
+      #difficulty-setup .difficulty-actions{gap:8px}
+      #difficulty-setup button{min-width:145px;padding:8px 12px;font-size:11px}
+      #difficulty-setup .config-section{margin-top:9px;padding-top:8px}
+      #difficulty-setup .config-grid{gap:5px;font-size:10px}
+      #difficulty-setup label{padding:5px}
+      #difficulty-setup select{padding:5px;font-size:10px}
+      #difficulty-setup .controls-note{font-size:9px;line-height:1.25}
+    }
+    @media (orientation:portrait) and (max-width:600px){
+      #difficulty-setup{padding:16px max(12px,env(safe-area-inset-left)) max(16px,env(safe-area-inset-bottom))}
+      #difficulty-setup .difficulty-card{max-height:calc(100vh - 32px);overflow:auto;padding:18px 16px}
+      #difficulty-setup .difficulty-actions{gap:8px}
+      #difficulty-setup button{min-width:0;flex:1;padding:12px 8px}
+    }
     #loading-art{position:fixed;inset:0;z-index:99990;background:#030006 url('/assets/game-loading-art.png') center/cover no-repeat;transition:opacity .35s ease;}
     #loading-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.62));}
     #loading-art.hidden{opacity:0;pointer-events:none;}
@@ -417,6 +448,21 @@
   document.addEventListener('visibilitychange',()=>{
     if(!document.hidden) log('Player retomado após retorno à aba.');
   });
+  // Alguns navegadores móveis atualizam o viewport depois do evento resize.
+  // Reemite resize em dois frames para o EmulatorJS recalcular o canvas e o
+  // gamepad depois de uma rotação, sem forçar a orientação do aparelho.
+  let orientationResizeTimer;
+  const refreshAfterOrientation=()=>{
+    clearTimeout(orientationResizeTimer);
+    const refresh=()=>window.dispatchEvent(new Event('resize'));
+    requestAnimationFrame(()=>{refresh();requestAnimationFrame(refresh)});
+    orientationResizeTimer=setTimeout(refresh,220);
+  };
+  addEventListener('orientationchange',refreshAfterOrientation,{passive:true});
+  addEventListener('resize',()=>{
+    document.documentElement.style.setProperty('--mga-vw',`${innerWidth}px`);
+    document.documentElement.style.setProperty('--mga-vh',`${innerHeight}px`);
+  },{passive:true});
 
   const chooseCoreOptionValue=(options,mode,kind)=>{
     const values=options.map(value=>({raw:value,label:value.replace(/^\([^)]*\)\s*/,'').trim()}));
