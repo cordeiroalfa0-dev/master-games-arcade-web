@@ -403,6 +403,57 @@
     if(!document.hidden) log('Player retomado após retorno à aba.');
   });
 
+  const chooseCoreOptionValue=(options,mode,kind)=>{
+    const values=options.map(value=>({raw:value,label:value.replace(/^\([^)]*\)\s*/,'').trim()}));
+    if(kind==='difficulty'){
+      const pattern=mode==='hard'?/(hardest|hard|difficult|expert|high)/i:/(easiest|easy|beginner|low)/i;
+      return values.find(item=>pattern.test(item.label))?.raw||null;
+    }
+    if(kind==='lives'){
+      const numeric=values.filter(item=>/\b\d+\b/.test(item.label));
+      if(!numeric.length)return null;
+      numeric.sort((a,b)=>parseInt(a.label.match(/\d+/)[0])-parseInt(b.label.match(/\d+/)[0]));
+      return (mode==='hard'?numeric[0]:numeric[numeric.length-1]).raw;
+    }
+    if(kind==='continue'){
+      const pattern=mode==='hard'?/(off|disabled|no|none)/i:/(on|enabled|yes)/i;
+      return values.find(item=>pattern.test(item.label))?.raw||null;
+    }
+    return null;
+  };
+  const applyDifficultyToCore=()=>{
+    const manager=window.EJS_emulator?.gameManager;
+    const getOptions=manager?.functions?.getCoreOptions;
+    const setVariable=manager?.functions?.setVariable;
+    if(typeof getOptions!=='function'||typeof setVariable!=='function'){
+      log('DIP: API de opções do core não disponível; modo não aplicado.');
+      return false;
+    }
+    let raw='';
+    try{raw=getOptions.call(manager)||''}catch(e){log('DIP: falha ao ler opções: '+(e?.message||e));return false}
+    const applied=[];
+    for(const line of String(raw).split(/\r?\n/)){
+      if(!line.includes('; '))continue;
+      const [definition,choices]=line.split('; ');
+      const optionName=definition.split('|')[0].trim();
+      const optionValues=choices.split('|').map(value=>value.trim()).filter(Boolean);
+      const label=optionName.replace(/^[^|]*[-_]/,'').replace(/[_-]/g,' ');
+      const kind=/difficulty|level/i.test(label)?'difficulty':/lives|stock|life/i.test(label)?'lives':/continue/i.test(label)?'continue':null;
+      if(!kind)continue;
+      const value=chooseCoreOptionValue(optionValues,difficulty,kind);
+      if(!value)continue;
+      try{setVariable.call(manager,optionName,value);applied.push(`${label}=${value}`)}catch(e){log('DIP: falha em '+optionName+': '+(e?.message||e))}
+    }
+    if(applied.length){
+      log('DIP aplicado no core: '+applied.join(', '));
+      window.MGA_difficulty.automatic=true;
+      window.MGA_difficulty.applied=applied;
+      return true;
+    }
+    log('DIP: este jogo/core não expôs opções de dificuldade, vidas ou continue.');
+    return false;
+  };
+
   window.EJS_onGameStart=()=>{
     if(started)return;
     started=true;
@@ -411,6 +462,7 @@
     if(startWatchdog)clearTimeout(startWatchdog);
     hide();
     log('Arcade/FBNeo iniciou o jogo');
+    applyDifficultyToCore();
     // O shader só pode ser ativado depois de o contexto gráfico do core existir.
     setTimeout(applyPixelEnhancement,0);
     goFullscreen();

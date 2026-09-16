@@ -47,9 +47,9 @@ Antes de publicar, execute `node tests/web-integrity.mjs` para verificar os mani
 
 ## Modos de dificuldade
 
-Ao abrir uma ROM no player web, o launcher exibe as opções **Fácil** e **Difícil** antes de iniciar o emulador. A escolha é salva por jogo no `localStorage` (`mga-difficulty-mode-v1`) e fica disponível em `window.MGA_difficulty` para o player e futuras integrações com DIP switches.
+Ao abrir uma ROM no player web, o launcher exibe as opções **Fácil** e **Difícil** antes de iniciar o emulador. A escolha é salva por jogo no `localStorage` (`mga-difficulty-mode-v1`) e fica disponível em `window.MGA_difficulty`. Depois que o core inicia, o player lê `getCoreOptions()` e chama `ejs_set_variable` para aplicar opções expostas pelo FBNeo relacionadas a dificuldade, vidas e continues.
 
-O arquivo `difficulty-profiles.generated.json` mantém sugestões separadas para os dois modos. No perfil Fácil, a sugestão padrão é usar cinco vidas e continues habilitados; no perfil Difícil, duas vidas e continues desabilitados. Como os DIP switches são específicos de cada driver, os perfis identificam a intenção e não alteram cegamente a memória da ROM. A aplicação automática desses valores exige uma API segura de opções DIP no core ou um menu de serviço por jogo.
+O arquivo `difficulty-profiles.generated.json` mantém sugestões separadas para os dois modos. No perfil Fácil, a sugestão padrão é usar cinco vidas e continues habilitados; no perfil Difícil, duas vidas e continues desabilitados. Como os DIP switches são específicos de cada driver, o player aplica somente opções realmente expostas pelo core; quando a ROM não oferece essas opções, o diagnóstico informa que o modo não pôde ser aplicado, sem fingir uma alteração.
 
 ## Hospedagem planejada
 
