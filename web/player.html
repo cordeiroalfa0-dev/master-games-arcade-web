@@ -33,7 +33,7 @@
     #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none}
     #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
     #manual-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100001;display:none;background:#08000f;color:#00e5ff;border:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66;padding:16px 24px;font:700 16px monospace;cursor:pointer}
-    #difficulty-setup{position:fixed;inset:0;z-index:100002;display:grid;place-items:center;background:radial-gradient(circle at center,#170026 0%,#030006 72%);color:#fff;padding:24px;box-sizing:border-box;font-family:monospace}
+    #difficulty-setup{position:fixed;inset:0;z-index:100002;display:grid;place-items:center;background:linear-gradient(rgba(3,0,6,.68),rgba(3,0,6,.82)),url('/assets/game-loading-art.png') center/cover no-repeat;color:#fff;padding:24px;box-sizing:border-box;font-family:monospace}
     #difficulty-setup .difficulty-card{width:min(560px,100%);border:1px solid #00e5ff55;background:#05000b;box-shadow:0 0 24px #00e5ff22;padding:24px;box-sizing:border-box;text-align:center}
     #difficulty-setup h1{margin:0 0 10px;color:#00e5ff;font-size:20px}
     #difficulty-setup p{margin:0 auto 20px;color:#aaa;font-size:12px;line-height:1.5;max-width:470px}
@@ -43,30 +43,14 @@
     #difficulty-setup button[data-difficulty=hard]{border:1px solid #ff2b6d;color:#ff6f9e}
     #difficulty-setup button.selected{box-shadow:0 0 14px currentColor}
     #difficulty-setup small{font-weight:normal;color:#bbb}
-    #difficulty-setup{position:fixed;inset:0;z-index:100002;display:grid;place-items:center;background:radial-gradient(circle at center,#170026 0%,#030006 72%);color:#fff;padding:24px;box-sizing:border-box;font-family:monospace}
-    #difficulty-setup .difficulty-card{width:min(560px,100%);border:1px solid #00e5ff55;background:#05000b;box-shadow:0 0 24px #00e5ff22;padding:24px;box-sizing:border-box;text-align:center}
-    #difficulty-setup h1{margin:0 0 10px;color:#00e5ff;font-size:20px}
-    #difficulty-setup p{margin:0 auto 20px;color:#aaa;font-size:12px;line-height:1.5;max-width:470px}
-    #difficulty-setup .difficulty-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-    #difficulty-setup button{min-width:190px;padding:14px 18px;background:#08000f;font:bold 13px monospace;cursor:pointer}
-    #difficulty-setup button[data-difficulty=easy]{border:1px solid #39ff88;color:#39ff88}
-    #difficulty-setup button[data-difficulty=hard]{border:1px solid #ff2b6d;color:#ff6f9e}
-    #difficulty-setup button.selected{box-shadow:0 0 14px currentColor}
-    #difficulty-setup small{font-weight:normal;color:#bbb}
-    #difficulty-setup{position:fixed;inset:0;z-index:100002;display:grid;place-items:center;background:radial-gradient(circle at center,#170026 0%,#030006 72%);color:#fff;padding:24px;box-sizing:border-box;font-family:monospace}
-    #difficulty-setup .difficulty-card{width:min(560px,100%);border:1px solid #00e5ff55;background:#05000b;box-shadow:0 0 24px #00e5ff22;padding:24px;box-sizing:border-box;text-align:center}
-    #difficulty-setup h1{margin:0 0 10px;color:#00e5ff;font-size:20px}
-    #difficulty-setup p{margin:0 auto 20px;color:#aaa;font-size:12px;line-height:1.5;max-width:470px}
-    #difficulty-setup .difficulty-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-    #difficulty-setup button{min-width:190px;padding:14px 18px;background:#08000f;font:bold 13px monospace;cursor:pointer}
-    #difficulty-setup button[data-difficulty=easy]{border:1px solid #39ff88;color:#39ff88}
-    #difficulty-setup button[data-difficulty=hard]{border:1px solid #ff2b6d;color:#ff6f9e}
-    #difficulty-setup button.selected{box-shadow:0 0 14px currentColor}
-    #difficulty-setup small{font-weight:normal;color:#bbb}
+    #loading-art{position:fixed;inset:0;z-index:99990;background:#030006 url('/assets/game-loading-art.png') center/cover no-repeat;transition:opacity .35s ease;}
+    #loading-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.62));}
+    #loading-art.hidden{opacity:0;pointer-events:none;}
   </style>
 </head>
 <body>
   <div id="game"></div>
+  <div id="loading-art" aria-label="Imagem de carregamento"></div>
   <div id="status">CARREGANDO...</div>
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
@@ -79,6 +63,7 @@
   const biosName=q.get('biosName')||'';
   const name=q.get('name')||'Master Games Arcade';
   const status=document.getElementById('status');
+  const loadingArt=document.getElementById('loading-art');
   const debug=document.getElementById('debug');
   const manual=document.getElementById('manual-start');
   const logs=[];
@@ -279,6 +264,7 @@
   const hide=()=>{
     status.style.display='none';
     manual.style.display='none';
+    loadingArt.classList.add('hidden');
   };
 
   // ---------------------------------------------------------------
