@@ -523,6 +523,13 @@
     attempting=false;
     if(retryTimer)clearTimeout(retryTimer);
     if(startWatchdog)clearTimeout(startWatchdog);
+    // Um perfil antigo do EmulatorJS pode restaurar o gamepad como oculto.
+    // Em dispositivos touch, os controles precisam aparecer ao iniciar;
+    // em desktop, preservamos a experiência sem sobreposição.
+    const touchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
+    if(touchDevice){
+      try{window.EJS_emulator?.toggleVirtualGamepad?.(true)}catch(e){log('Gamepad touch: '+(e?.message||e))}
+    }
     hide();
     log('Arcade/FBNeo iniciou o jogo');
     applyDifficultyToCore();
