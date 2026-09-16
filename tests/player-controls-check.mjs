@@ -5,8 +5,8 @@ const source = fs.readFileSync(new URL('../web/player.html', import.meta.url), '
 const requiredMappings = [
   "2:{value:'shift',value2:'SELECT'}",
   "3:{value:'enter',value2:'START'}",
-  "2:{value:'c',value2:'SELECT'}",
-  "3:{value:'v',value2:'START'}"
+  "2:{value:'',value2:'SELECT'}",
+  "3:{value:'',value2:'START'}"
 ];
 
 for (const mapping of requiredMappings) {
@@ -21,7 +21,11 @@ if (source.includes("1:{value:'enter',value2:'START'}")) {
   throw new Error('O jogador 2 não pode compartilhar o start do jogador 1');
 }
 
-if (!source.includes("CONTROL_PROFILE_VERSION='mga-players-credits-v2'")) {
+for (const legacy of ["2:{value:'c',value2:'SELECT'}", "3:{value:'v',value2:'START'}"]) {
+  if (source.includes(legacy)) throw new Error(`Atalho automático legado do P2 encontrado: ${legacy}`);
+}
+
+if (!source.includes("CONTROL_PROFILE_VERSION='mga-players-credits-p1-only-v3'")) {
   throw new Error('O perfil corrigido não invalida configurações antigas');
 }
 

@@ -248,7 +248,7 @@
   // O perfil anterior podia ter salvo START/SELECT compartilhados entre os
   // jogadores. Mudar a assinatura força o EmulatorJS a usar os controles
   // corrigidos sem apagar volume ou outras preferências do usuário.
-  const CONTROL_PROFILE_VERSION='mga-players-credits-v2';
+  const CONTROL_PROFILE_VERSION='mga-players-credits-p1-only-v3';
   for(const char of `${CONTROL_PROFILE_VERSION}:${romBase}`) gameId=((gameId*31)+char.charCodeAt(0))>>>0;
   window.EJS_gameID=gameId||1;
   // Define o core esperado mesmo quando há configurações antigas salvas.
@@ -319,8 +319,11 @@
     1:{
       0:{value:'j',value2:'BUTTON_2'},
       1:{value:'u',value2:'BUTTON_4'},
-      2:{value:'c',value2:'SELECT'},
-      3:{value:'v',value2:'START'},
+      // P2 não recebe crédito nem entra automaticamente. Os atalhos C/V
+      // (ou 6/2) são encaminhados abaixo somente quando o usuário solicitar.
+      // Mantemos value2 para que um segundo gamepad continue funcionando.
+      2:{value:'',value2:'SELECT'},
+      3:{value:'',value2:'START'},
       4:{value:'t',value2:'DPAD_UP'},
       5:{value:'g',value2:'DPAD_DOWN'},
       6:{value:'f',value2:'DPAD_LEFT'},
