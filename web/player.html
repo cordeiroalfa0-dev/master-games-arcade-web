@@ -295,6 +295,17 @@
 
   status.textContent='INICIANDO '+coreLabel+' — '+name+'...';
 
+  // Perfil touch explícito para o arcade. O perfil padrão do EmulatorJS pode
+  // variar por core e não expõe crédito/Start de forma consistente.
+  window.EJS_VirtualGamepadSettings=[
+    {type:'dpad',id:'dpad',location:'left',left:'50%',top:'50%',joystickInput:false,inputValues:[4,5,6,7]},
+    {type:'button',text:'B',id:'b',location:'right',left:0,top:42,bold:true,input_value:0},
+    {type:'button',text:'A',id:'a',location:'right',left:58,top:0,bold:true,input_value:8},
+    {type:'button',text:'Y',id:'y',location:'right',left:58,top:84,bold:true,input_value:1},
+    {type:'button',text:'X',id:'x',location:'right',left:116,top:42,bold:true,input_value:9},
+    {type:'button',text:'CRÉDITO',id:'credit',location:'center',left:-48,top:0,fontSize:11,block:true,input_value:2},
+    {type:'button',text:'START',id:'start',location:'center',left:38,top:0,fontSize:11,block:true,input_value:3}
+  ];
   window.EJS_player='#game';
   window.EJS_core=core;
   window.EJS_gameName=name.replace(/\.(zip|7z|chd)$/i,'');
