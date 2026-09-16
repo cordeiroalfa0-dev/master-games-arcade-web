@@ -98,7 +98,18 @@
       #loading-art{background-image:url('/assets/game-loading-art.png');}
       #difficulty-setup{background-image:linear-gradient(rgba(3,0,6,.68),rgba(3,0,6,.82)),url('/assets/game-loading-art.png');}
     }
-  </style>
+    /* Botões flutuantes: fechar e tela cheia */
+    #player-controls{position:fixed;top:10px;right:10px;z-index:100003;display:flex;gap:8px}
+    #btn-close,#btn-fullscreen{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);border:1px solid #00e5ff66;color:#00e5ff;font-size:20px;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s;border-radius:4px;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+    #btn-close:hover,#btn-fullscreen:hover{background:rgba(0,0,0,.8);border-color:#00e5ff}
+    #player-controls.hidden{opacity:0;pointer-events:none}
+    @media (hover:none) and (pointer:coarse){
+      #btn-close,#btn-fullscreen{width:36px;height:36px;font-size:16px}
+      #player-controls{top:max(6px,env(safe-area-inset-top));right:max(6px,env(safe-area-inset-right))}
+      #difficulty-setup label:has([data-setting="scanlines"]),
+      #difficulty-setup label:has([data-setting="vignette"]){display:none!important}
+    }
+   </style>
 </head>
 <body>
   <div id="game"></div>
@@ -106,6 +117,10 @@
   <div id="status">CARREGANDO...</div>
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
+  <div id="player-controls">
+    <button id="btn-fullscreen" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
+    <button id="btn-close" type="button" title="Fechar" aria-label="Fechar">✕</button>
+  </div>
 
 <script>
 (async()=>{
@@ -195,13 +210,16 @@
   // Perfis antigos usavam "auto" (contain), que deixava barras laterais.
   // Migra somente esse modo; preferências explícitas 4:3/stretch continuam.
   if(visual.aspect==='auto')visual.aspect='stretch';
+  // Em telas de toque (celular) scanlines e vinheta ficam sempre desligados.
+  const isTouchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
+  if(isTouchDevice){visual.scanlines=false;visual.vignette=false;}
   const applyVisual=()=>{
     document.body.classList.toggle('video-auto',visual.aspect==='auto');
     document.body.classList.toggle('video-aspect-43',visual.aspect==='4:3');
     document.body.classList.toggle('video-stretch',visual.aspect==='stretch');
     document.body.classList.toggle('video-integer',!!visual.integer);
-    document.body.classList.toggle('video-scanlines',!!visual.scanlines);
-    document.body.classList.toggle('video-vignette',!!visual.vignette);
+    document.body.classList.toggle('video-scanlines',!!visual.scanlines&&!isTouchDevice);
+    document.body.classList.toggle('video-vignette',!!visual.vignette&&!isTouchDevice);
     document.body.classList.toggle('video-amber',visual.palette==='amber');
     document.body.classList.toggle('video-cool',visual.palette==='cool');
     document.body.classList.toggle('video-soft',visual.palette==='soft');
@@ -471,6 +489,27 @@
       try{parent.postMessage({type:'mga-emulator-exit'},location.origin)}catch{}
     }
   });
+
+  // Botões flutuantes: fechar e tela cheia
+  const playerControls=document.getElementById('player-controls');
+  const btnClose=document.getElementById('btn-close');
+  const btnFullscreen=document.getElementById('btn-fullscreen');
+  btnClose.addEventListener('click',()=>{
+    try{parent.postMessage({type:'mga-emulator-exit'},location.origin)}catch{}
+  });
+  btnFullscreen.addEventListener('click',goFullscreen);
+  // Auto-esconde os botões após 3s de inatividade (apenas desktop)
+  let controlsHideTimer;
+  const showPlayerControls=()=>{
+    playerControls.classList.remove('hidden');
+    clearTimeout(controlsHideTimer);
+    if(!isTouchDevice){
+      controlsHideTimer=setTimeout(()=>playerControls.classList.add('hidden'),3000);
+    }
+  };
+  addEventListener('mousemove',showPlayerControls,{passive:true});
+  addEventListener('touchstart',showPlayerControls,{passive:true,capture:true});
+  showPlayerControls();
   document.addEventListener('visibilitychange',()=>{
     if(!document.hidden) log('Player retomado após retorno à aba.');
   });
