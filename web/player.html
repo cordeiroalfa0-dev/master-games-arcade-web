@@ -46,6 +46,10 @@
     #loading-art{position:fixed;inset:0;z-index:99990;background:#030006 url('/assets/game-loading-art.png') center/cover no-repeat;transition:opacity .35s ease;}
     #loading-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.62));}
     #loading-art.hidden{opacity:0;pointer-events:none;}
+    @media (orientation:portrait), (max-aspect-ratio:3/4){
+      #loading-art{background-image:url('/assets/game-loading-art-portrait.png');}
+      #difficulty-setup{background-image:linear-gradient(rgba(3,0,6,.68),rgba(3,0,6,.82)),url('/assets/game-loading-art-portrait.png');}
+    }
   </style>
 </head>
 <body>
