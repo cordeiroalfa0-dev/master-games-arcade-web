@@ -37,6 +37,7 @@ assert.match(player, /loading-art/);
 assert.match(player, /game-loading-art\.png/);
 assert.match(player, /game-loading-art-portrait\.png/);
 assert.match(player, /game-loading-art-wide\.png/);
+assert.match(player, /min-aspect-ratio:7\/5.*game-loading-art\.png/s);
 for (const token of ['video-aspect-43','video-stretch','video-integer','video-scanlines','video-vignette','video-amber','video-cool','video-soft','VISUAL_KEY','visualHelp']) assert.match(player, new RegExp(token));
 assert.match(gamepads, /stableKey/);
 assert.match(gamepads, /visibilitychange/);
