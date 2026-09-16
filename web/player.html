@@ -49,6 +49,8 @@
     #difficulty-setup label{display:flex;align-items:center;gap:7px;padding:7px;background:#ffffff08;border:1px solid #ffffff12;cursor:pointer}
     #difficulty-setup select{width:100%;padding:7px;background:#08000f;border:1px solid #00e5ff55;color:#fff;font:11px monospace}
     #difficulty-setup .controls-note{color:#999;font-size:10px;line-height:1.45}
+    #difficulty-setup .mobile-only{display:none}
+    @media (hover:none) and (pointer:coarse){#difficulty-setup .mobile-only{display:flex}}
     /* Controles touch: ficam na faixa inferior e deixam o centro do jogo livre. */
     #game .ejs_virtualGamepad_parent{z-index:20;top:auto!important;bottom:0;height:clamp(118px,24vh,178px);pointer-events:none}
     #game .ejs_virtualGamepad_parent>div{pointer-events:auto}
@@ -138,7 +140,7 @@
     const current=readDifficulty();
     const panel=document.createElement('div');
     panel.id='difficulty-setup';
-    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${name||'Master Games Arcade'}</h1><p>Escolha o modo e ajuste a apresentação antes de iniciar. As preferências ficam salvas neste navegador.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div class="config-section"><div class="config-title">VÍDEO</div><div class="config-grid"><label>Proporção <select data-setting="aspect"><option value="stretch">Tela cheia</option><option value="4:3">Arcade 4:3</option><option value="auto">Automática</option></select></label><label>Paleta <select data-setting="palette"><option value="normal">Normal</option><option value="cool">Fria</option><option value="amber">Âmbar</option><option value="soft">Suave</option></select></label><label><input type="checkbox" data-setting="scanlines"> Scanlines</label><label><input type="checkbox" data-setting="vignette"> Vinheta</label><label><input type="checkbox" data-setting="integer"> Escala inteira</label><label><input type="checkbox" data-setting="shader"> Shader SABR</label></div></div><div class="config-section"><div class="config-title">CONTROLES</div><div class="controls-note"><b>P1:</b> Shift/5 crédito · Enter/1 entrar · setas + Z/X/A/S jogar.<br><b>P2:</b> só entra quando solicitado · C/V ou 6/2 crédito/START.<br>Segundo controle USB continua disponível.</div></div><div style="margin-top:18px;color:#aaa;font-size:10px">DIP switches são aplicados quando o core expõe a opção.</div></div>`;
+    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${name||'Master Games Arcade'}</h1><p>Escolha o modo e ajuste a apresentação antes de iniciar. As preferências ficam salvas neste navegador.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div class="config-section"><div class="config-title">VÍDEO</div><div class="config-grid"><label>Proporção <select data-setting="aspect"><option value="stretch">Tela cheia</option><option value="4:3">Arcade 4:3</option><option value="auto">Automática</option></select></label><label>Paleta <select data-setting="palette"><option value="normal">Normal</option><option value="cool">Fria</option><option value="amber">Âmbar</option><option value="soft">Suave</option></select></label><label><input type="checkbox" data-setting="scanlines"> Scanlines</label><label><input type="checkbox" data-setting="vignette"> Vinheta</label><label><input type="checkbox" data-setting="integer"> Escala inteira</label><label><input type="checkbox" data-setting="shader"> Shader SABR</label><label class="mobile-only"><input type="checkbox" data-setting="landscape"> Tela horizontal</label></div></div><div class="config-section"><div class="config-title">CONTROLES</div><div class="controls-note"><b>P1:</b> Shift/5 crédito · Enter/1 entrar · setas + Z/X/A/S jogar.<br><b>P2:</b> só entra quando solicitado · C/V ou 6/2 crédito/START.<br>Segundo controle USB continua disponível.</div></div><div style="margin-top:18px;color:#aaa;font-size:10px">DIP switches são aplicados quando o core expõe a opção.</div></div>`;
     const aspect=panel.querySelector('[data-setting="aspect"]');
     const palette=panel.querySelector('[data-setting="palette"]');
     aspect.value=visual.aspect;
@@ -155,8 +157,16 @@
         visual.palette=palette.value;
         for(const key of ['scanlines','vignette','integer'])visual[key]=panel.querySelector(`[data-setting="${key}"]`).checked;
         pixelEnhancement=panel.querySelector('[data-setting="shader"]').checked;
+        const landscape=panel.querySelector('[data-setting="landscape"]')?.checked;
         applyVisual();
         panel.remove();
+        if(landscape){
+          try{
+            const requestFullscreen=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;
+            const fullscreen=requestFullscreen?.call(document.documentElement,{navigationUI:'hide'});
+            Promise.resolve(fullscreen).then(()=>screen.orientation?.lock?.('landscape')).catch(()=>{});
+          }catch{}
+        }
         resolve(mode);
       });
     });
