@@ -33,6 +33,36 @@
     #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;background:#000;color:#00e5ff;font:700 16px monospace;text-align:center;padding:24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none}
     #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
     #manual-start{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100001;display:none;background:#08000f;color:#00e5ff;border:2px solid #00e5ff;box-shadow:0 0 18px #00e5ff66;padding:16px 24px;font:700 16px monospace;cursor:pointer}
+    #difficulty-setup{position:fixed;inset:0;z-index:100002;display:grid;place-items:center;background:radial-gradient(circle at center,#170026 0%,#030006 72%);color:#fff;padding:24px;box-sizing:border-box;font-family:monospace}
+    #difficulty-setup .difficulty-card{width:min(560px,100%);border:1px solid #00e5ff55;background:#05000b;box-shadow:0 0 24px #00e5ff22;padding:24px;box-sizing:border-box;text-align:center}
+    #difficulty-setup h1{margin:0 0 10px;color:#00e5ff;font-size:20px}
+    #difficulty-setup p{margin:0 auto 20px;color:#aaa;font-size:12px;line-height:1.5;max-width:470px}
+    #difficulty-setup .difficulty-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    #difficulty-setup button{min-width:190px;padding:14px 18px;background:#08000f;font:bold 13px monospace;cursor:pointer}
+    #difficulty-setup button[data-difficulty=easy]{border:1px solid #39ff88;color:#39ff88}
+    #difficulty-setup button[data-difficulty=hard]{border:1px solid #ff2b6d;color:#ff6f9e}
+    #difficulty-setup button.selected{box-shadow:0 0 14px currentColor}
+    #difficulty-setup small{font-weight:normal;color:#bbb}
+    #difficulty-setup{position:fixed;inset:0;z-index:100002;display:grid;place-items:center;background:radial-gradient(circle at center,#170026 0%,#030006 72%);color:#fff;padding:24px;box-sizing:border-box;font-family:monospace}
+    #difficulty-setup .difficulty-card{width:min(560px,100%);border:1px solid #00e5ff55;background:#05000b;box-shadow:0 0 24px #00e5ff22;padding:24px;box-sizing:border-box;text-align:center}
+    #difficulty-setup h1{margin:0 0 10px;color:#00e5ff;font-size:20px}
+    #difficulty-setup p{margin:0 auto 20px;color:#aaa;font-size:12px;line-height:1.5;max-width:470px}
+    #difficulty-setup .difficulty-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    #difficulty-setup button{min-width:190px;padding:14px 18px;background:#08000f;font:bold 13px monospace;cursor:pointer}
+    #difficulty-setup button[data-difficulty=easy]{border:1px solid #39ff88;color:#39ff88}
+    #difficulty-setup button[data-difficulty=hard]{border:1px solid #ff2b6d;color:#ff6f9e}
+    #difficulty-setup button.selected{box-shadow:0 0 14px currentColor}
+    #difficulty-setup small{font-weight:normal;color:#bbb}
+    #difficulty-setup{position:fixed;inset:0;z-index:100002;display:grid;place-items:center;background:radial-gradient(circle at center,#170026 0%,#030006 72%);color:#fff;padding:24px;box-sizing:border-box;font-family:monospace}
+    #difficulty-setup .difficulty-card{width:min(560px,100%);border:1px solid #00e5ff55;background:#05000b;box-shadow:0 0 24px #00e5ff22;padding:24px;box-sizing:border-box;text-align:center}
+    #difficulty-setup h1{margin:0 0 10px;color:#00e5ff;font-size:20px}
+    #difficulty-setup p{margin:0 auto 20px;color:#aaa;font-size:12px;line-height:1.5;max-width:470px}
+    #difficulty-setup .difficulty-actions{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+    #difficulty-setup button{min-width:190px;padding:14px 18px;background:#08000f;font:bold 13px monospace;cursor:pointer}
+    #difficulty-setup button[data-difficulty=easy]{border:1px solid #39ff88;color:#39ff88}
+    #difficulty-setup button[data-difficulty=hard]{border:1px solid #ff2b6d;color:#ff6f9e}
+    #difficulty-setup button.selected{box-shadow:0 0 14px currentColor}
+    #difficulty-setup small{font-weight:normal;color:#bbb}
   </style>
 </head>
 <body>
@@ -53,6 +83,38 @@
   const manual=document.getElementById('manual-start');
   const logs=[];
 
+  const difficultyStorageKey='mga-difficulty-mode-v1';
+  const gameKey=(name||rom).replace(/\.(zip|7z|chd)$/i,'').toLowerCase();
+  const readDifficulty=()=>{
+    try{
+      const saved=JSON.parse(localStorage.getItem(difficultyStorageKey)||'{}');
+      return saved[gameKey]==='hard'?'hard':'easy';
+    }catch{return 'easy';}
+  };
+  const saveDifficulty=mode=>{
+    try{
+      const saved=JSON.parse(localStorage.getItem(difficultyStorageKey)||'{}');
+      saved[gameKey]=mode==='hard'?'hard':'easy';
+      localStorage.setItem(difficultyStorageKey,JSON.stringify(saved));
+    }catch{}
+  };
+  const chooseDifficulty=()=>new Promise(resolve=>{
+    const current=readDifficulty();
+    const panel=document.createElement('div');
+    panel.id='difficulty-setup';
+    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${name||'Master Games Arcade'}</h1><p>Escolha como jogar. A preferência fica salva para este jogo e pode ser alterada sempre que ele for aberto.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div style="margin-top:18px;color:#777;font-size:10px">Ajustes DIP podem variar conforme o jogo.</div></div>`;
+    const buttons=[...panel.querySelectorAll('[data-difficulty]')];
+    buttons.forEach(button=>{
+      if(button.dataset.difficulty===current)button.classList.add('selected');
+      button.addEventListener('click',()=>{
+        const mode=button.dataset.difficulty==='hard'?'hard':'easy';
+        saveDifficulty(mode);
+        panel.remove();
+        resolve(mode);
+      });
+    });
+    document.body.appendChild(panel);
+  });
   let ready=false;
   let started=false;
   let attempting=false;
@@ -124,8 +186,10 @@
     return;
   }
 
+  const difficulty=await chooseDifficulty();
   const romUrl=new URL(rom,location.origin).href;
   log('Jogo: '+name);
+  log('Modo de dificuldade: '+(difficulty==='hard'?'Difícil':'Fácil'));
   log('ROM URL: '+romUrl);
   if(biosUrl){
     log('BIOS: '+(biosName||'dependência')+' — '+new URL(biosUrl,location.origin).href);
@@ -189,6 +253,9 @@
   window.EJS_gameID=gameId||1;
   // Define o core esperado mesmo quando há configurações antigas salvas.
   window.EJS_defaultOptions={retroarch_core:core==='arcade'?'fbneo':'fbalpha2012_cps2'};
+  // O modo é mantido no perfil do jogo para que uma futura integração DIP
+  // possa aplicar valores específicos sem alterar o romset ou o core.
+  window.MGA_difficulty={mode:difficulty,rom:romBase,automatic:false};
   window.EJS_gameUrl=romUrl;
 
   // Versão fixada para evitar alterações automáticas no core.

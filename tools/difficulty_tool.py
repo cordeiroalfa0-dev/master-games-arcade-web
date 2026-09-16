@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Gera perfis de dificuldade por ROM para o Master Games Arcade.
+"""Gera perfis de dificuldade Fácil/Difícil por ROM para o Master Games Arcade.
 
 A dificuldade de arcades é definida por DIP switches do jogo, não por uma
 opção universal do core. Este utilitário analisa o catálogo, identifica a
@@ -52,36 +52,37 @@ def family_for(rom: str) -> tuple[str, str, str | None]:
     return "arcade", "arcade", None
 
 
-def easy_profile(family: str) -> dict:
+def difficulty_profile(family: str, difficulty: str) -> dict:
     # Nomes são intenções DIP, não valores aplicados cegamente: cada driver
+    is_hard = difficulty == "Hard"
     # pode chamar as opções de forma diferente. O campo status deixa isso claro.
     if family == "cps2":
         return {
             "status": "needs-driver-dip-application",
-            "difficulty": "Easy",
+            "difficulty": difficulty,
             "suggested_dips": [
-                {"label": "Difficulty", "value": "Easy"},
-                {"label": "Lives", "value": "5"},
-                {"label": "Continue", "value": "Enabled"},
+                {"label": "Difficulty", "value": "Hard" if is_hard else "Easy"},
+                {"label": "Lives", "value": "2" if is_hard else "5"},
+                {"label": "Continue", "value": "Disabled" if is_hard else "Enabled"},
             ],
         }
     if family == "neogeo":
         return {
             "status": "needs-driver-dip-application",
-            "difficulty": "Easy",
+            "difficulty": difficulty,
             "suggested_dips": [
-                {"label": "Difficulty", "value": "Easy"},
-                {"label": "Player Stock", "value": "5"},
-                {"label": "Continue", "value": "Enabled"},
+                {"label": "Difficulty", "value": "Hard" if is_hard else "Easy"},
+                {"label": "Player Stock", "value": "2" if is_hard else "5"},
+                {"label": "Continue", "value": "Disabled" if is_hard else "Enabled"},
             ],
         }
     return {
         "status": "needs-game-service-menu",
-        "difficulty": "Easy",
+        "difficulty": difficulty,
         "suggested_dips": [
-            {"label": "Difficulty", "value": "Easy"},
-            {"label": "Lives", "value": "5"},
-            {"label": "Continue", "value": "Enabled"},
+            {"label": "Difficulty", "value": "Hard" if is_hard else "Easy"},
+            {"label": "Lives", "value": "2" if is_hard else "5"},
+            {"label": "Continue", "value": "Disabled" if is_hard else "Enabled"},
         ],
     }
 
@@ -102,7 +103,8 @@ def build_profiles() -> dict:
             continue
         rom = base_name(name)
         family, core, bios = family_for(name)
-        profile = easy_profile(family)
+        profile = difficulty_profile(family, "Easy")
+        hard_profile = difficulty_profile(family, "Hard")
         profiles[rom] = {
             "rom": name,
             "title": titles.get(rom, rom),
@@ -110,6 +112,7 @@ def build_profiles() -> dict:
             "core": core,
             "bios": bios,
             "profile": profile,
+            "modes": {"easy": profile, "hard": hard_profile},
             "apply": {
                 "automatic": False,
                 "method": "service-menu-or-driver-patch",

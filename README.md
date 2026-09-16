@@ -45,6 +45,12 @@ O catálogo `roms-manifest.json`, o endpoint estático `roms-catalog.json` e o m
 
 Antes de publicar, execute `node tests/web-integrity.mjs` para verificar os manifestos, o player e os assets WebAssembly.
 
+## Modos de dificuldade
+
+Ao abrir uma ROM no player web, o launcher exibe as opções **Fácil** e **Difícil** antes de iniciar o emulador. A escolha é salva por jogo no `localStorage` (`mga-difficulty-mode-v1`) e fica disponível em `window.MGA_difficulty` para o player e futuras integrações com DIP switches.
+
+O arquivo `difficulty-profiles.generated.json` mantém sugestões separadas para os dois modos. No perfil Fácil, a sugestão padrão é usar cinco vidas e continues habilitados; no perfil Difícil, duas vidas e continues desabilitados. Como os DIP switches são específicos de cada driver, os perfis identificam a intenção e não alteram cegamente a memória da ROM. A aplicação automática desses valores exige uma API segura de opções DIP no core ou um menu de serviço por jogo.
+
 ## Hospedagem planejada
 
 Frontend: Vercel.

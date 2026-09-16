@@ -31,6 +31,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -60,6 +98,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -91,6 +167,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -120,6 +234,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -151,6 +303,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -180,6 +370,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -211,6 +439,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -240,6 +506,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -271,6 +575,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -300,6 +642,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -331,6 +711,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -360,6 +778,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -391,6 +847,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -420,6 +914,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -451,6 +983,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -480,6 +1050,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -511,6 +1119,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -540,6 +1186,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -571,6 +1255,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -600,6 +1322,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -631,6 +1391,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -660,6 +1458,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -691,6 +1527,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -720,6 +1594,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -751,6 +1663,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -780,6 +1730,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -811,6 +1799,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -840,6 +1866,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -871,6 +1935,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -900,6 +2002,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -931,6 +2071,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -960,6 +2138,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -991,6 +2207,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1020,6 +2274,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1051,6 +2343,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1080,6 +2410,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1111,6 +2479,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1140,6 +2546,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1171,6 +2615,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1200,6 +2682,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1231,6 +2751,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1260,6 +2818,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1291,6 +2887,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1320,6 +2954,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1351,6 +3023,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1380,6 +3090,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1411,6 +3159,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1440,6 +3226,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1471,6 +3295,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1500,6 +3362,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1531,6 +3431,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1560,6 +3498,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1591,6 +3567,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1620,6 +3634,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1651,6 +3703,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1680,6 +3770,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1711,6 +3839,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1740,6 +3906,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1771,6 +3975,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1800,6 +4042,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1831,6 +4111,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1860,6 +4178,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1891,6 +4247,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1920,6 +4314,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -1951,6 +4383,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -1980,6 +4450,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2011,6 +4519,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2040,6 +4586,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2071,6 +4655,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2100,6 +4722,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2131,6 +4791,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2160,6 +4858,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2191,6 +4927,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2220,6 +4994,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2251,6 +5063,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2280,6 +5130,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2311,6 +5199,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2340,6 +5266,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2371,6 +5335,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2400,6 +5402,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2431,6 +5471,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2460,6 +5538,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2491,6 +5607,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2520,6 +5674,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2551,6 +5743,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2580,6 +5810,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2611,6 +5879,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2640,6 +5946,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2671,6 +6015,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2700,6 +6082,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2731,6 +6151,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2760,6 +6218,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2791,6 +6287,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2820,6 +6354,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2851,6 +6423,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2880,6 +6490,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2911,6 +6559,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -2940,6 +6626,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -2971,6 +6695,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3000,6 +6762,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3031,6 +6831,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3060,6 +6898,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3091,6 +6967,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3120,6 +7034,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3151,6 +7103,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3180,6 +7170,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3211,6 +7239,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3240,6 +7306,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3271,6 +7375,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3300,6 +7442,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3331,6 +7511,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3360,6 +7578,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3391,6 +7647,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3420,6 +7714,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3451,6 +7783,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3480,6 +7850,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3511,6 +7919,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3540,6 +7986,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3571,6 +8055,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3600,6 +8122,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3631,6 +8191,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3660,6 +8258,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3691,6 +8327,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3720,6 +8394,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3751,6 +8463,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3780,6 +8530,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3811,6 +8599,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3840,6 +8666,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3871,6 +8735,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3900,6 +8802,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3931,6 +8871,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -3960,6 +8938,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -3991,6 +9007,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4020,6 +9074,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4051,6 +9143,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4080,6 +9210,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4111,6 +9279,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4140,6 +9346,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4171,6 +9415,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4200,6 +9482,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4231,6 +9551,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4260,6 +9618,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4291,6 +9687,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4320,6 +9754,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4351,6 +9823,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4380,6 +9890,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4411,6 +9959,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4440,6 +10026,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4471,6 +10095,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4500,6 +10162,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4531,6 +10231,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4560,6 +10298,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4591,6 +10367,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4620,6 +10434,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4651,6 +10503,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4680,6 +10570,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4711,6 +10639,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4740,6 +10706,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4771,6 +10775,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4800,6 +10842,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4831,6 +10911,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4860,6 +10978,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4891,6 +11047,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4920,6 +11114,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -4951,6 +11183,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -4980,6 +11250,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -5011,6 +11319,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -5040,6 +11386,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -5071,6 +11455,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -5100,6 +11522,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Player Stock",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Player Stock",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -5131,6 +11591,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -5160,6 +11658,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
@@ -5191,6 +11727,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -5221,6 +11795,44 @@
           }
         ]
       },
+      "modes": {
+        "easy": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-driver-dip-application",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
+      },
       "apply": {
         "automatic": false,
         "method": "service-menu-or-driver-patch",
@@ -5250,6 +11862,44 @@
             "value": "Enabled"
           }
         ]
+      },
+      "modes": {
+        "easy": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Easy",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Easy"
+            },
+            {
+              "label": "Lives",
+              "value": "5"
+            },
+            {
+              "label": "Continue",
+              "value": "Enabled"
+            }
+          ]
+        },
+        "hard": {
+          "status": "needs-game-service-menu",
+          "difficulty": "Hard",
+          "suggested_dips": [
+            {
+              "label": "Difficulty",
+              "value": "Hard"
+            },
+            {
+              "label": "Lives",
+              "value": "2"
+            },
+            {
+              "label": "Continue",
+              "value": "Disabled"
+            }
+          ]
+        }
       },
       "apply": {
         "automatic": false,
