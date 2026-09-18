@@ -126,8 +126,15 @@
         --mga-p-game:calc(100dvh - var(--mga-p-band) - var(--mga-p-top) - 2px)
       }
       #game .ejs_virtualGamepad_parent{
-        height:var(--mga-p-band);
+        position:fixed!important;left:0!important;right:0!important;bottom:0!important;
+        top:auto!important;height:var(--mga-p-band);
         background:linear-gradient(rgba(3,0,8,0),rgba(3,0,8,.72) 28%,rgba(3,0,8,.94))
+      }
+      /* Move o contêiner inteiro do jogo. Antes apenas o canvas recebia top,
+         mas o wrapper do EmulatorJS continuava preso no topo da viewport. */
+      #game{
+        position:absolute!important;top:var(--mga-p-top)!important;left:0!important;
+        width:100dvw!important;height:var(--mga-p-game)!important;
       }
       /* CRÉDITO/START numa linha própria, acima do direcional e dos botões */
       #game .ejs_virtualGamepad_bottom{
@@ -139,8 +146,8 @@
       body.video-stretch #game .ejs_canvas_parent,
       body.video-stretch #game canvas,body.video-stretch #game video,
       #game canvas,#game video{
-        top:var(--mga-p-top)!important;bottom:auto!important;left:0!important;
-        width:100dvw!important;height:var(--mga-p-game)!important;
+        top:0!important;bottom:auto!important;left:0!important;
+        width:100dvw!important;height:100%!important;
         max-width:100dvw!important;max-height:none!important;
         object-fit:contain!important
       }
