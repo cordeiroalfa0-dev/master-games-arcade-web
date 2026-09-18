@@ -217,16 +217,18 @@
       #loading-art{background-image:url('/assets/game-loading-art.png');}
       #difficulty-setup{background-image:linear-gradient(rgba(3,0,6,.68),rgba(3,0,6,.82)),url('/assets/game-loading-art.png');}
     }
-    /* Botões flutuantes: fechar e tela cheia */
-    #player-controls{position:fixed;top:10px;right:10px;z-index:100003;display:flex;gap:8px}
-    #btn-close,#btn-fullscreen{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);border:1px solid #00e5ff66;color:#00e5ff;font-size:20px;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s;border-radius:4px;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+    /* O wrapper externo já fornece o único botão FECHAR. Os controles internos
+       ficam abaixo do cabeçalho externo para nunca ocuparem o mesmo espaço. */
+    #player-controls{position:fixed;top:58px;right:10px;z-index:100003;display:flex;gap:8px}
+    #btn-close{display:none!important}
+    #btn-fullscreen{width:44px;height:44px;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);border:1px solid #00e5ff66;color:#00e5ff;font-size:20px;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s;border-radius:4px;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
     #btn-close:hover,#btn-fullscreen:hover{background:rgba(0,0,0,.8);border-color:#00e5ff}
     #player-controls.hidden{opacity:0;pointer-events:none}
     #btn-rotate{display:none}
     @media (hover:none) and (pointer:coarse){
       #btn-close,#btn-fullscreen,#btn-rotate{width:44px;height:44px;font-size:19px}
       #btn-rotate{display:flex}
-      #player-controls{top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));gap:10px}
+      #player-controls{top:calc(max(8px,env(safe-area-inset-top)) + 50px);right:max(8px,env(safe-area-inset-right));gap:10px}
       #difficulty-setup label:has([data-setting="scanlines"]),
       #difficulty-setup label:has([data-setting="vignette"]){display:none!important}
     }
