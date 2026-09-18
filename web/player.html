@@ -117,9 +117,12 @@
         --mga-p-dpad:clamp(112px,34vw,184px);
         --mga-p-floor:max(14px,env(safe-area-inset-bottom));
         --mga-p-row:56px;               /* faixa de CRÉDITO/START */
-        --mga-p-top:max(58px,env(safe-area-inset-top));
+        /* Reserva uma faixa maior no topo para afastar o jogo dos controles
+           flutuantes do navegador/player em celulares estreitos. */
+        --mga-p-top:max(76px,env(safe-area-inset-top));
         --mga-p-band:calc(var(--mga-p-floor) + var(--mga-p-dpad) + var(--mga-p-row) + 16px);
-        --mga-p-game:min(calc(100dvh - var(--mga-p-band) - var(--mga-p-top) - 8px),100vw)
+        /* 4:3: tela retangular de arcade, em vez do quadrado anterior. */
+        --mga-p-game:min(calc(100dvh - var(--mga-p-band) - var(--mga-p-top) - 8px),75vw)
       }
       #game .ejs_virtualGamepad_parent{
         height:var(--mga-p-band);
