@@ -814,6 +814,64 @@
     if(!document.hidden)enableGameAudio();
   });
 
+  // ---------------------------------------------------------------
+  // Progresso: salva o estado completo do jogo no navegador. Cada ROM tem
+  // uma chave própria, então Metal Slug, Street Fighter etc. não sobrescrevem
+  // o progresso uns dos outros. O estado é salvo periodicamente e quando o
+  // usuário troca de aplicativo/fecha a aba; ao voltar, é restaurado sozinho.
+  // ---------------------------------------------------------------
+  const MGA_SAVE_DB='mga-progress-v1';
+  const MGA_SAVE_STORE='states';
+  const MGA_SAVE_KEY=`${romBase}:${core}`;
+  let mgaSaveTimer=null;
+  let mgaSaveBusy=false;
+  const openProgressDb=()=>new Promise((resolve,reject)=>{
+    if(!window.indexedDB)return reject(new Error('IndexedDB indisponível'));
+    const req=indexedDB.open(MGA_SAVE_DB,1);
+    req.onupgradeneeded=()=>req.result.createObjectStore(MGA_SAVE_STORE);
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('Falha no banco de progresso'));
+  });
+  const saveProgress=async(silent=false)=>{
+    const manager=window.EJS_emulator?.gameManager;
+    if(!manager||!started||mgaSaveBusy)return false;
+    mgaSaveBusy=true;
+    try{
+      const state=manager.getState();
+      const db=await openProgressDb();
+      await new Promise((resolve,reject)=>{
+        const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
+        tx.objectStore(MGA_SAVE_STORE).put({state:new Uint8Array(state),savedAt:Date.now()},MGA_SAVE_KEY);
+        tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+      });
+      db.close();
+      if(!silent)log('Progresso salvo automaticamente');
+      return true;
+    }catch(e){log('Progresso: falha ao salvar '+(e?.message||e));return false}
+    finally{mgaSaveBusy=false}
+  };
+  const loadProgress=async()=>{
+    const manager=window.EJS_emulator?.gameManager;
+    if(!manager)return false;
+    try{
+      const db=await openProgressDb();
+      const saved=await new Promise((resolve,reject)=>{
+        const req=db.transaction(MGA_SAVE_STORE,'readonly').objectStore(MGA_SAVE_STORE).get(MGA_SAVE_KEY);
+        req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+      });
+      db.close();
+      if(!saved?.state?.byteLength)return false;
+      manager.loadState(new Uint8Array(saved.state));
+      log('Progresso anterior restaurado');
+      return true;
+    }catch(e){log('Progresso: nenhum save restaurado ('+(e?.message||e)+')');return false}
+  };
+  window.MGA_saveProgress=()=>saveProgress(false);
+  document.addEventListener('visibilitychange',()=>{
+    if(document.hidden)saveProgress(true);
+  });
+  addEventListener('pagehide',()=>saveProgress(true),{capture:true});
+
 
   window.EJS_onGameStart=()=>{
     if(started)return;
@@ -842,6 +900,11 @@
     // cria o contexto de áudio poucos instantes após o start).
     enableGameAudio();
     [200,800,2000,4000].forEach(ms=>setTimeout(enableGameAudio,ms));
+    // Restaura o último ponto alguns instantes após o core criar o estado;
+    // depois mantém um checkpoint automático a cada 30 segundos.
+    setTimeout(()=>loadProgress(),2500);
+    if(mgaSaveTimer)clearInterval(mgaSaveTimer);
+    mgaSaveTimer=setInterval(()=>saveProgress(true),30000);
     // O shader só pode ser ativado depois de o contexto gráfico do core existir.
     setTimeout(applyPixelEnhancement,0);
     goFullscreen();
