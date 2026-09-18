@@ -308,7 +308,7 @@
 
       const close = document.createElement("button");
       close.type = "button";
-      close.textContent = "✕ FECHAR";
+      close.textContent = "✕";
       close.style.cssText =
         "pointer-events:auto;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;padding:7px 12px;cursor:pointer;font-weight:bold;font-family:Arial,sans-serif;";
       bar.appendChild(close);
