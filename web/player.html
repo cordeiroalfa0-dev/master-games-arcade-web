@@ -119,11 +119,13 @@
         --mga-p-row:56px;               /* faixa de CRÉDITO/START */
         /* Reserva uma faixa maior no topo para afastar o jogo dos controles
            flutuantes do navegador/player em celulares estreitos. */
-        --mga-p-top:max(145px,env(safe-area-inset-top));
+        --mga-p-top:max(52px,calc(env(safe-area-inset-top) + 44px));
         --mga-p-band:calc(var(--mga-p-floor) + var(--mga-p-dpad) + var(--mga-p-row) + 6px);
         /* Usa todo o espaço entre o topo e a faixa CRÉDITO/START. Assim a tela
            fica retangular e não sobra um vão grande acima dos botões. */
-        --mga-p-game:calc(100dvh - var(--mga-p-band) - var(--mga-p-top) - 2px)
+        --mga-p-game:calc(100dvh - var(--mga-p-band) - var(--mga-p-top) - 2px);
+        /* O core desenha 4:3; este fator ocupa exatamente a faixa livre. */
+        --mga-p-scale:calc(var(--mga-p-game) * 1.333333 / 100dvw)
       }
       #game .ejs_virtualGamepad_parent{
         position:fixed!important;left:0!important;right:0!important;bottom:0!important;
@@ -143,16 +145,18 @@
       #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
         min-width:clamp(96px,30vw,140px);height:46px!important;line-height:46px!important
       }
-      body.video-stretch #game .ejs_canvas_parent,
+      #game .ejs_canvas_parent{
+        top:0!important;bottom:auto!important;left:0!important;
+        width:100dvw!important;height:var(--mga-p-game)!important;
+        max-width:100dvw!important;max-height:none!important;transform:none!important
+      }
       body.video-stretch #game canvas,body.video-stretch #game video,
       #game canvas,#game video{
         top:0!important;bottom:auto!important;left:0!important;
-        width:100dvw!important;height:100%!important;
+        width:100dvw!important;height:calc(100% / var(--mga-p-scale))!important;
         max-width:100dvw!important;max-height:none!important;
-        /* Retrato: o core desenha uma área 4:3 com barras pretas dentro do
-           canvas. Esticar o canvas faz a imagem ocupar toda a faixa vertical
-           até CRÉDITO/START, como solicitado para o celular. */
-        object-fit:fill!important;transform:scaleY(1.67);transform-origin:top left
+        /* Estica apenas o canvas, não o wrapper, evitando a escala dupla. */
+        object-fit:fill!important;transform:scaleY(var(--mga-p-scale));transform-origin:top left
       }
     }
     /* Paisagem no celular: o jogo é centralizado e sobra uma faixa embaixo só
@@ -717,6 +721,19 @@
     document.documentElement.style.setProperty('--mga-vh',`${innerHeight}px`);
     document.body.classList.toggle('mga-portrait',innerHeight>=innerWidth);
     document.body.classList.toggle('mga-landscape',innerWidth>innerHeight);
+    fitMobileGameViewport();
+  };
+  const fitMobileGameViewport=()=>{
+    if(!isTouchDevice||innerWidth>innerHeight)return;
+    const game=document.getElementById('game');
+    const parent=game?.querySelector('.ejs_canvas_parent');
+    const canvas=game?.querySelector('canvas,video');
+    if(!game||!parent||!canvas)return;
+    const height=game.getBoundingClientRect().height;
+    const scale=height*1.333333/Math.max(1,innerWidth);
+    parent.style.setProperty('height',`${height}px`,'important');
+    canvas.style.setProperty('height',`${height/scale}px`,'important');
+    canvas.style.setProperty('transform',`scaleY(${scale})`,'important');
   };
   addEventListener('resize',updateViewport,{passive:true});
   visualViewport?.addEventListener('resize',refreshAfterOrientation,{passive:true});
@@ -895,6 +912,7 @@
     }
     hide();
     log('Arcade/FBNeo iniciou o jogo');
+    [0,120,500,1200].forEach(ms=>setTimeout(fitMobileGameViewport,ms));
     applyDifficultyToCore();
     // Garante o som logo ao entrar no jogo (e de novo depois, pois o core
     // cria o contexto de áudio poucos instantes após o start).
@@ -909,7 +927,8 @@
     setTimeout(applyPixelEnhancement,0);
     goFullscreen();
     requestWakeLock();
-    setTimeout(maybeShowRotateHint,1200);
+    // A tela vertical já possui controles completos; não cubra a ação com um
+    // aviso flutuante. O botão 🔄 no topo continua disponível para paisagem.
 
     try{
       const fs=window.EJS_emulator?.gameManager?.FS;
