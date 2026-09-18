@@ -233,7 +233,7 @@
     playerUrl.searchParams.set("name", cleanRomName(romName));
     // O player é alterado junto com o bridge; versionar a URL evita que o
     // navegador reutilize uma versão antiga que ainda exibia o menu RetroArch.
-    playerUrl.searchParams.set("v", "20260918-controls-no-overlap-v3");
+    playerUrl.searchParams.set("v", "20260918-controls-icons-v1");
     if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
     if (biosName) playerUrl.searchParams.set("biosName", biosName);
 
@@ -309,8 +309,10 @@
       const close = document.createElement("button");
       close.type = "button";
       close.textContent = "✕";
+      close.title = "Fechar";
+      close.setAttribute("aria-label", "Fechar");
       close.style.cssText =
-        "pointer-events:auto;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;padding:7px 12px;cursor:pointer;font-weight:bold;font-family:Arial,sans-serif;";
+        "pointer-events:auto;width:36px;height:36px;padding:0;display:grid;place-items:center;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;cursor:pointer;font-size:20px;font-weight:bold;line-height:1;font-family:Arial,sans-serif;";
       bar.appendChild(close);
 
       const message = document.createElement("div");
