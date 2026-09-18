@@ -142,7 +142,7 @@ class EJS_GameManager {
             "block_sram_overwrite = false\n" +
             "video_gpu_screenshot = false\n" +
             "audio_latency = 64\n" +
-            "video_top_portrait_viewport = true\n" +
+            "video_top_portrait_viewport = false\n" +
             "video_vsync = true\n" +
             "video_smooth = false\n" +
             "fastforward_ratio = 3.0\n" +
