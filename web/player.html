@@ -56,9 +56,16 @@
     #game .ejs_virtualGamepad_parent>div{pointer-events:auto}
     #game .ejs_virtualGamepad_left{bottom:max(10px,env(safe-area-inset-bottom));left:max(10px,env(safe-area-inset-left));width:142px;height:142px}
     #game .ejs_virtualGamepad_right{bottom:max(10px,env(safe-area-inset-bottom));right:max(10px,env(safe-area-inset-right));width:148px;height:148px}
-    #game .ejs_virtualGamepad_bottom{bottom:max(10px,env(safe-area-inset-bottom));height:38px}
+    #game .ejs_virtualGamepad_bottom{bottom:max(10px,env(safe-area-inset-bottom));height:44px}
+    /* Crédito e START precisam de área de toque confortável no celular. */
+    #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{min-width:78px;height:44px!important;line-height:44px!important;padding:0 6px;box-sizing:border-box}
     #game .ejs_virtualGamepad_top{display:none}
     #game .ejs_virtualGamepad_button{touch-action:none}
+    /* O botão de menu do EmulatorJS é filho direto de #game e herdava
+       width/height 100% da regra acima, cobrindo a tela inteira com
+       z-index 999 e engolindo todos os toques (direção e crédito).
+       Ele não é usado pelo launcher: fica desativado. */
+    #game>.ejs_virtualGamepad_open{display:none!important;pointer-events:none!important;width:24px!important;height:24px!important;top:5px!important;left:auto!important;right:5px!important}
     @media (hover:none) and (pointer:coarse){
       #game .ejs_virtualGamepad_parent{display:block!important}
     }
@@ -654,6 +661,13 @@
     const touchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
     if(touchDevice){
       try{window.EJS_emulator?.toggleVirtualGamepad?.(true)}catch(e){log('Gamepad touch: '+(e?.message||e))}
+      try{
+        const pad=window.EJS_emulator?.virtualGamepad;
+        if(pad){pad.style.display='';pad.style.opacity='';}
+        // Remove qualquer sobreposição do menu do EmulatorJS que fique
+        // acima dos controles de toque.
+        document.querySelectorAll('#game>.ejs_virtualGamepad_open').forEach(el=>el.remove());
+      }catch(e){log('Ajuste do gamepad touch: '+(e?.message||e))}
     }
     hide();
     log('Arcade/FBNeo iniciou o jogo');
