@@ -149,8 +149,10 @@
         top:0!important;bottom:auto!important;left:0!important;
         width:100dvw!important;height:100%!important;
         max-width:100dvw!important;max-height:none!important;
-        /* Retrato: preencher a área inteira até CRÉDITO/START. */
-        object-fit:fill!important
+        /* Retrato: o core desenha uma área 4:3 com barras pretas dentro do
+           canvas. Esticar o canvas faz a imagem ocupar toda a faixa vertical
+           até CRÉDITO/START, como solicitado para o celular. */
+        object-fit:fill!important;transform:scaleY(1.67);transform-origin:top left
       }
     }
     /* Paisagem no celular: o jogo é centralizado e sobra uma faixa embaixo só
