@@ -480,7 +480,9 @@
   window.EJS_alignStartButton='center';
   window.EJS_language='en-US';
   window.EJS_disableAutoLang=true;
-  window.EJS_volume=0;
+  // O som do jogo precisa tocar durante a partida. Antes o volume nascia em 0
+  // (mudo) e nunca era religado.
+  window.EJS_volume=1;
   window.EJS_color='#00e5ff';
   window.EJS_backgroundColor='#000';
   window.EJS_DEBUG_XX=true;
@@ -755,6 +757,48 @@
     return false;
   };
 
+  // ---------------------------------------------------------------
+  // Áudio: navegadores (principalmente iOS/Android) só liberam som depois
+  // de um toque/clique. Além disso, um perfil antigo do EmulatorJS pode ter
+  // volume 0 salvo. Aqui forçamos volume cheio, desmutamos e retomamos o
+  // AudioContext do core em qualquer gesto do usuário.
+  // ---------------------------------------------------------------
+  const MGA_VOLUME=1;
+  const resumeAudioContexts=()=>{
+    const emu=window.EJS_emulator;
+    const mod=emu?.gameManager?.Module||window.Module;
+    const ctxs=[emu?.audioContext,mod?.SDL2?.audioContext,mod?.audioContext,window.MGA_audioCtx];
+    ctxs.forEach(ctx=>{
+      try{if(ctx&&ctx.state!=='running')ctx.resume()}catch(e){}
+    });
+  };
+  const enableGameAudio=()=>{
+    const emu=window.EJS_emulator;
+    try{
+      if(emu){
+        emu.muted=false;
+        if(typeof emu.setVolume==='function')emu.setVolume(MGA_VOLUME);
+        else emu.volume=MGA_VOLUME;
+        emu.gameManager?.setVolume?.(MGA_VOLUME);
+        emu.gameManager?.toggleMainLoop?.(1);
+      }
+    }catch(e){log('Áudio: '+(e?.message||e))}
+    try{
+      document.querySelectorAll('#game audio,#game video').forEach(el=>{
+        el.muted=false;el.volume=MGA_VOLUME;
+      });
+    }catch(e){}
+    resumeAudioContexts();
+  };
+  window.MGA_enableGameAudio=enableGameAudio;
+  ['pointerdown','touchstart','touchend','keydown','click'].forEach(evt=>{
+    addEventListener(evt,enableGameAudio,{passive:true});
+  });
+  document.addEventListener('visibilitychange',()=>{
+    if(!document.hidden)enableGameAudio();
+  });
+
+
   window.EJS_onGameStart=()=>{
     if(started)return;
     started=true;
@@ -778,6 +822,10 @@
     hide();
     log('Arcade/FBNeo iniciou o jogo');
     applyDifficultyToCore();
+    // Garante o som logo ao entrar no jogo (e de novo depois, pois o core
+    // cria o contexto de áudio poucos instantes após o start).
+    enableGameAudio();
+    [200,800,2000,4000].forEach(ms=>setTimeout(enableGameAudio,ms));
     // O shader só pode ser ativado depois de o contexto gráfico do core existir.
     setTimeout(applyPixelEnhancement,0);
     goFullscreen();
