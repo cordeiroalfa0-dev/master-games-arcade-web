@@ -108,20 +108,68 @@
     @media (hover:none) and (pointer:coarse){
       #game .ejs_virtualGamepad_parent{display:block!important}
     }
-    /* Retrato no celular: o jogo sobe para a metade de cima e os controles
-       ganham uma faixa própria embaixo, sem cobrir a imagem. */
+    /* Retrato no celular: o jogo ocupa a área de cima (o máximo possível) e os
+       controles ganham uma faixa própria embaixo, sem cobrir a imagem.
+       As medidas ficam em variáveis para o canvas e os botões usarem o mesmo
+       cálculo e nunca se sobreporem. */
     @media (hover:none) and (pointer:coarse) and (orientation:portrait){
+      body{
+        --mga-p-dpad:clamp(112px,34vw,184px);
+        --mga-p-floor:max(14px,env(safe-area-inset-bottom));
+        --mga-p-row:56px;               /* faixa de CRÉDITO/START */
+        --mga-p-top:max(58px,env(safe-area-inset-top));
+        --mga-p-band:calc(var(--mga-p-floor) + var(--mga-p-dpad) + var(--mga-p-row) + 16px);
+        --mga-p-game:min(calc(100dvh - var(--mga-p-band) - var(--mga-p-top) - 8px),100vw)
+      }
       #game .ejs_virtualGamepad_parent{
-        height:calc(var(--mga-floor) + var(--mga-dpad) + 78px);
-        background:linear-gradient(rgba(3,0,8,0),rgba(3,0,8,.72) 32%,rgba(3,0,8,.92))
+        height:var(--mga-p-band);
+        background:linear-gradient(rgba(3,0,8,0),rgba(3,0,8,.72) 28%,rgba(3,0,8,.94))
+      }
+      /* CRÉDITO/START numa linha própria, acima do direcional e dos botões */
+      #game .ejs_virtualGamepad_bottom{
+        bottom:calc(var(--mga-p-floor) + var(--mga-p-dpad) + 10px)!important
+      }
+      #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
+        min-width:clamp(96px,30vw,140px);height:46px!important;line-height:46px!important
       }
       body.video-stretch #game .ejs_canvas_parent,
       body.video-stretch #game canvas,body.video-stretch #game video,
       #game canvas,#game video{
-        top:max(8px,calc((100dvh - clamp(112px,34vw,184px) - 92px - min(52dvh,75vw)) / 2))!important;
-        bottom:auto!important;left:0!important;
-        width:100dvw!important;height:min(52dvh,75vw)!important;max-height:none!important;
+        top:var(--mga-p-top)!important;bottom:auto!important;left:0!important;
+        width:100dvw!important;height:var(--mga-p-game)!important;
+        max-width:100dvw!important;max-height:none!important;
         object-fit:contain!important
+      }
+    }
+    /* Paisagem no celular: o jogo é centralizado e sobra uma faixa embaixo só
+       para CRÉDITO/START, que assim nunca ficam sobre a tela do jogo. */
+    @media (hover:none) and (pointer:coarse) and (orientation:landscape){
+      body{
+        --mga-l-strip:clamp(52px,13dvh,68px);
+        --mga-l-game:calc(100dvh - var(--mga-l-strip))
+      }
+      #game .ejs_virtualGamepad_parent{
+        height:calc(var(--mga-l-strip) + clamp(96px,26vh,132px) + 12px);
+        background:linear-gradient(rgba(3,0,8,0),rgba(3,0,8,.55) 40%,rgba(3,0,8,.9))
+      }
+      body.video-stretch #game .ejs_canvas_parent,
+      body.video-stretch #game canvas,body.video-stretch #game video,
+      #game canvas,#game video{
+        top:0!important;bottom:auto!important;left:0!important;
+        width:100dvw!important;height:var(--mga-l-game)!important;
+        max-width:100dvw!important;max-height:none!important;
+        object-fit:contain!important
+      }
+      /* Faixa de baixo: CRÉDITO/START centralizados, fora da tela do jogo */
+      #game .ejs_virtualGamepad_bottom{
+        bottom:max(6px,env(safe-area-inset-bottom))!important;gap:12px
+      }
+      #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
+        min-width:96px;height:40px!important;line-height:40px!important;font-size:11px!important
+      }
+      /* Direcional e botões de ação sobem para não invadir a faixa */
+      #game .ejs_virtualGamepad_left,#game .ejs_virtualGamepad_right{
+        bottom:calc(var(--mga-l-strip) + 4px)
       }
     }
     @media (orientation:landscape) and (max-height:600px){
@@ -131,12 +179,6 @@
         --mga-gap:clamp(5px,1.4vh,10px);
         --mga-side:max(10px,env(safe-area-inset-left));
         --mga-floor:max(8px,env(safe-area-inset-bottom))
-      }
-      #game .ejs_virtualGamepad_bottom{
-        bottom:calc(var(--mga-floor) + var(--mga-dpad) + 8px);gap:10px
-      }
-      #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
-        min-width:84px;height:40px!important;line-height:40px!important;font-size:11px!important
       }
       #difficulty-setup{padding:10px max(12px,env(safe-area-inset-left)) 10px}
       #difficulty-setup .difficulty-card{width:min(620px,100%);max-height:calc(100vh - 20px);overflow:auto;padding:8px 12px}
@@ -159,7 +201,7 @@
       #difficulty-setup button{min-width:0;flex:1;padding:12px 8px}
     }
     /* Dica para girar o celular (só aparece em retrato touch) */
-    #rotate-hint{position:fixed;left:50%;bottom:calc(clamp(112px,34vw,184px) + max(14px,env(safe-area-inset-bottom)) + 74px);transform:translateX(-50%);z-index:100003;display:none;align-items:center;gap:8px;background:rgba(0,0,0,.72);border:1px solid #00e5ff66;color:#00e5ff;font:700 12px monospace;padding:10px 16px;border-radius:24px;backdrop-filter:blur(4px);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:opacity .3s}
+    #rotate-hint{position:fixed;left:50%;bottom:calc(clamp(112px,34vw,184px) + max(14px,env(safe-area-inset-bottom)) + 84px);transform:translateX(-50%);z-index:100003;display:none;align-items:center;gap:8px;background:rgba(0,0,0,.72);border:1px solid #00e5ff66;color:#00e5ff;font:700 12px monospace;padding:10px 16px;border-radius:24px;backdrop-filter:blur(4px);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:opacity .3s}
     #rotate-hint.hidden{opacity:0;pointer-events:none}
     @media (hover:none) and (pointer:coarse) and (orientation:portrait){
       #rotate-hint.visible{display:flex}
