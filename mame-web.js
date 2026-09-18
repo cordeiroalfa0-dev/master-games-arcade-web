@@ -116,10 +116,12 @@
     {
       bios: "qsound.zip",
       games: new Set([
-        "avsp", "avspu", "ddsom", "ddtod", "dstlk", "hsf2", "msh",
-        "mshvsf", "mvsc", "nwarru", "sfa", "sfa2u", "sfa3", "sfz2ald",
-        "sgemf", "spf2t", "ssf2", "ssf2t", "vhunt2", "vsavj", "xmcota",
-        "xmvsfur1"
+        "avsp", "avspu", "ddsom", "ddtod", "dstlk", "hsf2", "megaman2",
+        "msh", "mshvsf", "mvsc", "nwarr", "nwarru", "sfa", "sfa2", "sfa2u",
+        "sfa3", "sfz2al", "sfz2ald", "sgemf", "spf2t", "ssf2", "ssf2t",
+        "vhunt2", "vsav", "vsavj", "xmcota", "xmvsf", "xmvsfe", "xmvsfu",
+        "xmvsfj", "xmvsfur1", "armwar", "cybots", "gigawing", "mmatrix",
+        "progear"
       ])
     },
     {
@@ -151,7 +153,7 @@
       bios: biosName || null,
       biosAvailable: !!bios && !bios.skipDownload,
       biosUrl: bios && !bios.skipDownload ? `/${bios.name}` : null,
-      core: /^(avsp|ddsom|ddtod|dstlk|hsf2|msh|mshvsf|mvsc|sfa|sfa2|sfa3|sfz2al|sgemf|spf2t|ssf2|ssf2t|vhunt2|vsav|xmcota|xmvsf|progear)\.zip$/i.test(name) ? 'fbalpha2012_cps2' : 'arcade'
+      core: /^(avsp|avspu|ddsom|ddtod|dstlk|hsf2|megaman2|msh|mshvsf|mvsc|nwarr|nwarru|sfa|sfa2|sfa2u|sfa3|sfz2al|sfz2ald|sgemf|spf2t|ssf2|ssf2t|vhunt2|vsav|vsavj|xmcota|xmvsf|xmvsfe|xmvsfu|xmvsfj|xmvsfur1|armwar|cybots|gigawing|mmatrix|progear)\.zip$/i.test(name) ? 'fbalpha2012_cps2' : 'arcade'
     };
   };
 
@@ -233,7 +235,7 @@
     playerUrl.searchParams.set("name", cleanRomName(romName));
     // O player é alterado junto com o bridge; versionar a URL evita que o
     // navegador reutilize uma versão antiga que ainda exibia o menu RetroArch.
-    playerUrl.searchParams.set("v", "20260918-dino-core-v1");
+    playerUrl.searchParams.set("v", "20260918-core-audit-v1");
     if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
     if (biosName) playerUrl.searchParams.set("biosName", biosName);
 
