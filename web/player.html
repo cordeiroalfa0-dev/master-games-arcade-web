@@ -170,7 +170,9 @@
       }
       #game{
         position:absolute!important;top:0!important;left:0!important;
-        width:100dvw!important;height:var(--mga-l-game)!important
+        width:min(100dvw,calc(var(--mga-l-game) * 1.333333))!important;
+        height:var(--mga-l-game)!important;
+        margin-left:50%;transform:translateX(-50%)
       }
       #game .ejs_virtualGamepad_parent{
         height:calc(var(--mga-l-strip) + clamp(96px,26vh,132px) + 12px);
@@ -180,7 +182,7 @@
       body.video-stretch #game canvas,body.video-stretch #game video,
       #game canvas,#game video{
         top:0!important;bottom:auto!important;left:0!important;
-        width:100dvw!important;height:var(--mga-l-game)!important;
+        width:100%!important;height:var(--mga-l-game)!important;
         max-width:100dvw!important;max-height:none!important;
         object-fit:contain!important
       }
