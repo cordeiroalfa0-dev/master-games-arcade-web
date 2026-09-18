@@ -141,9 +141,9 @@ class EJS_GameManager {
             "screenshot_directory = \"/\"\n" +
             "block_sram_overwrite = false\n" +
             "video_gpu_screenshot = false\n" +
-            // Buffer maior para celulares, que costumam sofrer underrun de
-            // áudio quando o navegador alterna entre jogo e controles touch.
-            "audio_latency = 128\n" +
+            // Buffer amplo para celulares mais lentos, que podem sofrer
+            // underrun quando o navegador alterna entre jogo e controles touch.
+            "audio_latency = 512\n" +
             "video_top_portrait_viewport = false\n" +
             "video_vsync = true\n" +
             "video_smooth = false\n" +

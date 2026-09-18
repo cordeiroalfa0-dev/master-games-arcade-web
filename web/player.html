@@ -224,6 +224,13 @@
     @media (hover:none) and (pointer:coarse) and (orientation:portrait){
       #rotate-hint.visible{display:flex}
     }
+    #portrait-lock{position:fixed;inset:0;z-index:100004;display:none;place-items:center;background:#030006;color:#00e5ff;text-align:center;padding:28px;box-sizing:border-box;font:700 16px/1.5 monospace}
+    #portrait-lock .portrait-lock-card{max-width:360px;border:1px solid #00e5ff66;background:rgba(5,0,11,.96);box-shadow:0 0 24px #00e5ff22;padding:28px 22px}
+    #portrait-lock strong{display:block;margin-bottom:12px;font-size:24px}
+    @media (hover:none) and (pointer:coarse) and (orientation:portrait){
+      #portrait-lock{display:grid}
+      #game,#loading-art,#status,#difficulty-setup,#manual-start,#rotate-hint,#player-controls,#debug{visibility:hidden!important}
+    }
     #loading-art{position:fixed;inset:0;z-index:99990;background:#030006 url('/assets/game-loading-art.png') center/cover no-repeat;transition:opacity .35s ease;}
     #loading-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.62));}
     #loading-art.hidden{opacity:0;pointer-events:none;}
@@ -242,10 +249,8 @@
     #btn-fullscreen{width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);border:1px solid #00e5ff66;color:#00e5ff;font-size:20px;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s;border-radius:4px;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
     #btn-close:hover,#btn-fullscreen:hover{background:rgba(0,0,0,.8);border-color:#00e5ff}
     #player-controls.hidden{opacity:0;pointer-events:none}
-    #btn-rotate{display:none}
     @media (hover:none) and (pointer:coarse){
-      #btn-close,#btn-fullscreen,#btn-rotate{width:36px;height:36px;padding:0;font-size:19px}
-      #btn-rotate{display:flex}
+      #btn-close,#btn-fullscreen{width:36px;height:36px;padding:0;font-size:19px}
       #player-controls{top:max(8px,env(safe-area-inset-top));right:calc(max(8px,env(safe-area-inset-right)) + 50px);gap:8px}
       #difficulty-setup label:has([data-setting="scanlines"]),
       #difficulty-setup label:has([data-setting="vignette"]){display:none!important}
@@ -258,9 +263,9 @@
   <div id="status">CARREGANDO...</div>
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
+  <div id="portrait-lock" role="alert"><div class="portrait-lock-card"><strong>GIRE O CELULAR</strong>Este jogo funciona somente na horizontal.<br>Vire o aparelho para continuar.</div></div>
   <div id="rotate-hint" role="button" aria-label="Girar para tela cheia">🔄 GIRE O CELULAR — toque para tela cheia</div>
   <div id="player-controls">
-    <button id="btn-rotate" type="button" title="Tela horizontal" aria-label="Tela horizontal">🔄</button>
     <button id="btn-fullscreen" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
     <button id="btn-close" type="button" title="Fechar" aria-label="Fechar">✕</button>
   </div>
@@ -298,10 +303,8 @@
     const current=readDifficulty();
     const panel=document.createElement('div');
     panel.id='difficulty-setup';
-    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${name||'Master Games Arcade'}</h1><p>Escolha o modo e ajuste a apresentação antes de iniciar. As preferências ficam salvas neste navegador.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div class="config-section"><div class="config-title">VÍDEO</div><div class="config-grid"><label>Proporção <select data-setting="aspect"><option value="stretch">Tela cheia</option><option value="4:3">Arcade 4:3</option><option value="auto">Automática</option></select></label><label>Paleta <select data-setting="palette"><option value="normal">Normal</option><option value="cool">Fria</option><option value="amber">Âmbar</option><option value="soft">Suave</option></select></label><label><input type="checkbox" data-setting="scanlines"> Scanlines</label><label><input type="checkbox" data-setting="vignette"> Vinheta</label><label><input type="checkbox" data-setting="integer"> Escala inteira</label><label><input type="checkbox" data-setting="shader"> Shader SABR</label><label class="mobile-only"><input type="checkbox" data-setting="landscape"> Tela horizontal</label></div></div><div class="config-section"><div class="config-title">CONTROLES</div><div class="controls-note"><b>P1:</b> Shift/5 crédito · Enter/1 entrar · setas + Z/X/A/S jogar.<br><b>P2:</b> só entra quando solicitado · C/V ou 6/2 crédito/START.<br>Segundo controle USB continua disponível.</div></div><div style="margin-top:18px;color:#aaa;font-size:10px">DIP switches são aplicados quando o core expõe a opção.</div></div>`;
-    const aspect=panel.querySelector('[data-setting="aspect"]');
+    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${name||'Master Games Arcade'}</h1><p>Escolha o modo e ajuste a apresentação antes de iniciar. Os jogos para celular funcionam somente na horizontal.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div class="config-section"><div class="config-title">VÍDEO</div><div class="config-grid"><label>Paleta <select data-setting="palette"><option value="normal">Normal</option><option value="cool">Fria</option><option value="amber">Âmbar</option><option value="soft">Suave</option></select></label><label><input type="checkbox" data-setting="scanlines"> Scanlines</label><label><input type="checkbox" data-setting="vignette"> Vinheta</label><label><input type="checkbox" data-setting="integer"> Escala inteira</label><label><input type="checkbox" data-setting="shader"> Shader SABR</label></div></div><div class="config-section"><div class="config-title">CONTROLES</div><div class="controls-note"><b>P1:</b> Shift/5 crédito · Enter/1 entrar · setas + Z/X/A/S jogar.<br><b>P2:</b> só entra quando solicitado · C/V ou 6/2 crédito/START.<br>Segundo controle USB continua disponível.</div></div><div style="margin-top:18px;color:#aaa;font-size:10px">DIP switches são aplicados quando o core expõe a opção.</div></div>`;
     const palette=panel.querySelector('[data-setting="palette"]');
-    aspect.value=visual.aspect;
     palette.value=visual.palette;
     for(const key of ['scanlines','vignette','integer'])panel.querySelector(`[data-setting="${key}"]`).checked=!!visual[key];
     panel.querySelector('[data-setting="shader"]').checked=pixelEnhancement;
@@ -311,20 +314,11 @@
       button.addEventListener('click',()=>{
         const mode=button.dataset.difficulty==='hard'?'hard':'easy';
         saveDifficulty(mode);
-        visual.aspect=aspect.value;
         visual.palette=palette.value;
         for(const key of ['scanlines','vignette','integer'])visual[key]=panel.querySelector(`[data-setting="${key}"]`).checked;
         pixelEnhancement=panel.querySelector('[data-setting="shader"]').checked;
-        const landscape=panel.querySelector('[data-setting="landscape"]')?.checked;
         applyVisual();
         panel.remove();
-        if(landscape){
-          try{
-            const requestFullscreen=document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen;
-            const fullscreen=requestFullscreen?.call(document.documentElement,{navigationUI:'hide'});
-            Promise.resolve(fullscreen).then(()=>screen.orientation?.lock?.('landscape')).catch(()=>{});
-          }catch{}
-        }
         resolve(mode);
       });
     });
@@ -352,7 +346,7 @@
   try{visual={...visual, ...JSON.parse(localStorage.getItem(VISUAL_KEY)||'{}')}}catch{}
   // Perfis antigos usavam "auto" (contain), que deixava barras laterais.
   // Migra somente esse modo; preferências explícitas 4:3/stretch continuam.
-  if(visual.aspect==='auto')visual.aspect='stretch';
+  visual.aspect='stretch';
   // Em telas de toque (celular) scanlines e vinheta ficam sempre desligados.
   const isTouchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
   if(isTouchDevice){visual.scanlines=false;visual.vignette=false;}
@@ -371,11 +365,7 @@
     document.getElementById('game')?.style.setProperty('--video-saturation',visual.saturation);
     try{localStorage.setItem(VISUAL_KEY,JSON.stringify(visual))}catch{}
   };
-  const cycleVisual=()=>{
-    visual.aspect=visual.aspect==='auto'?'4:3':visual.aspect==='4:3'?'stretch':'auto';
-    applyVisual();log('Proporção: '+visual.aspect);
-  };
-  const visualHelp=()=>log('Vídeo: F1 shader SABR | F2 scanlines | F3 escala inteira | F4 proporção | F5 paleta | F6 brilho | F7 contraste | F8 saturação | F10 vinheta');
+  const visualHelp=()=>log('Vídeo: F1 shader SABR | F2 scanlines | F3 escala inteira | F5 paleta | F6 brilho | F7 contraste | F8 saturação | F10 vinheta');
   applyVisual();
   let pixelEnhancement=true;
   const applyPixelEnhancement=()=>{
@@ -623,7 +613,6 @@
     if(e.key==='F1'){e.preventDefault();pixelEnhancement=!pixelEnhancement;applyPixelEnhancement();}
     if(e.key==='F2'){e.preventDefault();visual.scanlines=!visual.scanlines;applyVisual();log('Scanlines: '+(visual.scanlines?'ligadas':'desligadas'));}
     if(e.key==='F3'){e.preventDefault();visual.integer=!visual.integer;applyVisual();log('Escala inteira: '+(visual.integer?'ligada':'desligada'));}
-    if(e.key==='F4'){e.preventDefault();cycleVisual();}
     if(e.key==='F5'){e.preventDefault();visual.palette=visual.palette==='normal'?'amber':visual.palette==='amber'?'cool':visual.palette==='cool'?'soft':'normal';applyVisual();log('Paleta: '+visual.palette);}
     if(e.key==='F6'){e.preventDefault();visual.brightness=visual.brightness>=1.25?.85:+(visual.brightness+.1).toFixed(2);applyVisual();log('Brilho: '+visual.brightness);}
     if(e.key==='F7'){e.preventDefault();visual.contrast=visual.contrast>=1.3?.85:+(visual.contrast+.1).toFixed(2);applyVisual();log('Contraste: '+visual.contrast);}
@@ -643,21 +632,6 @@
     try{parent.postMessage({type:'mga-emulator-exit'},location.origin)}catch{}
   });
   btnFullscreen.addEventListener('click',goFullscreen);
-
-  // Botão 🔄: entra em tela cheia e trava em paisagem; segundo toque destrava.
-  const btnRotate=document.getElementById('btn-rotate');
-  const lockLandscape=async()=>{
-    goFullscreen();
-    try{await screen.orientation?.lock?.('landscape')}catch(e){log('Trava de orientação: '+(e?.message||e))}
-  };
-  const unlockOrientation=async()=>{
-    try{screen.orientation?.unlock?.()}catch{}
-    try{if(document.fullscreenElement)await document.exitFullscreen()}catch{}
-  };
-  btnRotate.addEventListener('click',()=>{
-    if(document.fullscreenElement){unlockOrientation();log('Orientação destravada')}
-    else{lockLandscape();log('Tela cheia + paisagem solicitadas')}
-  });
 
   // Toque longo no Android/iOS não deve abrir menu de contexto sobre o jogo.
   if(isTouchDevice)addEventListener('contextmenu',e=>e.preventDefault());
@@ -685,7 +659,7 @@
   rotateHint.addEventListener('click',()=>{
     rotateHint.classList.add('hidden');
     try{sessionStorage.setItem('mga-rotate-hint-dismissed','1')}catch{}
-    lockLandscape();
+    goFullscreen();
   });
   addEventListener('orientationchange',()=>{
     if(innerWidth>innerHeight)rotateHint.classList.add('hidden');
@@ -724,7 +698,7 @@
     fitMobileGameViewport();
   };
   const fitMobileGameViewport=()=>{
-    if(!isTouchDevice||innerWidth>innerHeight)return;
+    if(!isTouchDevice||innerWidth<=innerHeight)return;
     const game=document.getElementById('game');
     const parent=game?.querySelector('.ejs_canvas_parent');
     const canvas=game?.querySelector('canvas,video');
@@ -794,9 +768,11 @@
   // Áudio: navegadores (principalmente iOS/Android) só liberam som depois
   // de um toque/clique. Além disso, um perfil antigo do EmulatorJS pode ter
   // volume 0 salvo. Aqui forçamos volume cheio, desmutamos e retomamos o
-  // AudioContext do core em qualquer gesto do usuário.
+  // AudioContext do core em qualquer gesto do usuário. Não reiniciamos o
+  // loop principal: fazer isso a cada toque pode introduzir cortes no áudio.
   // ---------------------------------------------------------------
   const MGA_VOLUME=1;
+  let mgaAudioConfigured=false;
   const resumeAudioContexts=()=>{
     const emu=window.EJS_emulator;
     const mod=emu?.gameManager?.Module||window.Module;
@@ -808,18 +784,18 @@
   const enableGameAudio=()=>{
     const emu=window.EJS_emulator;
     try{
-      if(emu){
+      if(emu&&!mgaAudioConfigured){
         emu.muted=false;
         if(typeof emu.setVolume==='function')emu.setVolume(MGA_VOLUME);
         else emu.volume=MGA_VOLUME;
         emu.gameManager?.setVolume?.(MGA_VOLUME);
-        emu.gameManager?.toggleMainLoop?.(1);
       }
     }catch(e){log('Áudio: '+(e?.message||e))}
     try{
       document.querySelectorAll('#game audio,#game video').forEach(el=>{
-        el.muted=false;el.volume=MGA_VOLUME;
+        if(!mgaAudioConfigured){el.muted=false;el.volume=MGA_VOLUME;}
       });
+      if(emu&&!mgaAudioConfigured)mgaAudioConfigured=true;
     }catch(e){}
     resumeAudioContexts();
   };

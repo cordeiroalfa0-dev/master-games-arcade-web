@@ -13,14 +13,28 @@ html,body{margin:0;padding:0;width:100%;height:100%;overflow:hidden;background:#
 #introContent{position:fixed;left:0;right:0;bottom:10vh;z-index:10;display:flex;flex-direction:column;align-items:center;color:#fff;font-family:monospace;transition:opacity 1s}.hidden{opacity:0}
 .line{height:1px;width:220px;background:linear-gradient(90deg,transparent,#00e5ff,#e040fb,transparent);margin:6px}.subtitle{font-size:12px;letter-spacing:3px;color:#e040fb;text-shadow:0 0 15px #e040fb;margin:8px}.title{font-size:28px;line-height:1.25;text-align:center;text-shadow:0 0 20px #00e5ff}.title b{display:block}.games{color:#00e5ff}.arcade{color:#e040fb}.version{margin-top:15px;color:#b7dce8;font-size:18px;letter-spacing:3px}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#00e676;box-shadow:0 0 10px #00e676;margin-right:10px}
 #insertCoin{position:fixed;z-index:20;left:0;right:0;bottom:7vh;text-align:center;opacity:0;transition:opacity .8s;font-family:monospace;color:#fff}.show{opacity:1!important}.coin{font-size:18px;letter-spacing:4px;text-shadow:0 0 15px #00e5ff;animation:pulse 1.2s infinite}.hint{margin-top:12px;color:#9ab0ba;font-size:18px}@keyframes pulse{50%{opacity:.45}}
+.mobile-hint{display:none}
 #cursor{position:fixed;z-index:100;width:10px;height:10px;border:1px solid #00e5ff;border-radius:50%;box-shadow:0 0 8px #00e5ff;pointer-events:none;transform:translate(-50%,-50%)}
+@media (max-width:600px){
+  #introContent{bottom:17vh;padding:0 18px;box-sizing:border-box}
+  .line{width:min(220px,72vw)}
+  .subtitle{font-size:9px;letter-spacing:1.5px;margin:6px 0}
+  .title{font-size:24px;line-height:1.15}
+  .version{margin-top:10px;font-size:11px;letter-spacing:1px;white-space:nowrap}
+  .dot{width:6px;height:6px;margin-right:6px}
+  #insertCoin{bottom:11vh;padding:0 18px;box-sizing:border-box}
+  .coin{font-size:15px;letter-spacing:2px}
+  .desktop-hint{display:none}
+  .mobile-hint{display:inline}
+  .hint{margin:10px auto 0;max-width:88vw;font-size:12px;line-height:1.4;letter-spacing:1px}
+}
 </style>
 </head>
 <body>
 <video id="bgVideo" playsinline preload="auto" autoplay muted><source src="https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/dist/intro_bg.mp4" type="video/mp4"></video>
 <div id="bgImage"></div><div id="darkLayer"></div><div class="scanlines"></div>
 <div id="introContent"><div class="line"></div><div class="subtitle">THE ULTIMATE ARCADE EXPERIENCE</div><div class="title"><b>MASTER</b><b class="games">GAMES</b><b class="arcade">ARCADE</b></div><div class="version"><span class="dot"></span>WEB EDITION • 2026</div><div class="line"></div></div>
-<div id="insertCoin"><div class="coin">INSERT COIN</div><div class="hint">PRESSIONE QUALQUER TECLA PARA CONTINUAR</div></div><div id="cursor"></div>
+<div id="insertCoin"><div class="coin">INSERT COIN</div><div class="hint"><span class="desktop-hint">PRESSIONE QUALQUER TECLA PARA CONTINUAR</span><span class="mobile-hint">TOQUE PARA CONTINUAR</span></div></div><div id="cursor"></div>
 <script>
 let canEnter=false;
 let fullscreenRequested=false;
