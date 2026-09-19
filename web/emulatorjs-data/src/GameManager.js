@@ -141,11 +141,23 @@ class EJS_GameManager {
             "screenshot_directory = \"/\"\n" +
             "block_sram_overwrite = false\n" +
             "video_gpu_screenshot = false\n" +
-            // Buffer amplo para celulares mais lentos, que podem sofrer
-            // underrun quando o navegador alterna entre jogo e controles touch.
-            "audio_latency = 512\n" +
+            // Áudio no celular: 512 ms era grande demais e fazia o som atrasar
+            // e "travar" quando o navegador reduzia o ritmo. 192 ms mantém o
+            // buffer seguro sem atraso perceptível.
+            "audio_latency = 192\n" +
+            // Controle dinâmico da taxa: o RetroArch estica/encolhe levemente o
+            // áudio para acompanhar o vídeo, em vez de cortar o som (underrun).
+            "audio_sync = true\n" +
+            "audio_rate_control = true\n" +
+            "audio_rate_control_delta = 0.005\n" +
+            "audio_max_timing_skew = 0.05\n" +
+            "audio_volume = 0.0\n" +
             "video_top_portrait_viewport = false\n" +
-            "video_vsync = true\n" +
+            // Sem vsync o vídeo não segura o áudio quando o celular perde
+            // quadros; quem dita o ritmo passa a ser o som.
+            "video_vsync = false\n" +
+            "video_frame_delay = 0\n" +
+            "video_hard_sync = false\n" +
             "video_smooth = false\n" +
             "fastforward_ratio = 3.0\n" +
             "slowmotion_ratio = 3.0\n" +
