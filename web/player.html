@@ -219,9 +219,11 @@
     }
     @media (orientation:landscape) and (max-height:600px){
       #game .ejs_virtualGamepad_parent{
-        --mga-dpad:clamp(96px,26vh,132px);
-        --mga-btn:clamp(44px,11vh,58px);
-        --mga-gap:clamp(5px,1.4vh,10px);
+        /* Direcional e botões maiores na horizontal: ocupam as faixas
+           laterais livres, sem cobrir a tela do jogo centralizada. */
+        --mga-dpad:clamp(128px,34vh,180px);
+        --mga-btn:clamp(54px,14.5vh,76px);
+        --mga-gap:clamp(6px,1.6vh,12px);
         --mga-side:max(10px,env(safe-area-inset-left));
         --mga-floor:max(8px,env(safe-area-inset-bottom))
       }
