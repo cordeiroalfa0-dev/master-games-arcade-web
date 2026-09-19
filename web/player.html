@@ -245,18 +245,12 @@
       #difficulty-setup .difficulty-actions{gap:8px}
       #difficulty-setup button{min-width:0;flex:1;padding:12px 8px}
     }
-    /* Dica para girar o celular (só aparece em retrato touch) */
-    #rotate-hint{position:fixed;left:50%;bottom:calc(clamp(112px,34vw,184px) + max(14px,env(safe-area-inset-bottom)) + 84px);transform:translateX(-50%);z-index:100003;display:none;align-items:center;gap:8px;background:rgba(0,0,0,.72);border:1px solid #00e5ff66;color:#00e5ff;font:700 12px monospace;padding:10px 16px;border-radius:24px;backdrop-filter:blur(4px);cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:opacity .3s}
-    #rotate-hint.hidden{opacity:0;pointer-events:none}
-    @media (hover:none) and (pointer:coarse) and (orientation:portrait){
-      #rotate-hint.visible{display:flex}
-    }
     #portrait-lock{position:fixed;inset:0;z-index:100004;display:none;place-items:center;background:#030006;color:#00e5ff;text-align:center;padding:28px;box-sizing:border-box;font:700 16px/1.5 monospace}
     #portrait-lock .portrait-lock-card{max-width:360px;border:1px solid #00e5ff66;background:rgba(5,0,11,.96);box-shadow:0 0 24px #00e5ff22;padding:28px 22px}
     #portrait-lock strong{display:block;margin-bottom:12px;font-size:24px}
     @media (hover:none) and (pointer:coarse) and (orientation:portrait){
       #portrait-lock{display:grid}
-      #game,#loading-art,#status,#difficulty-setup,#manual-start,#rotate-hint,#player-controls,#debug{visibility:hidden!important}
+      #game,#loading-art,#status,#difficulty-setup,#manual-start,#player-controls,#debug{visibility:hidden!important}
     }
     #loading-art{position:fixed;inset:0;z-index:99990;background:#030006 url('/assets/game-loading-art.png') center/cover no-repeat;transition:opacity .35s ease;}
     #loading-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.62));}
@@ -291,7 +285,6 @@
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
   <div id="portrait-lock" role="alert"><div class="portrait-lock-card"><strong>GIRE O CELULAR</strong>Este jogo funciona somente na horizontal.<br>Vire o aparelho para continuar.</div></div>
-  <div id="rotate-hint" role="button" aria-label="Girar para tela cheia">🔄 GIRE O CELULAR — toque para tela cheia</div>
   <div id="player-controls">
     <button id="btn-fullscreen" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
     <button id="btn-close" type="button" title="Fechar" aria-label="Fechar">✕</button>
@@ -618,13 +611,24 @@
       const req=el.requestFullscreen||el.webkitRequestFullscreen||el.msRequestFullscreen;
       if(req){
         const p=req.call(el,{navigationUI:'hide'});
-        if(p&&p.catch)p.catch(err=>log('Tela cheia recusada: '+(err?.message||err)));
+        if(p&&p.then)p.then(()=>{
+          // Ao abrir o jogo, trava a tela em horizontal automaticamente.
+          if(isTouchDevice&&screen.orientation?.lock){
+            screen.orientation.lock('landscape').catch(err=>log('Bloqueio de orientação recusado: '+(err?.message||err)));
+          }
+        }).catch(err=>log('Tela cheia recusada: '+(err?.message||err)));
         log('Tela cheia solicitada');
       }
     }catch(e){
       log('Tela cheia falhou: '+(e?.message||e));
     }
   };
+
+  document.addEventListener('fullscreenchange',()=>{
+    if(!document.fullscreenElement&&screen.orientation?.unlock){
+      try{screen.orientation.unlock()}catch{}
+    }
+  },{passive:true});
 
   // F11 alterna tela cheia; F9 mostra diagnóstico; Escape fecha o player.
   addEventListener('keydown',e=>{
@@ -673,24 +677,6 @@
     if(!document.hidden&&started)requestWakeLock();
   },{passive:true});
 
-  // Dica de rotação: aparece uma vez por sessão quando o jogo inicia em retrato.
-  const rotateHint=document.getElementById('rotate-hint');
-  let rotateHintTimer;
-  const maybeShowRotateHint=()=>{
-    if(!isTouchDevice||innerWidth>innerHeight||document.fullscreenElement)return;
-    if(sessionStorage.getItem('mga-rotate-hint-dismissed'))return;
-    rotateHint.classList.add('visible');
-    clearTimeout(rotateHintTimer);
-    rotateHintTimer=setTimeout(()=>rotateHint.classList.add('hidden'),7000);
-  };
-  rotateHint.addEventListener('click',()=>{
-    rotateHint.classList.add('hidden');
-    try{sessionStorage.setItem('mga-rotate-hint-dismissed','1')}catch{}
-    goFullscreen();
-  });
-  addEventListener('orientationchange',()=>{
-    if(innerWidth>innerHeight)rotateHint.classList.add('hidden');
-  },{passive:true});
   // Auto-esconde os botões após 3s de inatividade (apenas desktop)
   let controlsHideTimer;
   const showPlayerControls=()=>{
@@ -945,8 +931,6 @@
     setTimeout(applyPixelEnhancement,0);
     goFullscreen();
     requestWakeLock();
-    // A tela vertical já possui controles completos; não cubra a ação com um
-    // aviso flutuante. O botão 🔄 no topo continua disponível para paisagem.
 
     try{
       const fs=window.EJS_emulator?.gameManager?.FS;
