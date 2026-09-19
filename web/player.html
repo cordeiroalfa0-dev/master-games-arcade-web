@@ -833,6 +833,19 @@
   document.addEventListener('visibilitychange',()=>{
     if(!document.hidden)enableGameAudio();
   });
+  // No celular o som pode ser suspenso sozinho (chamada, notificação, tela
+  // apagada) e não volta mais: o jogo continua mas o áudio fica "travado".
+  // Este vigia religa o contexto de áudio assim que ele sai do ar.
+  setInterval(()=>{
+    if(document.hidden)return;
+    const emu=window.EJS_emulator;
+    const mod=emu?.gameManager?.Module||window.Module;
+    const suspended=[emu?.audioContext,mod?.SDL2?.audioContext,mod?.audioContext,window.MGA_audioCtx]
+      .some(ctx=>ctx&&ctx.state!=='running');
+    if(suspended)resumeAudioContexts();
+  },2000);
+  addEventListener('focus',()=>{if(!document.hidden)resumeAudioContexts()});
+  addEventListener('pageshow',()=>resumeAudioContexts());
 
   // ---------------------------------------------------------------
   // Progresso: salva o estado completo do jogo no navegador. Cada ROM tem
@@ -922,10 +935,12 @@
     enableGameAudio();
     [200,800,2000,4000].forEach(ms=>setTimeout(enableGameAudio,ms));
     // Restaura o último ponto alguns instantes após o core criar o estado;
-    // depois mantém um checkpoint automático a cada 30 segundos.
+    // depois mantém um checkpoint automático. O salvamento congela o core por
+    // um instante e cortava o som, então ele agora é mais espaçado e só roda
+    // com o jogo em primeiro plano.
     setTimeout(()=>loadProgress(),2500);
     if(mgaSaveTimer)clearInterval(mgaSaveTimer);
-    mgaSaveTimer=setInterval(()=>saveProgress(true),30000);
+    mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);
     // O shader só pode ser ativado depois de o contexto gráfico do core existir.
     setTimeout(applyPixelEnhancement,0);
     goFullscreen();
