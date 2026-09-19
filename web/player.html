@@ -114,13 +114,13 @@
        cálculo e nunca se sobreporem. */
     @media (hover:none) and (pointer:coarse) and (orientation:portrait){
       body{
-        --mga-p-dpad:clamp(112px,34vw,184px);
+        --mga-p-dpad:clamp(88px,26vw,128px);
         --mga-p-floor:max(14px,env(safe-area-inset-bottom));
-        --mga-p-row:56px;               /* faixa de CRÉDITO/START */
+        --mga-p-row:40px;               /* faixa de CRÉDITO/START */
         --mga-p-band:calc(var(--mga-p-floor) + var(--mga-p-dpad) + var(--mga-p-row) + 6px);
         /* Mantém a tela quadrada e presa logo acima dos controles. Quando há
            espaço, o aumento acontece para cima sem deslocar os botões. */
-        --mga-p-game:min(100dvw,calc(100dvh - var(--mga-p-band) - 2px));
+        --mga-p-game:calc(100dvh - var(--mga-p-band) - 2px);
         --mga-p-top:max(0px,calc(100dvh - var(--mga-p-band) - var(--mga-p-game) - 2px));
         /* O core desenha 4:3; este fator ocupa exatamente a faixa livre. */
         --mga-p-scale:calc(var(--mga-p-game) * 1.333333 / 100dvw)
@@ -161,7 +161,7 @@
        para CRÉDITO/START, que assim nunca ficam sobre a tela do jogo. */
     @media (hover:none) and (pointer:coarse) and (orientation:landscape){
       body{
-        --mga-l-strip:clamp(44px,10dvh,56px);
+        --mga-l-strip:clamp(36px,8dvh,44px);
         /* Faixa menor e margem menor: a tela do jogo fica um pouco maior
            sem invadir o espaço dos controles nas laterais. */
         --mga-l-game:calc(100dvh - var(--mga-l-strip) - 2px)
