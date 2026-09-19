@@ -162,8 +162,8 @@
        Os controles e botões de CRÉDITO/START flutuam nas laterais e na base. */
     @media (hover:none) and (pointer:coarse) and (orientation:landscape){
       body{
-        --mga-l-strip:0px;
-        --mga-l-game:100dvh;
+        --mga-l-strip:calc(38px + max(8px, env(safe-area-inset-bottom)));
+        --mga-l-game:calc(100dvh - var(--mga-l-strip));
       }
       #game{
         position:fixed!important;inset:0!important;
@@ -187,18 +187,18 @@
       }
       body.video-stretch #game .ejs_canvas_parent,
       body.video-stretch #game canvas,body.video-stretch #game video{
-        position:absolute!important;inset:0!important;
-        width:100dvw!important;height:100dvh!important;
-        max-width:100dvw!important;max-height:100dvh!important;
+        position:absolute!important;top:0!important;left:0!important;right:0!important;
+        width:100dvw!important;height:var(--mga-l-game)!important;
+        max-width:100dvw!important;max-height:var(--mga-l-game)!important;
         object-fit:fill!important;z-index:1
       }
       #game .ejs_canvas_parent,
       #game canvas,#game video{
-        position:absolute!important;top:0!important;bottom:0!important;
+        position:absolute!important;top:0!important;bottom:var(--mga-l-strip)!important;
         left:0!important;right:0!important;margin:auto!important;
-        width:min(100dvw,calc(100dvh * 1.333333))!important;
-        height:100dvh!important;
-        max-width:100dvw!important;max-height:100dvh!important;
+        width:min(100dvw,calc(var(--mga-l-game) * 1.333333))!important;
+        height:var(--mga-l-game)!important;
+        max-width:100dvw!important;max-height:var(--mga-l-game)!important;
         object-fit:fill!important;z-index:1;transform:none!important
       }
       /* CRÉDITO/START centralizados na base com fundo semitransparente */
@@ -726,9 +726,9 @@
     const parent=game?.querySelector('.ejs_canvas_parent');
     const canvas=game?.querySelector('canvas,video');
     if(!game||!parent||!canvas)return;
-    parent.style.setProperty('height','100dvh','important');
+    parent.style.setProperty('height','var(--mga-l-game)','important');
     parent.style.setProperty('top','0px','important');
-    canvas.style.setProperty('height','100dvh','important');
+    canvas.style.setProperty('height','var(--mga-l-game)','important');
     canvas.style.setProperty('transform','none','important');
     canvas.style.setProperty('object-fit','fill','important');
   };
