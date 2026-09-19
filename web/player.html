@@ -117,13 +117,11 @@
         --mga-p-dpad:clamp(112px,34vw,184px);
         --mga-p-floor:max(14px,env(safe-area-inset-bottom));
         --mga-p-row:56px;               /* faixa de CRÉDITO/START */
-        /* Reserva uma faixa maior no topo para afastar o jogo dos controles
-           flutuantes do navegador/player em celulares estreitos. */
-        --mga-p-top:max(52px,calc(env(safe-area-inset-top) + 44px));
         --mga-p-band:calc(var(--mga-p-floor) + var(--mga-p-dpad) + var(--mga-p-row) + 6px);
-        /* Usa todo o espaço entre o topo e a faixa CRÉDITO/START. Assim a tela
-           fica retangular e não sobra um vão grande acima dos botões. */
-        --mga-p-game:calc(100dvh - var(--mga-p-band) - var(--mga-p-top) - 2px);
+        /* Mantém a tela quadrada e presa logo acima dos controles. Quando há
+           espaço, o aumento acontece para cima sem deslocar os botões. */
+        --mga-p-game:min(100dvw,calc(100dvh - var(--mga-p-band) - 2px));
+        --mga-p-top:max(0px,calc(100dvh - var(--mga-p-band) - var(--mga-p-game) - 2px));
         /* O core desenha 4:3; este fator ocupa exatamente a faixa livre. */
         --mga-p-scale:calc(var(--mga-p-game) * 1.333333 / 100dvw)
       }
