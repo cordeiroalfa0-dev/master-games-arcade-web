@@ -272,6 +272,16 @@
       #difficulty-setup label:has([data-setting="vignette"]){display:none!important}
     }
 
+    :root{--mga-pad-opacity:0.75;}
+    html,body,#game{overscroll-behavior:none!important;-webkit-overscroll-behavior:none!important;-webkit-touch-callout:none}
+    #game .ejs_virtualGamepad_parent{opacity:var(--mga-pad-opacity,0.75)!important;transition:opacity .2s ease}
+
+    .mga-ctrl-btn{height:36px;padding:0 9px;display:flex;align-items:center;justify-content:center;gap:4px;background:rgba(8,0,18,.8);border:1px solid #00e5ffaa;box-shadow:0 0 8px rgba(0,229,255,.3);color:#00e5ff;font:bold 11px monospace;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s,background .2s;border-radius:4px;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+    .mga-ctrl-btn:hover{background:rgba(0,229,255,.25);border-color:#00e5ff}
+    @media (hover:none) and (pointer:coarse){
+      .mga-ctrl-btn{height:36px;padding:0 7px;font-size:11px}
+    }
+
     #btn-save{height:36px;padding:0 10px;display:flex;align-items:center;justify-content:center;gap:4px;background:rgba(8,0,18,.8);border:1px solid #00e5ffaa;box-shadow:0 0 8px rgba(0,229,255,.3);color:#00e5ff;font:bold 11px monospace;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s,background .2s;border-radius:4px;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
     #btn-save:hover{background:rgba(0,229,255,.25);border-color:#00e5ff}
     @media (hover:none) and (pointer:coarse){
@@ -312,7 +322,10 @@
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
   
   <div id="player-controls">
-    <button id="btn-save" type="button" title="Salvar e Carregar Partidas (15 Slots)" aria-label="Saves">💾 Saves</button>
+    <button id="btn-save" class="mga-ctrl-btn" type="button" title="Salvar e Carregar Partidas (15 Slots)" aria-label="Saves">💾 Saves</button>
+    <button id="btn-pause" class="mga-ctrl-btn" type="button" title="Pausar / Retomar Jogo" aria-label="Pausa">⏸</button>
+    <button id="btn-haptic" class="mga-ctrl-btn" type="button" title="Vibração Tátil nos Botões (Haptic)" aria-label="Vibração">📳</button>
+    <button id="btn-opacity" class="mga-ctrl-btn" type="button" title="Ajustar Opacidade dos Controles Virtuais" aria-label="Opacidade">👁 75%</button>
     <button id="btn-fullscreen" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
     <button id="btn-close" type="button" title="Fechar" aria-label="Fechar">✕</button>
   </div>
@@ -1162,6 +1175,88 @@
   window.addEventListener('message',e=>{
     if(e.data?.type==='mga-open-saves')openSavesModal();
   });
+
+  // ===============================================================
+  // MELHORIAS MOBILE: Haptic Feedback, Pausa Rápida, Opacidade & Anti-Gestos
+  // ===============================================================
+  let mgaHapticEnabled = localStorage.getItem('mga_haptic_enabled') !== '0';
+  const triggerHaptic = (ms = 14) => {
+    if (!mgaHapticEnabled || !navigator.vibrate) return;
+    try { navigator.vibrate(ms); } catch (_) {}
+  };
+
+  const btnHaptic = document.getElementById('btn-haptic');
+  const updateHapticUI = () => {
+    if (!btnHaptic) return;
+    btnHaptic.textContent = mgaHapticEnabled ? '📳' : '📳✕';
+    btnHaptic.style.color = mgaHapticEnabled ? '#00e5ff' : '#777';
+    btnHaptic.title = mgaHapticEnabled ? 'Vibração: Ativada' : 'Vibração: Desativada';
+  };
+  updateHapticUI();
+  if (btnHaptic) {
+    btnHaptic.addEventListener('click', () => {
+      mgaHapticEnabled = !mgaHapticEnabled;
+      try { localStorage.setItem('mga_haptic_enabled', mgaHapticEnabled ? '1' : '0'); } catch (_) {}
+      updateHapticUI();
+      if (mgaHapticEnabled) triggerHaptic(20);
+      showToast(mgaHapticEnabled ? '📳 Vibração ativada' : '📳 Vibração desativada');
+    });
+  }
+
+  // Opacidade rápida dos controles touch no celular (para não cobrir o jogo)
+  const PAD_OPACITIES = [
+    { label: '👁 100%', val: '1.0' },
+    { label: '👁 75%', val: '0.75' },
+    { label: '👁 50%', val: '0.50' },
+    { label: '👁 25%', val: '0.25' }
+  ];
+  let currentOpIdx = parseInt(localStorage.getItem('mga_pad_op_idx') || '1', 10);
+  if (isNaN(currentOpIdx) || currentOpIdx < 0 || currentOpIdx >= PAD_OPACITIES.length) currentOpIdx = 1;
+  const applyPadOpacity = (idx, silent = false) => {
+    currentOpIdx = idx % PAD_OPACITIES.length;
+    const item = PAD_OPACITIES[currentOpIdx];
+    document.documentElement.style.setProperty('--mga-pad-opacity', item.val);
+    const btnOp = document.getElementById('btn-opacity');
+    if (btnOp) btnOp.textContent = item.label;
+    try { localStorage.setItem('mga_pad_op_idx', String(currentOpIdx)); } catch (_) {}
+    if (!silent) showToast('Controles: ' + item.label.replace('👁 ', '') + ' de opacidade');
+  };
+  applyPadOpacity(currentOpIdx, true);
+  const btnOpacity = document.getElementById('btn-opacity');
+  if (btnOpacity) {
+    btnOpacity.addEventListener('click', () => {
+      applyPadOpacity(currentOpIdx + 1);
+      triggerHaptic(12);
+    });
+  }
+
+  // Pausa rápida para celular (atender ligação / notificações sem perder vida)
+  const btnPause = document.getElementById('btn-pause');
+  if (btnPause) {
+    btnPause.addEventListener('click', () => {
+      const emu = window.EJS_emulator;
+      if (!emu || !started) {
+        showToast('⚠️ O jogo ainda não iniciou');
+        return;
+      }
+      emu.togglePlaying?.();
+      const isPaused = !!emu.paused;
+      btnPause.textContent = isPaused ? '▶' : '⏸';
+      btnPause.title = isPaused ? 'Retomar Emulação' : 'Pausar Emulação';
+      btnPause.style.color = isPaused ? '#ffbb00' : '#00e5ff';
+      showToast(isPaused ? '⏸ Jogo Pausado' : '▶ Jogo Retomado');
+      triggerHaptic(20);
+    });
+  }
+
+  // Hooking de toque no Gamepad touch para Haptic Feedback imediato
+  document.addEventListener('touchstart', (e) => {
+    const target = e.target;
+    if (target && target.closest && target.closest('.ejs_virtualGamepad_parent, .ejs_dpad_main, .ejs_virtualGamepad_button, .mga-btn-action, .mga-ctrl-btn')) {
+      triggerHaptic(15);
+    }
+    requestWakeLock();
+  }, { passive: true, capture: true });
 
   // Melhora resposta touch no celular e garante áudio ativo no primeiro toque
   ['touchstart','touchend','click'].forEach(evt=>{
