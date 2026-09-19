@@ -447,10 +447,51 @@
     }
 
     if (path === "/api/art") {
+      const romParam = cleanRomName(parsed.searchParams.get("rom") || "");
+      const clean = romParam.toLowerCase().replace(/\s*\(\d+\)$/, "").trim();
+
+      const candidateUrls = [
+        "https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/snaps/" + clean + ".png",
+        "https://raw.githubusercontent.com/cordeiroalfa0-dev/master-games-arcade-system/main/snaps/" + clean + ".png"
+      ];
+
+      for (const artUrl of candidateUrls) {
+        try {
+          const res = await originalFetch(artUrl, { cache: "force-cache" });
+          if (res.ok) {
+            const blob = await res.blob();
+            if (blob.size > 200) {
+              return new Response(blob, {
+                status: 200,
+                headers: {
+                  "Content-Type": res.headers.get("Content-Type") || "image/png",
+                  "Cache-Control": "public, max-age=86400",
+                  "Access-Control-Allow-Origin": "*"
+                }
+              });
+            }
+          }
+        } catch {
+          // continuar tentando candidatos
+        }
+      }
+
       return jsonResponse(
         { ok: false, available: false, url: null },
         404
       );
+    }
+
+    if (path === "/api/media" || path === "/api/video") {
+      const romParam = cleanRomName(parsed.searchParams.get("rom") || "");
+      const clean = romParam.toLowerCase().replace(/\s*\(\d+\)$/, "").trim();
+      return jsonResponse({
+        ok: true,
+        rom: clean,
+        snap: "https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/snaps/" + clean + ".png",
+        icon: "https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/snaps/" + clean + ".png",
+        video: "https://archive.org/download/mame-video-previews/" + clean + ".mp4"
+      });
     }
 
     if (path === "/api/roms") {
