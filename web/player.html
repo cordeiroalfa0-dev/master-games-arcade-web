@@ -271,6 +271,37 @@
       #difficulty-setup label:has([data-setting="scanlines"]),
       #difficulty-setup label:has([data-setting="vignette"]){display:none!important}
     }
+
+    #btn-save{height:36px;padding:0 10px;display:flex;align-items:center;justify-content:center;gap:4px;background:rgba(8,0,18,.8);border:1px solid #00e5ffaa;box-shadow:0 0 8px rgba(0,229,255,.3);color:#00e5ff;font:bold 11px monospace;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s,background .2s;border-radius:4px;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
+    #btn-save:hover{background:rgba(0,229,255,.25);border-color:#00e5ff}
+    @media (hover:none) and (pointer:coarse){
+      #btn-save{height:36px;padding:0 8px;font-size:11px}
+    }
+    #mga-saves-modal{position:fixed;inset:0;z-index:100005;background:rgba(2,0,6,.88);backdrop-filter:blur(8px);display:none;place-items:center;padding:max(8px,env(safe-area-inset-top)) max(10px,env(safe-area-inset-right)) max(8px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));box-sizing:border-box;font-family:monospace;color:#fff}
+    #mga-saves-modal.open{display:grid!important}
+    .mga-modal-dialog{width:min(660px,100%);max-height:min(90dvh,540px);background:#070012;border:2px solid #00e5ff;box-shadow:0 0 24px rgba(0,229,255,.35);border-radius:8px;display:flex;flex-direction:column;overflow:hidden}
+    .mga-modal-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#100022;border-bottom:1px solid #00e5ff44}
+    .mga-modal-title{color:#00e5ff;font-size:13px;font-weight:bold;letter-spacing:1px;text-shadow:0 0 8px #00e5ff88}
+    .mga-modal-close{background:transparent;border:1px solid #ff2b6d;color:#ff6f9e;width:30px;height:30px;display:grid;place-items:center;font-size:18px;cursor:pointer;border-radius:4px;line-height:1}
+    .mga-modal-actions{display:flex;gap:8px;padding:8px 14px;background:rgba(0,229,255,.05);border-bottom:1px solid #ffffff15;flex-wrap:wrap;align-items:center}
+    .mga-btn-action{background:#120224;border:1px solid #00e5ff88;color:#00e5ff;padding:6px 12px;font:bold 11px monospace;cursor:pointer;border-radius:4px;display:inline-flex;align-items:center;gap:6px;min-height:30px}
+    .mga-btn-action:hover{background:#00e5ff22}
+    .mga-slots-grid{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;-webkit-overflow-scrolling:touch}
+    .mga-slot-card{display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,.03);border:1px solid rgba(0,229,255,.2);border-radius:6px;gap:8px}
+    .mga-slot-card.has-data{border-color:rgba(57,255,136,.4);background:rgba(57,255,136,.04)}
+    .mga-slot-left{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+    .mga-slot-badge{font-size:11px;font-weight:bold;color:#00e5ff}
+    .mga-slot-card.has-data .mga-slot-badge{color:#39ff88}
+    .mga-slot-time{font-size:10px;color:#999;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .mga-slot-btns{display:flex;gap:6px;align-items:center;flex-shrink:0}
+    .mga-btn-save{background:#062238;border:1px solid #00e5ff;color:#00e5ff;padding:5px 9px;font:bold 11px monospace;cursor:pointer;border-radius:4px;min-height:32px}
+    .mga-btn-load{background:#06381b;border:1px solid #39ff88;color:#39ff88;padding:5px 9px;font:bold 11px monospace;cursor:pointer;border-radius:4px;min-height:32px}
+    .mga-btn-load:disabled{opacity:.3;border-color:#555;color:#777;cursor:not-allowed}
+    .mga-btn-del{background:#380611;border:1px solid #ff2b6d;color:#ff6f9e;padding:5px 8px;font:bold 11px monospace;cursor:pointer;border-radius:4px;min-height:32px}
+    .mga-btn-del:disabled{opacity:.2;border-color:#555;color:#777;cursor:not-allowed}
+    #mga-toast{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:100010;background:rgba(8,0,18,.96);border:1px solid #00e5ff;box-shadow:0 0 16px rgba(0,229,255,.5);color:#00e5ff;padding:8px 16px;border-radius:20px;font:bold 12px monospace;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap}
+    #mga-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
+
    </style>
 </head>
 <body>
@@ -281,9 +312,27 @@
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
   
   <div id="player-controls">
+    <button id="btn-save" type="button" title="Salvar e Carregar Partidas (15 Slots)" aria-label="Saves">💾 Saves</button>
     <button id="btn-fullscreen" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
     <button id="btn-close" type="button" title="Fechar" aria-label="Fechar">✕</button>
   </div>
+
+
+  <div id="mga-saves-modal" role="dialog" aria-modal="true" aria-labelledby="mga-modal-title">
+    <div class="mga-modal-dialog">
+      <div class="mga-modal-header">
+        <span id="mga-modal-title" class="mga-modal-title">💾 PARTIDAS SALVAS (15 SLOTS)</span>
+        <button id="mga-modal-close" class="mga-modal-close" type="button" aria-label="Fechar">✕</button>
+      </div>
+      <div class="mga-modal-actions">
+        <button id="mga-btn-quick-save" class="mga-btn-action" type="button">⚡ Quick Save</button>
+        <button id="mga-btn-quick-load" class="mga-btn-action" type="button">⚡ Quick Load</button>
+        <span style="font-size:10px;color:#888;margin-left:auto;">Toque em Salvar ou Carregar no slot desejado</span>
+      </div>
+      <div id="mga-slots-list" class="mga-slots-grid"></div>
+    </div>
+  </div>
+  <div id="mga-toast"></div>
 
 <script>
 (async()=>{
@@ -840,11 +889,26 @@
   // o progresso uns dos outros. O estado é salvo periodicamente e quando o
   // usuário troca de aplicativo/fecha a aba; ao voltar, é restaurado sozinho.
   // ---------------------------------------------------------------
+  // ---------------------------------------------------------------
+  // Gerenciador de Partidas: Sistema de Salvamento com 15 Slots + Auto-save
+  // Otimizado para telas touch/mobile e persistente em IndexedDB.
+  // ---------------------------------------------------------------
   const MGA_SAVE_DB='mga-progress-v1';
   const MGA_SAVE_STORE='states';
   const MGA_SAVE_KEY=`${romBase}:${core}`;
+  const MGA_TOTAL_SLOTS=15;
   let mgaSaveTimer=null;
   let mgaSaveBusy=false;
+
+  const showToast=(msg,duration=2600)=>{
+    const toast=document.getElementById('mga-toast');
+    if(!toast)return;
+    toast.textContent=msg;
+    toast.classList.add('show');
+    clearTimeout(toast._timer);
+    toast._timer=setTimeout(()=>toast.classList.remove('show'),duration);
+  };
+
   const openProgressDb=()=>new Promise((resolve,reject)=>{
     if(!window.indexedDB)return reject(new Error('IndexedDB indisponível'));
     const req=indexedDB.open(MGA_SAVE_DB,1);
@@ -852,6 +916,102 @@
     req.onsuccess=()=>resolve(req.result);
     req.onerror=()=>reject(req.error||new Error('Falha no banco de progresso'));
   });
+
+  const getSlotKey=slot=>`${MGA_SAVE_KEY}:slot_${slot}`;
+
+  const getLastSlot=()=>{
+    const val=parseInt(localStorage.getItem(`mga_last_slot_${romBase}`)||'1',10);
+    return isNaN(val)||val<1||val>MGA_TOTAL_SLOTS?1:val;
+  };
+
+  const setLastSlot=slot=>{
+    try{localStorage.setItem(`mga_last_slot_${romBase}`,String(slot))}catch{}
+  };
+
+  const saveToSlot=async(slot,silent=false)=>{
+    const manager=window.EJS_emulator?.gameManager;
+    if(!manager||!started||mgaSaveBusy){
+      if(!silent)showToast('⚠️ O jogo ainda não iniciou!');
+      return false;
+    }
+    mgaSaveBusy=true;
+    try{
+      const state=manager.getState();
+      const db=await openProgressDb();
+      const now=Date.now();
+      const dateStr=new Date(now).toLocaleString('pt-BR');
+      const key=getSlotKey(slot);
+      const record={key,slot,rom:romBase,core,savedAt:now,dateStr,state:new Uint8Array(state)};
+      await new Promise((resolve,reject)=>{
+        const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
+        tx.objectStore(MGA_SAVE_STORE).put(record,key);
+        tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+      });
+      db.close();
+      setLastSlot(slot);
+      if(!silent)showToast(`💾 Partida salva no Slot ${slot}!`);
+      log(`Slot ${slot} salvo com sucesso`);
+      await renderSlotsList();
+      return true;
+    }catch(e){
+      log(`Progresso: falha ao salvar slot ${slot} (${e?.message||e})`);
+      if(!silent)showToast(`❌ Falha ao salvar slot ${slot}`);
+      return false;
+    }finally{
+      mgaSaveBusy=false;
+    }
+  };
+
+  const loadFromSlot=async(slot,silent=false)=>{
+    const manager=window.EJS_emulator?.gameManager;
+    if(!manager){
+      if(!silent)showToast('⚠️ Emulador não disponível');
+      return false;
+    }
+    try{
+      const db=await openProgressDb();
+      const key=getSlotKey(slot);
+      const saved=await new Promise((resolve,reject)=>{
+        const req=db.transaction(MGA_SAVE_STORE,'readonly').objectStore(MGA_SAVE_STORE).get(key);
+        req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+      });
+      db.close();
+      if(!saved?.state?.byteLength){
+        if(!silent)showToast(`⚠️ Slot ${slot} está vazio!`);
+        return false;
+      }
+      manager.loadState(new Uint8Array(saved.state));
+      setLastSlot(slot);
+      if(!silent)showToast(`🎮 Partida do Slot ${slot} carregada!`);
+      log(`Slot ${slot} restaurado`);
+      closeSavesModal();
+      return true;
+    }catch(e){
+      log(`Progresso: falha ao carregar slot ${slot} (${e?.message||e})`);
+      if(!silent)showToast(`❌ Falha ao carregar slot ${slot}`);
+      return false;
+    }
+  };
+
+  const deleteSlot=async(slot)=>{
+    try{
+      const db=await openProgressDb();
+      const key=getSlotKey(slot);
+      await new Promise((resolve,reject)=>{
+        const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
+        tx.objectStore(MGA_SAVE_STORE).delete(key);
+        tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+      });
+      db.close();
+      showToast(`🗑 Slot ${slot} apagado.`);
+      await renderSlotsList();
+      return true;
+    }catch(e){
+      log(`Progresso: falha ao apagar slot ${slot} (${e?.message||e})`);
+      return false;
+    }
+  };
+
   const saveProgress=async(silent=false)=>{
     const manager=window.EJS_emulator?.gameManager;
     if(!manager||!started||mgaSaveBusy)return false;
@@ -859,17 +1019,20 @@
     try{
       const state=manager.getState();
       const db=await openProgressDb();
+      const now=Date.now();
+      const dateStr=new Date(now).toLocaleString('pt-BR');
       await new Promise((resolve,reject)=>{
         const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
-        tx.objectStore(MGA_SAVE_STORE).put({state:new Uint8Array(state),savedAt:Date.now()},MGA_SAVE_KEY);
+        tx.objectStore(MGA_SAVE_STORE).put({state:new Uint8Array(state),savedAt:now,dateStr},MGA_SAVE_KEY);
         tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
       });
       db.close();
-      if(!silent)log('Progresso salvo automaticamente');
+      if(!silent)showToast('💾 Progresso salvo automaticamente');
       return true;
-    }catch(e){log('Progresso: falha ao salvar '+(e?.message||e));return false}
+    }catch(e){log('Progresso: falha ao salvar auto '+(e?.message||e));return false}
     finally{mgaSaveBusy=false}
   };
+
   const loadProgress=async()=>{
     const manager=window.EJS_emulator?.gameManager;
     if(!manager)return false;
@@ -884,9 +1047,131 @@
       manager.loadState(new Uint8Array(saved.state));
       log('Progresso anterior restaurado');
       return true;
-    }catch(e){log('Progresso: nenhum save restaurado ('+(e?.message||e)+')');return false}
+    }catch(e){log('Progresso: nenhum save auto restaurado ('+(e?.message||e)+')');return false}
   };
+
+  const renderSlotsList=async()=>{
+    const container=document.getElementById('mga-slots-list');
+    if(!container)return;
+    container.innerHTML='<div style="color:#00e5ff;font-size:12px;padding:8px;">Carregando slots...</div>';
+    try{
+      const db=await openProgressDb();
+      const recordsMap={};
+      await new Promise((resolve,reject)=>{
+        const tx=db.transaction(MGA_SAVE_STORE,'readonly');
+        const store=tx.objectStore(MGA_SAVE_STORE);
+        const req=store.openCursor();
+        req.onsuccess=e=>{
+          const cursor=e.target.result;
+          if(cursor){
+            const key=String(cursor.key);
+            if(key.startsWith(`${MGA_SAVE_KEY}:slot_`)){
+              const slotNum=parseInt(key.split(':slot_')[1],10);
+              recordsMap[slotNum]=cursor.value;
+            }else if(key===MGA_SAVE_KEY){
+              recordsMap['auto']=cursor.value;
+            }
+            cursor.continue();
+          }else{
+            resolve();
+          }
+        };
+        req.onerror=()=>reject(req.error);
+      });
+      db.close();
+
+      container.innerHTML='';
+
+      // Slot Automático
+      const autoSave=recordsMap['auto'];
+      const autoCard=document.createElement('div');
+      autoCard.className='mga-slot-card'+(autoSave?' has-data':'');
+      autoCard.style.borderLeft='3px solid #ffbb00';
+      autoCard.innerHTML=`
+        <div class="mga-slot-left">
+          <span class="mga-slot-badge" style="color:#ffbb00">⚡ SLOT AUTOMÁTICO (Auto-Save)</span>
+          <span class="mga-slot-time">${autoSave?('💾 '+ (autoSave.dateStr || new Date(autoSave.savedAt).toLocaleString('pt-BR'))):'Nenhum save automático ainda'}</span>
+        </div>
+        <div class="mga-slot-btns">
+          <button class="mga-btn-load" type="button" ${autoSave?'':'disabled'}>▶ Carregar</button>
+        </div>
+      `;
+      autoCard.querySelector('.mga-btn-load').onclick=()=>loadProgress();
+      container.appendChild(autoCard);
+
+      // Slots 1 a 15
+      for(let i=1;i<=MGA_TOTAL_SLOTS;i++){
+        const item=recordsMap[i];
+        const card=document.createElement('div');
+        card.className='mga-slot-card'+(item?' has-data':'');
+        const numStr=i<10?('0'+i):(''+i);
+        card.innerHTML=`
+          <div class="mga-slot-left">
+            <span class="mga-slot-badge">SLOT ${numStr}</span>
+            <span class="mga-slot-time">${item?('💾 '+(item.dateStr || new Date(item.savedAt).toLocaleString('pt-BR'))):'Vazio — livre para salvar'}</span>
+          </div>
+          <div class="mga-slot-btns">
+            <button class="mga-btn-save" type="button" title="Salvar progresso atual no slot ${i}">💾 Salvar</button>
+            <button class="mga-btn-load" type="button" title="Carregar progresso do slot ${i}" ${item?'':'disabled'}>▶ Carregar</button>
+            <button class="mga-btn-del" type="button" title="Excluir save do slot ${i}" ${item?'':'disabled'}>🗑</button>
+          </div>
+        `;
+        card.querySelector('.mga-btn-save').onclick=()=>saveToSlot(i);
+        card.querySelector('.mga-btn-load').onclick=()=>loadFromSlot(i);
+        card.querySelector('.mga-btn-del').onclick=()=>{
+          if(confirm(`Deseja apagar o save do Slot ${i}?`))deleteSlot(i);
+        };
+        container.appendChild(card);
+      }
+    }catch(e){
+      container.innerHTML=`<div style="color:#ff2b6d;font-size:12px;padding:8px;">Erro ao listar saves: ${e?.message||e}</div>`;
+    }
+  };
+
+  const openSavesModal=()=>{
+    const modal=document.getElementById('mga-saves-modal');
+    if(!modal)return;
+    modal.classList.add('open');
+    renderSlotsList();
+    if(screen.orientation?.lock){
+      screen.orientation.lock("landscape").catch(()=>{});
+    }
+  };
+
+  const closeSavesModal=()=>{
+    const modal=document.getElementById('mga-saves-modal');
+    if(modal)modal.classList.remove('open');
+  };
+
+  // Wire up saves controls
+  const btnSave=document.getElementById('btn-save');
+  const modalClose=document.getElementById('mga-modal-close');
+  const modal=document.getElementById('mga-saves-modal');
+  const btnQuickSave=document.getElementById('mga-btn-quick-save');
+  const btnQuickLoad=document.getElementById('mga-btn-quick-load');
+
+  if(btnSave)btnSave.addEventListener('click',openSavesModal);
+  if(modalClose)modalClose.addEventListener('click',closeSavesModal);
+  if(modal)modal.addEventListener('click',e=>{
+    if(e.target===modal)closeSavesModal();
+  });
+  if(btnQuickSave)btnQuickSave.addEventListener('click',()=>saveToSlot(getLastSlot()));
+  if(btnQuickLoad)btnQuickLoad.addEventListener('click',()=>loadFromSlot(getLastSlot()));
+
+  // Listen for open-saves message from parent window / top bar
+  window.addEventListener('message',e=>{
+    if(e.data?.type==='mga-open-saves')openSavesModal();
+  });
+
+  // Melhora resposta touch no celular e garante áudio ativo no primeiro toque
+  ['touchstart','touchend','click'].forEach(evt=>{
+    window.addEventListener(evt,()=>enableGameAudio(),{passive:true});
+  });
+
   window.MGA_saveProgress=()=>saveProgress(false);
+  window.MGA_openSaves=openSavesModal;
+  window.MGA_saveToSlot=saveToSlot;
+  window.MGA_loadFromSlot=loadFromSlot;
   document.addEventListener('visibilitychange',()=>{
     if(document.hidden)saveProgress(true);
   });
