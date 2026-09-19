@@ -321,14 +321,32 @@
         "font-family:monospace;color:#00e5ff;letter-spacing:1px;font-size:12px;text-shadow:0 0 8px #00e5ff;";
       bar.appendChild(brand);
 
+      const navActions = document.createElement("div");
+      navActions.style.cssText = "display:flex;align-items:center;gap:8px;";
+
+      const btnSaves = document.createElement("button");
+      btnSaves.type = "button";
+      btnSaves.textContent = "💾 Saves (1-15)";
+      btnSaves.title = "Gerenciar Partidas Salvas";
+      btnSaves.setAttribute("aria-label", "Partidas Salvas");
+      btnSaves.style.cssText =
+        "pointer-events:auto;height:34px;padding:0 12px;display:flex;align-items:center;justify-content:center;background:#0d001e;border:1px solid #00e5ff;box-shadow:0 0 8px #00e5ff55;color:#00e5ff;cursor:pointer;font-size:11px;font-weight:bold;font-family:monospace;border-radius:4px;";
+      btnSaves.onclick = () => {
+        const iframe = overlay.querySelector("iframe");
+        iframe?.contentWindow?.postMessage({ type: "mga-open-saves" }, "*");
+      };
+      navActions.appendChild(btnSaves);
+
       const close = document.createElement("button");
       close.type = "button";
       close.textContent = "✕";
       close.title = "Fechar";
       close.setAttribute("aria-label", "Fechar");
       close.style.cssText =
-        "pointer-events:auto;width:36px;height:36px;padding:0;display:grid;place-items:center;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;cursor:pointer;font-size:20px;font-weight:bold;line-height:1;font-family:Arial,sans-serif;";
-      bar.appendChild(close);
+        "pointer-events:auto;width:34px;height:34px;padding:0;display:grid;place-items:center;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;cursor:pointer;font-size:20px;font-weight:bold;line-height:1;font-family:Arial,sans-serif;border-radius:4px;";
+      navActions.appendChild(close);
+
+      bar.appendChild(navActions);
 
       const message = document.createElement("div");
       message.id = "mga-rom-message";
