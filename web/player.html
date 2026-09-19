@@ -112,19 +112,7 @@
        controles ganham uma faixa própria embaixo, sem cobrir a imagem.
        As medidas ficam em variáveis para o canvas e os botões usarem o mesmo
        cálculo e nunca se sobreporem. */
-    @media (hover:none) and (pointer:coarse) and (orientation:portrait){
-      body{
-        --mga-p-dpad:clamp(88px,26vw,128px);
-        --mga-p-floor:max(14px,env(safe-area-inset-bottom));
-        --mga-p-row:40px;               /* faixa de CRÉDITO/START */
-        --mga-p-band:calc(var(--mga-p-floor) + var(--mga-p-dpad) + var(--mga-p-row) + 6px);
-        /* Mantém a tela quadrada e presa logo acima dos controles. Quando há
-           espaço, o aumento acontece para cima sem deslocar os botões. */
-        --mga-p-game:calc(100dvh - var(--mga-p-band) - 2px);
-        --mga-p-top:max(0px,calc(100dvh - var(--mga-p-band) - var(--mga-p-game) - 2px));
-        /* O core desenha 4:3; este fator ocupa exatamente a faixa livre. */
-        --mga-p-scale:calc(var(--mga-p-game) * 1.333333 / 100dvw)
-      }
+    
       #game .ejs_virtualGamepad_parent{
         position:fixed!important;left:0!important;right:0!important;bottom:0!important;
         top:auto!important;height:var(--mga-p-band);
@@ -254,12 +242,10 @@
       #difficulty-setup .difficulty-actions{gap:8px}
       #difficulty-setup button{min-width:0;flex:1;padding:12px 8px}
     }
-    #portrait-lock{position:fixed;inset:0;z-index:100004;display:none;place-items:center;background:#030006;color:#00e5ff;text-align:center;padding:28px;box-sizing:border-box;font:700 16px/1.5 monospace}
-    #portrait-lock .portrait-lock-card{max-width:360px;border:1px solid #00e5ff66;background:rgba(5,0,11,.96);box-shadow:0 0 24px #00e5ff22;padding:28px 22px}
-    #portrait-lock strong{display:block;margin-bottom:12px;font-size:24px}
-    @media (hover:none) and (pointer:coarse) and (orientation:portrait){
-      #portrait-lock{display:grid}
-      #game,#loading-art,#status,#difficulty-setup,#manual-start,#player-controls,#debug{visibility:hidden!important}
+    
+    
+    
+    
     }
     #loading-art{position:fixed;inset:0;z-index:99990;background:#030006 url('/assets/game-loading-art.png') center/cover no-repeat;transition:opacity .35s ease;}
     #loading-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.62));}
@@ -293,7 +279,7 @@
   <div id="status">CARREGANDO...</div>
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
-  <div id="portrait-lock" role="alert"><div class="portrait-lock-card"><strong>GIRE O CELULAR</strong>Este jogo funciona somente na horizontal.<br>Vire o aparelho para continuar.</div></div>
+  
   <div id="player-controls">
     <button id="btn-fullscreen" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
     <button id="btn-close" type="button" title="Fechar" aria-label="Fechar">✕</button>
@@ -301,6 +287,11 @@
 
 <script>
 (async()=>{
+  try {
+    if (screen.orientation?.lock) {
+      screen.orientation.lock("landscape").catch(()=>{});
+    }
+  } catch {}
   const q=new URLSearchParams(location.search);
   const rom=q.get('rom');
   const biosUrl=q.get('bios')||'';
