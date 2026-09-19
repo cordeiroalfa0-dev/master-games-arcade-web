@@ -199,7 +199,7 @@
         width:min(100dvw,calc(100dvh * 1.333333))!important;
         height:100dvh!important;
         max-width:100dvw!important;max-height:100dvh!important;
-        object-fit:contain!important;z-index:1
+        object-fit:fill!important;z-index:1;transform:none!important
       }
       /* CRÉDITO/START centralizados na base com fundo semitransparente */
       #game .ejs_virtualGamepad_bottom{
@@ -726,11 +726,11 @@
     const parent=game?.querySelector('.ejs_canvas_parent');
     const canvas=game?.querySelector('canvas,video');
     if(!game||!parent||!canvas)return;
-    const height=game.getBoundingClientRect().height;
-    const scale=height*1.333333/Math.max(1,innerWidth);
-    parent.style.setProperty('height',`${height}px`,'important');
-    canvas.style.setProperty('height',`${height/scale}px`,'important');
-    canvas.style.setProperty('transform',`scaleY(${scale})`,'important');
+    parent.style.setProperty('height','100dvh','important');
+    parent.style.setProperty('top','0px','important');
+    canvas.style.setProperty('height','100dvh','important');
+    canvas.style.setProperty('transform','none','important');
+    canvas.style.setProperty('object-fit','fill','important');
   };
   addEventListener('resize',updateViewport,{passive:true});
   visualViewport?.addEventListener('resize',refreshAfterOrientation,{passive:true});
