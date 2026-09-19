@@ -235,7 +235,7 @@
     playerUrl.searchParams.set("name", cleanRomName(romName));
     // O player é alterado junto com o bridge; versionar a URL evita que o
     // navegador reutilize uma versão antiga que ainda exibia o menu RetroArch.
-    playerUrl.searchParams.set("v", "20260918-mobile-audit-v1");
+    playerUrl.searchParams.set("v", "20260918-horizontal-only-v5");
     if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
     if (biosName) playerUrl.searchParams.set("biosName", biosName);
 
@@ -286,6 +286,19 @@
   }
 
   function showWebPlayer(romName) {
+    try {
+      const el = document.documentElement;
+      const req = el.requestFullscreen || el.webkitRequestFullscreen;
+      if (req && !document.fullscreenElement) {
+        req.call(el).then(() => {
+          if (screen.orientation?.lock) {
+            screen.orientation.lock("landscape").catch(() => {});
+          }
+        }).catch(() => {});
+      } else if (screen.orientation?.lock) {
+        screen.orientation.lock("landscape").catch(() => {});
+      }
+    } catch {}
     return new Promise((resolve, reject) => {
       document.getElementById("mga-web-player")?.remove();
 
