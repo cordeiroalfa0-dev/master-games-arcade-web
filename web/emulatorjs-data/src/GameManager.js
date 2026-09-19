@@ -144,13 +144,13 @@ class EJS_GameManager {
             // Áudio no celular: 512 ms era grande demais e fazia o som atrasar
             // e "travar" quando o navegador reduzia o ritmo. 192 ms mantém o
             // buffer seguro sem atraso perceptível.
-            "audio_latency = 192\n" +
-            // Controle dinâmico da taxa: o RetroArch estica/encolhe levemente o
-            // áudio para acompanhar o vídeo, em vez de cortar o som (underrun).
+            // Configuração para evitar engasgos de áudio no FBNeo em celulares
+            "audio_latency = 256\n" +
             "audio_sync = true\n" +
             "audio_rate_control = true\n" +
-            "audio_rate_control_delta = 0.005\n" +
-            "audio_max_timing_skew = 0.05\n" +
+            "audio_rate_control_delta = 0.02\n" +
+            "audio_max_timing_skew = 0.20\n" +
+            "audio_resampler = \"linear\"\n" +
             "audio_volume = 0.0\n" +
             "video_top_portrait_viewport = false\n" +
             // Sem vsync o vídeo não segura o áudio quando o celular perde
