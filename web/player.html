@@ -55,9 +55,9 @@
        Tamanhos derivados da largura/altura da tela para nunca ficarem
        pequenos demais no celular nem gigantes no tablet. */
     #game .ejs_virtualGamepad_parent{
-      --mga-dpad:clamp(126px,38vw,204px);
-      --mga-btn:clamp(56px,15vw,84px);
-      --mga-gap:clamp(7px,2.4vw,16px);
+      --mga-dpad:clamp(112px,34vw,184px);
+      --mga-btn:clamp(48px,13.5vw,74px);
+      --mga-gap:clamp(6px,2.2vw,14px);
       --mga-side:max(12px,env(safe-area-inset-left));
       --mga-floor:max(14px,env(safe-area-inset-bottom));
       z-index:20;top:auto!important;bottom:0;height:auto;pointer-events:none
@@ -91,14 +91,14 @@
     /* CRÉDITO e START ficam numa faixa acima do direcional, sem disputar
        espaço com ele em telas estreitas. */
     #game .ejs_virtualGamepad_bottom{
-      left:0!important;right:0!important;margin-left:0!important;transform:none!important;justify-content:center;
+      left:50%!important;right:auto!important;margin-left:0!important;transform:translateX(-50%);
       width:auto!important;height:auto!important;display:flex;gap:clamp(8px,3vw,16px);
       bottom:calc(var(--mga-floor) + var(--mga-dpad) + 12px)
     }
     #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
       position:relative!important;left:auto!important;top:auto!important;
-      min-width:clamp(96px,28vw,140px);height:54px!important;line-height:54px!important;
-      font-size:13px!important;letter-spacing:1px;padding:0 16px;border-radius:27px;box-sizing:border-box
+      min-width:clamp(88px,26vw,124px);height:48px!important;line-height:48px!important;
+      font-size:12px!important;letter-spacing:1px;padding:0 14px;border-radius:24px;box-sizing:border-box
     }
     /* O botão de menu do EmulatorJS é filho direto de #game e herdava
        width/height 100% da regra acima, cobrindo a tela inteira com
@@ -114,9 +114,9 @@
        cálculo e nunca se sobreporem. */
     @media (hover:none) and (pointer:coarse) and (orientation:portrait){
       body{
-        --mga-p-dpad:clamp(126px,38vw,204px);
+        --mga-p-dpad:clamp(112px,34vw,184px);
         --mga-p-floor:max(14px,env(safe-area-inset-bottom));
-        --mga-p-row:62px;               /* faixa de CRÉDITO/START */
+        --mga-p-row:56px;               /* faixa de CRÉDITO/START */
         /* Reserva uma faixa maior no topo para afastar o jogo dos controles
            flutuantes do navegador/player em celulares estreitos. */
         --mga-p-top:max(52px,calc(env(safe-area-inset-top) + 44px));
@@ -143,7 +143,7 @@
         bottom:calc(var(--mga-p-floor) + var(--mga-p-dpad) + 10px)!important
       }
       #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
-        min-width:clamp(104px,32vw,156px);height:52px!important;line-height:52px!important
+        min-width:clamp(96px,30vw,140px);height:46px!important;line-height:46px!important
       }
       #game .ejs_canvas_parent{
         top:0!important;bottom:auto!important;left:0!important;
@@ -163,7 +163,7 @@
        para CRÉDITO/START, que assim nunca ficam sobre a tela do jogo. */
     @media (hover:none) and (pointer:coarse) and (orientation:landscape){
       body{
-        --mga-l-strip:clamp(56px,14dvh,74px);
+        --mga-l-strip:clamp(52px,13dvh,68px);
         /* Mantém uma margem real para os controles; antes o jogo ocupava
            toda a altura e acabava ficando grande demais na horizontal. */
         --mga-l-game:calc(100dvh - var(--mga-l-strip) - 8px)
@@ -177,9 +177,15 @@
         height:var(--mga-l-game)!important;
         margin-left:auto!important;margin-right:auto!important;transform:none!important
       }
+      /* Os controles NÃO podem ficar presos à caixa do jogo: em jogos
+         verticais ela é estreita e centralizada, o que jogava o direcional
+         e os botões para o meio da tela, por cima da imagem. O contêiner
+         dos controles passa a cobrir a tela inteira (fixed), então o
+         direcional ancora no canto esquerdo e os botões no canto direito. */
       #game .ejs_virtualGamepad_parent{
-        height:calc(var(--mga-l-strip) + clamp(112px,30vh,152px) + 12px);
-        background:linear-gradient(rgba(3,0,8,0),rgba(3,0,8,.55) 40%,rgba(3,0,8,.9))
+        position:fixed!important;inset:0!important;
+        width:100dvw!important;height:100dvh!important;
+        background:none
       }
       body.video-stretch #game .ejs_canvas_parent,
       body.video-stretch #game canvas,body.video-stretch #game video,
@@ -194,18 +200,28 @@
         bottom:max(6px,env(safe-area-inset-bottom))!important;gap:12px
       }
       #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
-        min-width:112px;height:46px!important;line-height:46px!important;font-size:12px!important
+        min-width:96px;height:40px!important;line-height:40px!important;font-size:11px!important
       }
-      /* Direcional e botões de ação sobem para não invadir a faixa */
-      #game .ejs_virtualGamepad_left,#game .ejs_virtualGamepad_right{
-        bottom:calc(var(--mga-l-strip) + 4px)
+      /* Direcional no canto esquerdo da TELA; botões no canto direito,
+         ambos acima da faixa de CRÉDITO/START. */
+      #game .ejs_virtualGamepad_left{
+        left:max(12px,env(safe-area-inset-left))!important;
+        bottom:calc(var(--mga-l-strip) + 4px)!important
+      }
+      #game .ejs_virtualGamepad_right{
+        left:auto!important;right:max(12px,env(safe-area-inset-right))!important;
+        bottom:calc(var(--mga-l-strip) + 4px)!important
+      }
+      /* CRÉDITO/START centralizados na faixa de baixo da TELA inteira */
+      #game .ejs_virtualGamepad_bottom{
+        left:0!important;right:0!important;transform:none!important;justify-content:center
       }
     }
     @media (orientation:landscape) and (max-height:600px){
       #game .ejs_virtualGamepad_parent{
-        --mga-dpad:clamp(108px,30vh,150px);
-        --mga-btn:clamp(50px,13vh,68px);
-        --mga-gap:clamp(6px,1.6vh,12px);
+        --mga-dpad:clamp(96px,26vh,132px);
+        --mga-btn:clamp(44px,11vh,58px);
+        --mga-gap:clamp(5px,1.4vh,10px);
         --mga-side:max(10px,env(safe-area-inset-left));
         --mga-floor:max(8px,env(safe-area-inset-bottom))
       }
