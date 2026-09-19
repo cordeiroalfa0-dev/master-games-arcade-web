@@ -112,7 +112,15 @@
        controles ganham uma faixa própria embaixo, sem cobrir a imagem.
        As medidas ficam em variáveis para o canvas e os botões usarem o mesmo
        cálculo e nunca se sobreporem. */
-    
+    @media (hover:none) and (pointer:coarse) and (orientation:portrait){
+      body{
+        --mga-p-dpad:clamp(112px,34vw,184px);
+        --mga-p-floor:max(14px,env(safe-area-inset-bottom));
+        --mga-p-top:calc(max(8px,env(safe-area-inset-top)) + 44px);
+        --mga-p-band:calc(var(--mga-p-dpad) + var(--mga-p-floor) + 66px);
+        --mga-p-game:calc(100dvh - var(--mga-p-top) - var(--mga-p-band));
+        --mga-p-scale:1;
+      }
       #game .ejs_virtualGamepad_parent{
         position:fixed!important;left:0!important;right:0!important;bottom:0!important;
         top:auto!important;height:var(--mga-p-band);
@@ -242,11 +250,6 @@
       #difficulty-setup .difficulty-actions{gap:8px}
       #difficulty-setup button{min-width:0;flex:1;padding:12px 8px}
     }
-    
-    
-    
-    
-    }
     #loading-art{position:fixed;inset:0;z-index:99990;background:#030006 url('/assets/game-loading-art.png') center/cover no-repeat;transition:opacity .35s ease;}
     #loading-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.62));}
     #loading-art.hidden{opacity:0;pointer-events:none;}
@@ -366,6 +369,9 @@
   const logs=[];
   let difficulty;
 
+  // Escapa texto vindo da URL antes de inserir em innerHTML (evita XSS via ?name=).
+  const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
   const difficultyStorageKey='mga-difficulty-mode-v1';
   const gameKey=(name||rom).replace(/\.(zip|7z|chd)$/i,'').toLowerCase();
   const readDifficulty=()=>{
@@ -385,7 +391,7 @@
     const current=readDifficulty();
     const panel=document.createElement('div');
     panel.id='difficulty-setup';
-    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${name||'Master Games Arcade'}</h1><p>Escolha o modo e ajuste a apresentação antes de iniciar. Os jogos para celular funcionam somente na horizontal.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div class="config-section"><div class="config-title">VÍDEO</div><div class="config-grid"><label>Paleta <select data-setting="palette"><option value="normal">Normal</option><option value="cool">Fria</option><option value="amber">Âmbar</option><option value="soft">Suave</option></select></label><label><input type="checkbox" data-setting="scanlines"> Scanlines</label><label><input type="checkbox" data-setting="vignette"> Vinheta</label><label><input type="checkbox" data-setting="integer"> Escala inteira</label><label><input type="checkbox" data-setting="shader"> Shader SABR</label></div></div><div class="config-section"><div class="config-title">CONTROLES</div><div class="controls-note"><b>P1:</b> Shift/5 crédito · Enter/1 entrar · setas + Z/X/A/S jogar.<br><b>P2:</b> só entra quando solicitado · C/V ou 6/2 crédito/START.<br>Segundo controle USB continua disponível.</div></div><div style="margin-top:18px;color:#aaa;font-size:10px">DIP switches são aplicados quando o core expõe a opção.</div></div>`;
+    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${esc(name||'Master Games Arcade')}</h1><p>Escolha o modo e ajuste a apresentação antes de iniciar. Os jogos para celular funcionam somente na horizontal.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div class="config-section"><div class="config-title">VÍDEO</div><div class="config-grid"><label>Paleta <select data-setting="palette"><option value="normal">Normal</option><option value="cool">Fria</option><option value="amber">Âmbar</option><option value="soft">Suave</option></select></label><label><input type="checkbox" data-setting="scanlines"> Scanlines</label><label><input type="checkbox" data-setting="vignette"> Vinheta</label><label><input type="checkbox" data-setting="integer"> Escala inteira</label><label><input type="checkbox" data-setting="shader"> Shader SABR</label></div></div><div class="config-section"><div class="config-title">CONTROLES</div><div class="controls-note"><b>P1:</b> Shift/5 crédito · Enter/1 entrar · setas + Z/X/A/S jogar.<br><b>P2:</b> só entra quando solicitado · C/V ou 6/2 crédito/START.<br>Segundo controle USB continua disponível.</div></div><div style="margin-top:18px;color:#aaa;font-size:10px">DIP switches são aplicados quando o core expõe a opção.</div></div>`;
     const palette=panel.querySelector('[data-setting="palette"]');
     palette.value=visual.palette;
     for(const key of ['scanlines','vignette','integer'])panel.querySelector(`[data-setting="${key}"]`).checked=!!visual[key];
@@ -430,6 +436,7 @@
   // Migra somente esse modo; preferências explícitas 4:3/stretch continuam.
   visual.aspect='stretch';
   // Em telas de toque (celular) scanlines e vinheta ficam sempre desligados.
+  // (Única declaração de isTouchDevice: a duplicada foi removida.)
   const isTouchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
   if(isTouchDevice){visual.scanlines=false;visual.vignette=false;}
   const applyVisual=()=>{
@@ -449,7 +456,6 @@
   };
   const visualHelp=()=>log('Vídeo: F1 shader SABR | F2 scanlines | F3 escala inteira | F5 paleta | F6 brilho | F7 contraste | F8 saturação | F10 vinheta');
   applyVisual();
-  const isTouchDevice=typeof navigator!=="undefined"&&((navigator.maxTouchPoints>0)||window.matchMedia?.("(pointer:coarse)").matches);
   let pixelEnhancement=!isTouchDevice;
   const applyPixelEnhancement=()=>{
     const emulator=window.EJS_emulator;
@@ -701,8 +707,9 @@
     }
     if(e.key==='F9'||e.code==='F9'){
       e.preventDefault();
-      const debug=document.getElementById('debug');
-      if(debug) debug.style.display=debug.style.display==='none'?'block':'none';
+      // O #debug começa oculto pelo CSS (não por style inline), então o estado
+      // real precisa vir de getComputedStyle; senão o 1º F9 não fazia nada.
+      debug.style.display=getComputedStyle(debug).display==='none'?'block':'none';
     }
     if(e.key==='F1'){e.preventDefault();pixelEnhancement=!pixelEnhancement;applyPixelEnhancement();}
     if(e.key==='F2'){e.preventDefault();visual.scanlines=!visual.scanlines;applyVisual();log('Scanlines: '+(visual.scanlines?'ligadas':'desligadas'));}
@@ -1137,7 +1144,7 @@
         container.appendChild(card);
       }
     }catch(e){
-      container.innerHTML=`<div style="color:#ff2b6d;font-size:12px;padding:8px;">Erro ao listar saves: ${e?.message||e}</div>`;
+      container.innerHTML=`<div style="color:#ff2b6d;font-size:12px;padding:8px;">Erro ao listar saves: ${esc(e?.message||e)}</div>`;
     }
   };
 
