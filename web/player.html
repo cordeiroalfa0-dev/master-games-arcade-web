@@ -1420,6 +1420,7 @@
     setTimeout(()=>{
       if(!started){
         attempting=false;
+        if(!window.EJS_startOnLoaded)showManualStart();
         log('O core ainda não iniciou; nova tentativa poderá ser feita manualmente.');
       }
     },5000);
