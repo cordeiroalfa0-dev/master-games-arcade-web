@@ -163,10 +163,10 @@
        para CRÉDITO/START, que assim nunca ficam sobre a tela do jogo. */
     @media (hover:none) and (pointer:coarse) and (orientation:landscape){
       body{
-        --mga-l-strip:clamp(52px,13dvh,68px);
-        /* Mantém uma margem real para os controles; antes o jogo ocupava
-           toda a altura e acabava ficando grande demais na horizontal. */
-        --mga-l-game:calc(100dvh - var(--mga-l-strip) - 8px)
+        --mga-l-strip:clamp(44px,10dvh,56px);
+        /* Faixa menor e margem menor: a tela do jogo fica um pouco maior
+           sem invadir o espaço dos controles nas laterais. */
+        --mga-l-game:calc(100dvh - var(--mga-l-strip) - 2px)
       }
       /* Centraliza SEM transform: um transform aqui faz o contêiner "fixed"
          dos controles ficar preso à caixa do jogo em vez da tela inteira,
