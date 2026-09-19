@@ -70,6 +70,14 @@
       backdrop-filter:blur(2px);-webkit-tap-highlight-color:transparent;transition:background .08s,transform .08s
     }
     #game .ejs_virtualGamepad_button_down{background:rgba(0,229,255,.5)!important;border-color:#fff!important;transform:scale(.94)}
+    /* Modo leve: reduz composição GPU em celulares sem alterar o layout dos controles. */
+    @media (hover:none) and (pointer:coarse){
+      #game .ejs_virtualGamepad_button,
+      .mga-ctrl-btn,#btn-save,#btn-fullscreen,#mga-saves-modal{
+        backdrop-filter:none;-webkit-backdrop-filter:none;box-shadow:none;text-shadow:none;transition:none
+      }
+      #game .ejs_virtualGamepad_button{border-width:1px}
+    }
     /* Direcional */
     #game .ejs_virtualGamepad_left{bottom:var(--mga-floor);left:var(--mga-side);width:var(--mga-dpad);height:var(--mga-dpad)}
     #game .ejs_dpad_main{opacity:.88}
@@ -383,6 +391,28 @@
   const logs=[];
   let difficulty;
 
+  // Ative a janela de partidas antes de qualquer await ou inicialização do
+  // emulador. Assim o botão Saves continua funcionando mesmo se o core/BIOS
+  // travar ou falhar antes de terminar o restante deste script.
+  const earlySavesModal=document.getElementById('mga-saves-modal');
+  const earlySavesButton=document.getElementById('btn-save');
+  const earlySavesClose=document.getElementById('mga-modal-close');
+  const earlyOpenSaves=()=>{
+    if(!earlySavesModal)return;
+    earlySavesModal.classList.add('open');
+    window.MGA_refreshSaves?.();
+  };
+  const earlyCloseSaves=()=>earlySavesModal?.classList.remove('open');
+  earlySavesButton?.addEventListener('click',earlyOpenSaves);
+  earlySavesClose?.addEventListener('click',earlyCloseSaves);
+  earlySavesModal?.addEventListener('click',e=>{
+    if(e.target===earlySavesModal)earlyCloseSaves();
+  });
+  window.MGA_openSaves=earlyOpenSaves;
+  window.addEventListener('message',e=>{
+    if(e.data?.type==='mga-open-saves')earlyOpenSaves();
+  });
+
   // Escapa texto vindo da URL antes de inserir em innerHTML (evita XSS via ?name=).
   const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
@@ -595,9 +625,9 @@
   // público). O CDN só é usado como failsafe automático (emulator.js já
   // tenta cdn.emulatorjs.org sozinho se algum arquivo local faltar).
   window.EJS_pathtodata='/web/emulatorjs-data/';
-  // Iniciar automaticamente: o usuário deve ver diretamente o jogo, sem a
-  // tela/botão do EmulatorJS.
-  window.EJS_startOnLoaded=true;
+  // No touch, aguarde o toque explícito do usuário para reduzir a corrida de
+  // inicialização e liberar áudio/tela cheia no gesto que inicia o jogo.
+  window.EJS_startOnLoaded=!isTouchDevice;
   window.EJS_alignStartButton='center';
   window.EJS_language='en-US';
   window.EJS_disableAutoLang=true;
@@ -914,7 +944,9 @@
   // No celular o som pode ser suspenso sozinho (chamada, notificação, tela
   // apagada) e não volta mais: o jogo continua mas o áudio fica "travado".
   // Este vigia religa o contexto de áudio assim que ele sai do ar.
-  setInterval(()=>{
+  // No celular, visibilitychange/focus/pageshow já cobrem a retomada sem
+  // manter um loop periódico concorrendo com o core.
+  if(!isTouchDevice)setInterval(()=>{
     if(document.hidden)return;
     const emu=window.EJS_emulator;
     const mod=emu?.gameManager?.Module||window.Module;
@@ -1185,25 +1217,16 @@
     if(modal)modal.classList.remove('open');
   };
 
+  // O listener do botão já foi instalado no início do script. Este callback
+  // apenas conecta a listagem dos 15 slots quando ela estiver disponível.
+  window.MGA_refreshSaves=renderSlotsList;
+
   // Wire up saves controls
-  const btnSave=document.getElementById('btn-save');
-  const modalClose=document.getElementById('mga-modal-close');
-  const modal=document.getElementById('mga-saves-modal');
   const btnQuickSave=document.getElementById('mga-btn-quick-save');
   const btnQuickLoad=document.getElementById('mga-btn-quick-load');
 
-  if(btnSave)btnSave.addEventListener('click',openSavesModal);
-  if(modalClose)modalClose.addEventListener('click',closeSavesModal);
-  if(modal)modal.addEventListener('click',e=>{
-    if(e.target===modal)closeSavesModal();
-  });
   if(btnQuickSave)btnQuickSave.addEventListener('click',()=>saveToSlot(getLastSlot()));
   if(btnQuickLoad)btnQuickLoad.addEventListener('click',()=>loadFromSlot(getLastSlot()));
-
-  // Listen for open-saves message from parent window / top bar
-  window.addEventListener('message',e=>{
-    if(e.data?.type==='mga-open-saves')openSavesModal();
-  });
 
   // ===============================================================
   // MELHORIAS MOBILE: Haptic Feedback, Pausa Rápida, Opacidade & Anti-Gestos
@@ -1287,11 +1310,6 @@
     requestWakeLock();
   }, { passive: true, capture: true });
 
-  // Melhora resposta touch no celular e garante áudio ativo no primeiro toque
-  ['touchstart','touchend','click'].forEach(evt=>{
-    window.addEventListener(evt,()=>enableGameAudio(),{passive:true});
-  });
-
   window.MGA_saveProgress=()=>saveProgress(false);
   window.MGA_openSaves=openSavesModal;
   window.MGA_saveToSlot=saveToSlot;
@@ -1324,17 +1342,17 @@
     }
     hide();
     log('Arcade/FBNeo iniciou o jogo');
-    [0,120,500,1200].forEach(ms=>setTimeout(fitMobileGameViewport,ms));
+    [0,250,1000].forEach(ms=>setTimeout(fitMobileGameViewport,ms));
     applyDifficultyToCore();
     // Garante o som logo ao entrar no jogo (e de novo depois, pois o core
     // cria o contexto de áudio poucos instantes após o start).
     enableGameAudio();
-    [200,800,2000,4000].forEach(ms=>setTimeout(enableGameAudio,ms));
+    [300,1200].forEach(ms=>setTimeout(enableGameAudio,ms));
     // Restaura o último ponto alguns instantes após o core criar o estado;
     // depois mantém um checkpoint automático. O salvamento congela o core por
     // um instante e cortava o som, então ele agora é mais espaçado e só roda
     // com o jogo em primeiro plano.
-    setTimeout(()=>loadProgress(),2500);
+    if(!isTouchDevice)setTimeout(()=>loadProgress(),2500);
     if(!isTouchDevice){
       if(mgaSaveTimer)clearInterval(mgaSaveTimer);
       mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);
@@ -1443,12 +1461,16 @@
 
   window.EJS_ready=()=>{
     ready=true;
-    log('EmulatorJS pronto; o jogo será iniciado automaticamente');
-    // Algumas versões do EmulatorJS exibem o menu RetroArch mesmo com
-    // startOnLoad=true. Acione o botão interno uma vez como fallback, antes
-    // de ocultar a camada de controles.
+    log(window.EJS_startOnLoaded
+      ? 'EmulatorJS pronto; o jogo será iniciado automaticamente'
+      : 'EmulatorJS pronto; aguardando toque para iniciar no celular');
+    // No celular, tente o botão interno apenas se ele já existir; caso
+    // contrário, mostre o botão manual sem manter uma tentativa concorrente.
     setTimeout(()=>{
-      if(!started&&!attempting&&!window.EJS_startOnLoaded) tryStart();
+      if(!started&&!attempting&&!window.EJS_startOnLoaded){
+        const didStart=tryStart();
+        if(!didStart)showManualStart();
+      }
     },700);
     hideEmulatorUi();
     setTimeout(hideEmulatorUi,300);
