@@ -389,7 +389,8 @@
   };
   const visualHelp=()=>log('Vídeo: F1 shader SABR | F2 scanlines | F3 escala inteira | F5 paleta | F6 brilho | F7 contraste | F8 saturação | F10 vinheta');
   applyVisual();
-  let pixelEnhancement=true;
+  const isTouchDevice=typeof navigator!=="undefined"&&((navigator.maxTouchPoints>0)||window.matchMedia?.("(pointer:coarse)").matches);
+  let pixelEnhancement=!isTouchDevice;
   const applyPixelEnhancement=()=>{
     const emulator=window.EJS_emulator;
     if(!emulator?.enableShader)return;
@@ -927,8 +928,10 @@
     // um instante e cortava o som, então ele agora é mais espaçado e só roda
     // com o jogo em primeiro plano.
     setTimeout(()=>loadProgress(),2500);
-    if(mgaSaveTimer)clearInterval(mgaSaveTimer);
-    mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);
+    if(!isTouchDevice){
+      if(mgaSaveTimer)clearInterval(mgaSaveTimer);
+      mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);
+    }
     // O shader só pode ser ativado depois de o contexto gráfico do core existir.
     setTimeout(applyPixelEnhancement,0);
     goFullscreen();
