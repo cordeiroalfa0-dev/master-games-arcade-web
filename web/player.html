@@ -121,6 +121,9 @@
         --mga-p-game:calc(100dvh - var(--mga-p-top) - var(--mga-p-band));
         --mga-p-scale:1;
       }
+      body.mga-embedded{
+        --mga-p-top:calc(max(8px,env(safe-area-inset-top)) + var(--mga-header-h) + 44px);
+      }
       #game .ejs_virtualGamepad_parent{
         position:fixed!important;left:0!important;right:0!important;bottom:0!important;
         top:auto!important;height:var(--mga-p-band);
@@ -275,7 +278,18 @@
       #difficulty-setup label:has([data-setting="vignette"]){display:none!important}
     }
 
-    :root{--mga-pad-opacity:0.75;}
+    /* Dentro do launcher (iframe) o cabeçalho externo já tem Saves (1-15) e
+       Fechar e fica por cima do canto superior direito. Então o botão Saves
+       interno some (o externo abre o mesmo painel via postMessage) e os demais
+       botões descem para logo abaixo do cabeçalho. Ajuste --mga-header-h (ou
+       use ?headerH=NN na URL) se o cabeçalho tiver outra altura. */
+    body.mga-embedded #btn-save{display:none!important}
+    body.mga-embedded #player-controls{
+      top:calc(max(8px,env(safe-area-inset-top)) + var(--mga-header-h));
+      right:max(10px,env(safe-area-inset-right))
+    }
+
+    :root{--mga-pad-opacity:0.75;--mga-header-h:52px;}
     html,body,#game{overscroll-behavior:none!important;-webkit-overscroll-behavior:none!important;-webkit-touch-callout:none}
     #game .ejs_virtualGamepad_parent{opacity:var(--mga-pad-opacity,0.75)!important;transition:opacity .2s ease}
 
@@ -439,6 +453,14 @@
   // (Única declaração de isTouchDevice: a duplicada foi removida.)
   const isTouchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
   if(isTouchDevice){visual.scanlines=false;visual.vignette=false;}
+  // Rodando dentro do launcher (iframe)? Então o cabeçalho externo cobre o topo.
+  let embedded=false;
+  try{embedded=window.self!==window.top}catch{embedded=true}
+  document.body.classList.toggle('mga-embedded',embedded);
+  {
+    const headerH=parseInt(q.get('headerH')||'',10);
+    if(embedded&&headerH>0)document.documentElement.style.setProperty('--mga-header-h',headerH+'px');
+  }
   const applyVisual=()=>{
     document.body.classList.toggle('video-auto',visual.aspect==='auto');
     document.body.classList.toggle('video-aspect-43',visual.aspect==='4:3');
