@@ -12,4 +12,5 @@ assert.equal((source.match(/addEventListener\('click',earlyOpenSaves\)/g) || [])
 assert.match(source, /window\.MGA_refreshSaves=renderSlotsList/);
 assert.match(source, /setTimeout\(\(\)=>loadProgress\(\),isTouchDevice\?3500:2500\)/, 'restauração automática precisa existir no celular');
 assert.match(source, /if\(!isTouchDevice\)\{\s*if\(mgaSaveTimer\)clearInterval\(mgaSaveTimer\)/, 'timer periódico deve continuar limitado ao desktop');
+assert.match(source, /body\.mga-embedded #btn-save\{display:flex!important\}/, 'botão de save precisa aparecer no celular horizontal embutido');
 console.log('PASS saves-regression: botão e janela são ativados antes do primeiro await');

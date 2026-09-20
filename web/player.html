@@ -286,6 +286,13 @@
       #difficulty-setup label:has([data-setting="vignette"]){display:none!important}
     }
 
+    /* Em horizontal mobile, o cabeçalho externo pode ficar oculto pelo modo
+       tela cheia. Mantenha o botão de salvar acessível dentro do player. */
+    @media (hover:none) and (pointer:coarse) and (orientation:landscape){
+      body.mga-embedded #btn-save{display:flex!important}
+      body.mga-embedded #player-controls{gap:4px;right:max(8px,env(safe-area-inset-right))}
+    }
+
     /* Dentro do launcher (iframe) o cabeçalho externo já tem Saves (1-15) e
        Fechar e fica por cima do canto superior direito. Então o botão Saves
        interno some (o externo abre o mesmo painel via postMessage) e os demais
