@@ -304,6 +304,19 @@
       right:max(10px,env(safe-area-inset-right))
     }
 
+    /* Em tela cheia horizontal o cabeçalho externo pode ficar fora da área
+       visível ou ser ocultado pelo navegador. Nesse caso o botão interno é a
+       alternativa de acesso aos mesmos 15 slots de save. Esta regra precisa
+       ficar depois da regra geral de iframe para vencer o display:none. */
+    @media (hover:none) and (pointer:coarse) and (orientation:landscape){
+      body.mga-embedded #btn-save{display:flex!important}
+      body.mga-embedded #player-controls{
+        top:max(8px,env(safe-area-inset-top));
+        right:max(8px,env(safe-area-inset-right));
+        gap:4px
+      }
+    }
+
     :root{--mga-pad-opacity:0.75;--mga-header-h:52px;}
     html,body,#game{overscroll-behavior:none!important;-webkit-overscroll-behavior:none!important;-webkit-touch-callout:none}
     #game .ejs_virtualGamepad_parent{opacity:var(--mga-pad-opacity,0.75)!important;transition:opacity .2s ease}
