@@ -1,62 +1,29 @@
-# Master Games Arcade Web
+# Welcome to your Lovable project
 
-Versão Web do Master Games Arcade.
+This project was built with [Lovable](https://lovable.dev).
 
-## Objetivo
+## Build with Lovable
 
-Migrar o launcher atual para execução no navegador com WebAssembly, preservando ao máximo a interface, imagens, identidade visual, catálogo e experiência original.
+Open your project in the [Lovable editor](https://lovable.dev) and keep building.
 
-## Regra da migração
+- **Ship faster**: describe what you want to build and Lovable handles the code.
+- **Stay in sync**: connect the project to GitHub and every change made in Lovable is committed straight to your repository.
+- **Full ownership**: this code is yours. Push to your repository and your changes sync back into Lovable, ready for your next prompt.
 
-**Preservar primeiro, limpar depois.** Não redesenhar o launcher nem remover arquivos reutilizáveis sem necessidade.
+## Development
 
-### Será preservado quando tecnicamente possível
+Prefer working locally? You need Node.js and npm — [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating).
 
-- Interface e layout atuais
-- Logos, imagens, capas e fundos
-- Cores, fontes e identidade visual
-- Menus, botões, textos e animações
-- Catálogo e dados reutilizáveis
-- Controles e experiência de arcade
+```sh
+git clone <this-repository-url>
+cd <repository-name>
+npm i
+npm run dev
+```
 
-### Será substituído somente quando necessário
+## Built with
 
-- MAME nativo `.exe` → emulação WebAssembly
-- Electron/IPC → APIs do navegador
-- Controles nativos → Keyboard/Gamepad API
-- Persistência local nativa → IndexedDB/Cache quando necessário
-
-## Emulador web
-
-A execução principal no navegador usa o core **Arcade do EmulatorJS**, compatível com o
-conjunto **FinalBurn Alpha (FBA) v0.2.97.42**. Esse core não é o MAME Plus! 0.168.2:
-ROMs precisam pertencer ao conjunto FBA indicado e as BIOS exigidas precisam manter os
-nomes esperados pelo core, como `neogeo.zip` e `pgm.zip`. Um ROM set do MAME 0.168.2
-pode funcionar no aplicativo nativo, mas não deve ser misturado com o core Arcade web.
-
-O player fornece as BIOS pela opção oficial `EJS_biosUrl`; não copia a mesma BIOS para
-pastas internas do FBNeo. Para usar MAME Plus! 0.168.2 de verdade no navegador seria
-necessário publicar e manter um build WebAssembly específico desse executável e usar um
-ROM set correspondente, em vez do core Arcade atual.
-
-## Recursos integrados
-
-O catálogo `roms-manifest.json`, o endpoint estático `roms-catalog.json` e o mapa de títulos `game-titles.json` são mantidos localmente para reduzir dependências externas. O EmulatorJS e os cores FBNeo são self-hosted em `web/emulatorjs-data/`, com fallback controlado para o CDN oficial.
-
-Antes de publicar, execute `node tests/web-integrity.mjs` para verificar os manifestos, o player e os assets WebAssembly.
-
-## Modos de dificuldade
-
-Ao abrir uma ROM no player web, o launcher exibe as opções **Fácil** e **Difícil** antes de iniciar o emulador. A escolha é salva por jogo no `localStorage` (`mga-difficulty-mode-v1`) e fica disponível em `window.MGA_difficulty`. Depois que o core inicia, o player lê `getCoreOptions()` e chama `ejs_set_variable` para aplicar opções expostas pelo FBNeo relacionadas a dificuldade, vidas e continues.
-
-O arquivo `difficulty-profiles.generated.json` mantém sugestões separadas para os dois modos. No perfil Fácil, a sugestão padrão é usar cinco vidas e continues habilitados; no perfil Difícil, duas vidas e continues desabilitados. Como os DIP switches são específicos de cada driver, o player aplica somente opções realmente expostas pelo core; quando a ROM não oferece essas opções, o diagnóstico informa que o modo não pôde ser aplicado, sem fingir uma alteração.
-
-## Hospedagem planejada
-
-Frontend: Vercel.
-
-ROMs: armazenamento separado/CDN, evitando colocar vários GB de ROMs dentro do repositório ou no deploy da Vercel.
-
-## Fonte
-
-O projeto reconstruído enviado anteriormente é usado como referência visual e funcional. O repositório original `master-games-arcade-system` permanece separado e não é alterado durante esta migração.
+- TanStack Start
+- TypeScript
+- React
+- Tailwind CSS
