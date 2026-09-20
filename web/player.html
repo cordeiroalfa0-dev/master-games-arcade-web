@@ -1348,11 +1348,13 @@
     // cria o contexto de áudio poucos instantes após o start).
     enableGameAudio();
     [300,1200].forEach(ms=>setTimeout(enableGameAudio,ms));
-    // Restaura o último ponto alguns instantes após o core criar o estado;
-    // depois mantém um checkpoint automático. O salvamento congela o core por
-    // um instante e cortava o som, então ele agora é mais espaçado e só roda
-    // com o jogo em primeiro plano.
-    if(!isTouchDevice)setTimeout(()=>loadProgress(),2500);
+    // Restaura o último ponto em qualquer dispositivo. O core precisa de um
+    // pouco mais de tempo no celular para criar o estado antes do loadState;
+    // deixar esse caminho fora do touch fazia o jogo reabrir sempre do zero.
+    setTimeout(()=>loadProgress(),isTouchDevice?3500:2500);
+    // No celular não mantemos um timer periódico: além de consumir bateria,
+    // getState pode interromper o áudio. Os saves por troca de app/aba e os
+    // slots manuais continuam ativos; no desktop, o checkpoint segue espaçado.
     if(!isTouchDevice){
       if(mgaSaveTimer)clearInterval(mgaSaveTimer);
       mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);

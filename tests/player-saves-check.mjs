@@ -10,4 +10,6 @@ assert.ok(firstAwait >= 0 && early < firstAwait, 'Saves precisa ser ativado ante
 assert.ok(laterWire > early, 'bloco posterior de saves não encontrado');
 assert.equal((source.match(/addEventListener\('click',earlyOpenSaves\)/g) || []).length, 1, 'listener do botão Saves duplicado');
 assert.match(source, /window\.MGA_refreshSaves=renderSlotsList/);
+assert.match(source, /setTimeout\(\(\)=>loadProgress\(\),isTouchDevice\?3500:2500\)/, 'restauração automática precisa existir no celular');
+assert.match(source, /if\(!isTouchDevice\)\{\s*if\(mgaSaveTimer\)clearInterval\(mgaSaveTimer\)/, 'timer periódico deve continuar limitado ao desktop');
 console.log('PASS saves-regression: botão e janela são ativados antes do primeiro await');
