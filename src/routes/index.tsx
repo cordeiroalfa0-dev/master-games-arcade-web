@@ -45,14 +45,37 @@ function Index() {
         }
 
         main > aside > div.flex-1.overflow-y-auto {
+          display: block !important;
+          overflow-x: hidden !important;
+          overflow-y: auto !important;
           min-height: 0 !important;
-          overscroll-behavior: contain;
+          overscroll-behavior-y: contain;
+          -webkit-overflow-scrolling: touch;
+          touch-action: pan-y !important;
+          pointer-events: auto !important;
+          scrollbar-width: thin;
+          scrollbar-color: rgba(0, 229, 255, 0.7) rgba(0, 0, 0, 0.35);
+        }
+
+        main > aside > div.flex-1.overflow-y-auto::-webkit-scrollbar {
+          width: 8px;
+        }
+
+        main > aside > div.flex-1.overflow-y-auto::-webkit-scrollbar-track {
+          background: rgba(0, 0, 0, 0.35);
+        }
+
+        main > aside > div.flex-1.overflow-y-auto::-webkit-scrollbar-thumb {
+          background: rgba(0, 229, 255, 0.7);
+          border-radius: 999px;
+          border: 1px solid rgba(0, 0, 0, 0.45);
         }
 
         main > aside > div.flex-1.overflow-y-auto > button {
           padding: 7px 10px !important;
           font-size: clamp(11px, 2.15vw, 14px) !important;
           line-height: 1.2 !important;
+          touch-action: pan-y !important;
         }
 
         main > aside input[placeholder="Buscar (fuzzy)..."] {
