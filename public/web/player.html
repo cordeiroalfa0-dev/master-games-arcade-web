@@ -264,6 +264,8 @@
     #loading-art{position:fixed;inset:0;z-index:99990;background:#030006 url('/assets/game-loading-art.png') center/cover no-repeat;transition:opacity .35s ease;}
     #loading-art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18),rgba(0,0,0,.62));}
     #loading-art.hidden{opacity:0;pointer-events:none;}
+    #mga-rotate-warning{position:fixed;inset:0;z-index:100020;display:none;place-items:center;background:rgba(3,0,8,.96);color:#00e5ff;text-align:center;padding:24px;box-sizing:border-box;font:bold 16px monospace;line-height:1.6;text-shadow:0 0 10px #00e5ff}
+    #mga-rotate-warning.show{display:grid!important}
     @media (orientation:portrait), (max-aspect-ratio:3/4){
       #loading-art{background-image:url('/assets/game-loading-art-portrait.png');}
       #difficulty-setup{background-image:linear-gradient(rgba(3,0,6,.68),rgba(3,0,6,.82)),url('/assets/game-loading-art-portrait.png');}
@@ -364,6 +366,7 @@
 <body>
   <div id="game"></div>
   <div id="loading-art" aria-label="Imagem de carregamento"></div>
+  <div id="mga-rotate-warning" role="status">GIRE O CELULAR<br><small style="color:#fff;font-size:12px">Este jogo funciona na horizontal.</small></div>
   <div id="status">CARREGANDO...</div>
   <pre id="debug"></pre>
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
@@ -411,6 +414,7 @@
   const loadingArt=document.getElementById('loading-art');
   const debug=document.getElementById('debug');
   const manual=document.getElementById('manual-start');
+  const rotateWarning=document.getElementById('mga-rotate-warning');
   const logs=[];
   let difficulty;
 
@@ -560,6 +564,15 @@
     fail('ROM NÃO INFORMADA');
     return;
   }
+
+  const updateRotationNotice=()=>{
+    const portrait=isTouchDevice&&matchMedia('(orientation:portrait)').matches;
+    rotateWarning?.classList.toggle('show',portrait);
+    document.body.classList.toggle('mga-portrait-blocked',portrait);
+  };
+  updateRotationNotice();
+  addEventListener('resize',updateRotationNotice,{passive:true});
+  addEventListener('orientationchange',updateRotationNotice,{passive:true});
 
   const romUrl=new URL(rom,location.origin).href;
   log('Jogo: '+name);
@@ -795,7 +808,7 @@
     if(e.key==='F10'){e.preventDefault();visual.vignette=!visual.vignette;applyVisual();log('Vinheta: '+(visual.vignette?'ligada':'desligada'));}
     if(e.key==='?'||e.key==='h'){e.preventDefault();visualHelp();}
     if(e.key==='Escape'&&!e.target.matches('input,textarea,button')){
-      try{parent.postMessage({type:'mga-emulator-exit'},location.origin)}catch{}
+      try{parent.postMessage({type:'mga-emulator-exit-requested'},location.origin)}catch{}
     }
   });
 
@@ -804,7 +817,7 @@
   const btnClose=document.getElementById('btn-close');
   const btnFullscreen=document.getElementById('btn-fullscreen');
   btnClose.addEventListener('click',()=>{
-    try{parent.postMessage({type:'mga-emulator-exit'},location.origin)}catch{}
+    try{parent.postMessage({type:'mga-emulator-exit-requested'},location.origin)}catch{}
   });
   btnFullscreen.addEventListener('click',goFullscreen);
 
@@ -1219,7 +1232,14 @@
     const manager=window.EJS_emulator?.gameManager;
     if(!manager||!started||mgaSaveBusy)return false;
     mgaSaveBusy=true;
+    const emulator=window.EJS_emulator;
+    const wasPaused=!!emulator?.paused;
     try{
+      if(!wasPaused){
+        if(typeof emulator?.pause==='function')emulator.pause(true);
+        else manager.toggleMainLoop?.(0);
+        await mgaSleep(150);
+      }
       const state=manager.getState();
       const db=await openProgressDb();
       const now=Date.now();
@@ -1233,7 +1253,15 @@
       if(!silent)showToast('💾 Progresso salvo automaticamente');
       return true;
     }catch(e){log('Progresso: falha ao salvar auto '+(e?.message||e));return false}
-    finally{mgaSaveBusy=false}
+    finally{
+      if(!wasPaused){
+        try{
+          if(typeof emulator?.play==='function')emulator.play(true);
+          else manager.toggleMainLoop?.(1);
+        }catch(e){log('Progresso: falha ao retomar após auto-save ('+(e?.message||e)+')')}
+      }
+      mgaSaveBusy=false
+    }
   };
 
   const loadProgress=async()=>{
@@ -1255,6 +1283,27 @@
       return true;
     }catch(e){log('Progresso: nenhum save auto restaurado ('+(e?.message||e)+')');return false}
   };
+
+  const saveAndExit=async()=>{
+    try{
+      closeSavesModal?.();
+      showToast('💾 Salvando antes de sair...',10000);
+      const deadline=Date.now()+5000;
+      while(mgaSaveBusy&&Date.now()<deadline)await mgaSleep(100);
+      const ok=await saveProgress(true);
+      parent.postMessage({
+        type:ok?'mga-emulator-save-complete':'mga-emulator-save-failed',
+        message:ok?'Partida salva com sucesso.':'Não foi possível salvar a partida.'
+      },location.origin);
+    }catch(e){
+      log('Progresso: falha ao salvar antes de sair '+(e?.message||e));
+      parent.postMessage({type:'mga-emulator-save-failed',message:'Falha ao salvar antes de sair.'},location.origin);
+    }
+  };
+  window.addEventListener('message',e=>{
+    if(e.source!==window.parent||e.origin!==location.origin)return;
+    if(e.data?.type==='mga-request-save-exit')saveAndExit();
+  });
 
   const renderSlotsList=async()=>{
     const container=document.getElementById('mga-slots-list');
@@ -1486,13 +1535,10 @@
     // pouco mais de tempo no celular para criar o estado antes do loadState;
     // deixar esse caminho fora do touch fazia o jogo reabrir sempre do zero.
     setTimeout(()=>loadProgress(),isTouchDevice?3500:2500);
-    // No celular não mantemos um timer periódico: além de consumir bateria,
-    // getState pode interromper o áudio. Os saves por troca de app/aba e os
-    // slots manuais continuam ativos; no desktop, o checkpoint segue espaçado.
-    if(!isTouchDevice){
-      if(mgaSaveTimer)clearInterval(mgaSaveTimer);
-      mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);
-    }
+    // Mantém um checkpoint periódico em qualquer dispositivo. A captura pausa
+    // o core por poucos milissegundos e evita depender de pagehide no celular.
+    if(mgaSaveTimer)clearInterval(mgaSaveTimer);
+    mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);
     // O shader só pode ser ativado depois de o contexto gráfico do core existir.
     setTimeout(applyPixelEnhancement,0);
     goFullscreen();

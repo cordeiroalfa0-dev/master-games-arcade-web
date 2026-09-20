@@ -235,19 +235,50 @@
     playerUrl.searchParams.set("name", cleanRomName(romName));
     // O player é alterado junto com o bridge; versionar a URL evita que o
     // navegador reutilize uma versão antiga que ainda exibia o menu RetroArch.
-    playerUrl.searchParams.set("v", "20260920-landscape-save-v6");
+    playerUrl.searchParams.set("v", "20260920-safe-exit-v6");
     if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
     if (biosName) playerUrl.searchParams.set("biosName", biosName);
 
     let closed = false;
+    let closeInProgress = false;
 
-    const closePlayer = () => {
+    const finishClose = () => {
       if (closed) return;
       closed = true;
+      closeInProgress = false;
       window.removeEventListener("message", onMessage);
       iframe.src = "about:blank";
       iframe.remove();
       overlay.remove();
+      try {
+        if (document.fullscreenElement) document.exitFullscreen?.().catch?.(() => {});
+      } catch {}
+      try { screen.orientation?.unlock?.(); } catch {}
+    };
+
+    const requestSaveAndClose = () => {
+      if (closed || closeInProgress) return;
+      if (!iframe.contentWindow) return finishClose();
+      closeInProgress = true;
+      message.textContent = "SALVANDO A PARTIDA...";
+      message.style.display = "grid";
+      iframe.contentWindow.postMessage({ type: "mga-request-save-exit" }, location.origin);
+      window.setTimeout(() => {
+        if (closeInProgress && !closed) {
+          message.textContent = "O salvamento demorou. Tente novamente ou saia sem salvar.";
+          closeInProgress = false;
+        }
+      }, 10000);
+    };
+
+    const closePlayer = () => {
+      if (closed) return;
+      if (!player) return finishClose();
+      if (window.confirm("Deseja salvar a partida antes de sair?\n\nOK = salvar e sair\nCancelar = continuar jogando")) {
+        requestSaveAndClose();
+      } else {
+        if (window.confirm("Sair sem salvar?")) finishClose();
+      }
     };
 
     const onMessage = (event) => {
@@ -261,12 +292,66 @@
       }
 
       if (event.data?.type === "mga-emulator-exit") {
+        finishClose();
+      }
+
+      if (event.data?.type === "mga-emulator-exit-requested") {
         closePlayer();
       }
 
+      if (event.data?.type === "mga-emulator-save-complete") {
+        finishClose();
+      }
+
+      if (event.data?.type === "mga-emulator-save-failed") {
+        closeInProgress = false;
+        message.style.display = "grid";
+        message.style.pointerEvents = "auto";
+        message.innerHTML = "";
+        const box = document.createElement("div");
+        box.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:14px;max-width:520px;line-height:1.5;";
+        const text = document.createElement("div");
+        text.textContent = event.data.message || "Não foi possível salvar a partida.";
+        const actions = document.createElement("div");
+        actions.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;justify-content:center;";
+        const retry = document.createElement("button");
+        retry.textContent = "Tentar salvar novamente";
+        retry.style.cssText = "padding:10px 14px;background:#08000f;border:1px solid #00e5ff;color:#00e5ff;font:bold 12px monospace;cursor:pointer;";
+        retry.onclick = requestSaveAndClose;
+        const exit = document.createElement("button");
+        exit.textContent = "Sair sem salvar";
+        exit.style.cssText = "padding:10px 14px;background:#08000f;border:1px solid #ff2bd6;color:#ff8ad8;font:bold 12px monospace;cursor:pointer;";
+        exit.onclick = finishClose;
+        actions.append(retry, exit);
+        box.append(text, actions);
+        message.appendChild(box);
+      }
+
       if (event.data?.type === "mga-emulator-error") {
-        message.textContent =
-          event.data.message || "Erro ao iniciar o jogo.";
+        message.style.display = "grid";
+        message.style.pointerEvents = "auto";
+        message.innerHTML = "";
+        const box = document.createElement("div");
+        box.style.cssText = "display:flex;flex-direction:column;align-items:center;gap:14px;max-width:520px;line-height:1.5;";
+        const text = document.createElement("div");
+        text.textContent = event.data.message || "Erro ao iniciar o jogo.";
+        const actions = document.createElement("div");
+        actions.style.cssText = "display:flex;gap:10px;flex-wrap:wrap;justify-content:center;";
+        const retry = document.createElement("button");
+        retry.textContent = "Tentar novamente";
+        retry.style.cssText = "padding:10px 14px;background:#08000f;border:1px solid #00e5ff;color:#00e5ff;font:bold 12px monospace;cursor:pointer;";
+        retry.onclick = () => {
+          message.textContent = `PREPARANDO ${romName}...`;
+          message.style.pointerEvents = "none";
+          iframe.src = `${playerUrl.href}&retry=${Date.now()}`;
+        };
+        const exit = document.createElement("button");
+        exit.textContent = "Voltar à biblioteca";
+        exit.style.cssText = "padding:10px 14px;background:#08000f;border:1px solid #ff2bd6;color:#ff8ad8;font:bold 12px monospace;cursor:pointer;";
+        exit.onclick = finishClose;
+        actions.append(retry, exit);
+        box.append(text, actions);
+        message.appendChild(box);
       }
     };
 
@@ -358,7 +443,7 @@
       document.body.appendChild(overlay);
 
       let player;
-      close.onclick = () => player?.closePlayer();
+      close.onclick = () => closePlayer();
 
       (async () => {
         try {
@@ -555,7 +640,8 @@
         const entry = files.find((file) => file?.name === name);
         return { name, available: !!entry && !entry.skipDownload, id: entry?.id || null };
       });
-      return jsonResponse({ ok: true, bios });
+      const missing = bios.filter((entry) => !entry.available).map((entry) => entry.name);
+      return jsonResponse({ ok: true, bios, ready: missing.length === 0, missing });
     }
 
     if (path === "/api/games/recent" && method === "GET") {

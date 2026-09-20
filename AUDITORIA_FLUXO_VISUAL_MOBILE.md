@@ -7,7 +7,13 @@
 
 O fluxo principal está implementado e a biblioteca web funciona: a aplicação carregou o bridge WebAssembly, encontrou **175 jogos**, exibiu a lista e habilitou os botões de seleção. O player também possui uma integração coerente por `iframe`, com comunicação por `postMessage` para informar início, erro e saída.
 
-Entretanto, o sistema ainda não está pronto para ser considerado robusto no celular. Os maiores riscos estão na saída imediata do `iframe`, que pode interromper um save assíncrono; na inconsistência entre o formato retornado pelo status de BIOS e o formato esperado pela interface; na ausência de uma confirmação antes de sair com alterações não salvas; e na falta de testes automatizados para o fluxo visual real. A interface móvel foi cuidadosamente estilizada para a orientação horizontal, mas não foi possível simular toque e `pointer: coarse` na sessão de navegador disponível. Portanto, a validação mobile abaixo combina inspeção do código com o teste visual realizado no navegador, e não substitui um teste em celular físico.
+As lacunas de código identificadas foram corrigidas nesta entrega. A interface móvel foi cuidadosamente estilizada para a orientação horizontal, mas ainda não foi possível simular toque e `pointer: coarse` na sessão de navegador disponível. Portanto, a validação mobile abaixo combina inspeção do código com o teste visual realizado no navegador, e não substitui um teste em celular físico.
+
+## Status após a implementação
+
+Foi implementado um protocolo de saída segura: o launcher pergunta se deve salvar, envia uma solicitação ao `iframe`, aguarda `mga-emulator-save-complete` e só então desmonta o player. Em caso de falha, são oferecidas as ações **Tentar salvar novamente** e **Sair sem salvar**. O bridge também passou a retornar `ready` e `missing` junto com a lista detalhada de BIOS.
+
+O player agora exibe recuperação para falhas de inicialização, com **Tentar novamente** e **Voltar à biblioteca**, libera fullscreen e orientação ao sair, mostra um aviso explícito quando o celular está em retrato e mantém checkpoint periódico também em dispositivos touch. A URL do player foi versionada para impedir que o navegador reutilize a implementação antiga.
 
 ## Fluxo auditado
 
@@ -15,13 +21,13 @@ Entretanto, o sistema ainda não está pronto para ser considerado robusto no ce
 |---|---|---|---|
 | Entrada na aplicação | A página inicial injeta o bridge WebAssembly e o bundle remoto do launcher. | Funciona no teste local. | O launcher depende de assets remotos com hash fixo e de um repositório separado. |
 | Seleção do jogo | O catálogo é carregado pelo bridge; a lista visualiza nome, busca, favoritos e recentes. | 175 jogos apareceram e os botões estavam habilitados. | Há um arquivo sem título correspondente: `cap-33s-2`; o fallback funciona, mas a catalogação está incompleta. |
-| Abertura do jogo | O bridge resolve ROM e BIOS, cria um `iframe` e carrega `/web/player.html`. | Arquitetura correta. | A falha de rede ou BIOS é apresentada como texto, sem ação clara de tentar novamente ou voltar à lista. |
-| Inicialização | O player exibe configuração de dificuldade, vídeo e controles antes de iniciar o EmulatorJS. | Implementado. | Se o core não iniciar, o usuário pode ficar em uma tela de erro sem uma ação de reinício bem definida. |
+| Abertura do jogo | O bridge resolve ROM e BIOS, cria um `iframe` e carrega `/web/player.html`. | Arquitetura correta. | Corrigido: falhas agora oferecem nova tentativa ou retorno à biblioteca. |
+| Inicialização | O player exibe configuração de dificuldade, vídeo e controles antes de iniciar o EmulatorJS. | Implementado. | Corrigido: a tela de erro não deixa mais o usuário preso sem ação. |
 | Jogo e controles | O player configura teclado, gamepad e controles touch, forçando a orientação horizontal. | Implementado por CSS e configuração do EmulatorJS. | Falta uma matriz de testes por dispositivo, especialmente para crédito, START, segundo jogador e rotação física. |
-| Salvamento manual | Há 15 slots, IndexedDB, pausa temporária durante a captura e confirmação visual. | O código está melhor protegido contra estado incompleto. | Falta bloquear duplo toque, exibir progresso durante a gravação e garantir save antes de fechar o player. |
+| Salvamento manual | Há 15 slots, IndexedDB, pausa temporária durante a captura e confirmação visual. | O código está melhor protegido contra estado incompleto. | Saída segura e checkpoint mobile implementados; o teste físico de toque ainda falta. |
 | Carregamento | O player aguarda o core, pausa o loop, aplica o estado e só depois confirma. | Implementado e validado em build. | Ainda não há verificação independente de que o estado restaurado mudou o jogo; o sucesso depende da ausência de exceção em `loadState`. |
-| Retorno à partida | O modal possui “Voltar à partida”, botão de fechar e fechamento ao tocar fora. | Implementado. | Não há confirmação ou save automático explícito ao retornar/fechar. |
-| Saída do jogo | O player envia `mga-emulator-exit`; o launcher remove o `iframe` e o overlay. | Funciona estruturalmente. | A remoção imediata pode abortar IndexedDB e perder o último progresso; fullscreen e orientação podem permanecer ativos. |
+| Retorno à partida | O modal possui “Voltar à partida”, botão de fechar e fechamento ao tocar fora. | Implementado. | O teste físico mobile ainda falta. |
+| Saída do jogo | O player solicita save; o launcher aguarda confirmação antes de remover o `iframe` e libera fullscreen/orientação. | Corrigido e validado por contrato no navegador. | O teste de toque em aparelho físico ainda falta. |
 
 ## Achados prioritários
 
