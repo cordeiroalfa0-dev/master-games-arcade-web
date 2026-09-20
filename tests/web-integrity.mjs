@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = path.resolve(new URL('..', import.meta.url).pathname);
+const launcher = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 const player = fs.readFileSync(path.join(root, 'web/player.html'), 'utf8');
 const bridge = fs.readFileSync(path.join(root, 'web/mame-web.js'), 'utf8');
 const gamepads = fs.readFileSync(path.join(root, 'web/gamepad-manager.js'), 'utf8');
@@ -39,6 +40,10 @@ assert.match(player, /loading-art/);
 assert.match(player, /game-loading-art\.png/);
 assert.match(player, /game-loading-art-portrait\.png/);
 assert.match(player, /min-aspect-ratio:7\/5.*game-loading-art\.png/s);
+assert.match(launcher, /mga-mobile-landscape-list-fix/);
+assert.match(launcher, /orientation: landscape/);
+assert.match(launcher, /#root aside[\s\S]*min-width: 300px/);
+assert.match(launcher, /#root aside button[\s\S]*white-space: normal/);
 for (const token of ['video-aspect-43','video-stretch','video-integer','video-scanlines','video-vignette','video-amber','video-cool','video-soft','VISUAL_KEY','visualHelp']) assert.match(player, new RegExp(token));
 assert.match(gamepads, /stableKey/);
 assert.match(gamepads, /visibilitychange/);

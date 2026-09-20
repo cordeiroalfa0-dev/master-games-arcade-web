@@ -27,6 +27,31 @@
     <script src="/web/mame-web.js?v=20260919-art-media-v1"></script>
     <script type="module" crossorigin src="https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/dist/assets/index-CQxxgdzD.js"></script>
     <link rel="stylesheet" crossorigin href="https://cdn.jsdelivr.net/gh/cordeiroalfa0-dev/master-games-arcade-system@main/dist/assets/index-CJVcYSDx.css">
+    <style id="mga-mobile-landscape-list-fix">
+      /* Em celulares deitados, a arte não pode comprimir a lista a ponto de
+         esconder os nomes. Preserve a coluna rolável com uma largura útil. */
+      @media (hover: none) and (orientation: landscape) and (max-height: 600px) {
+        #root aside {
+          width: min(48vw, 390px) !important;
+          min-width: 300px !important;
+          max-width: calc(100vw - 16px) !important;
+        }
+        #root aside > div.h-28 {
+          height: 72px !important;
+        }
+        #root aside button {
+          white-space: normal !important;
+          overflow: visible !important;
+          text-overflow: clip !important;
+          line-height: 1.25 !important;
+        }
+        #root aside .overflow-y-auto {
+          min-height: 0 !important;
+          overscroll-behavior: contain;
+          -webkit-overflow-scrolling: touch;
+        }
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
