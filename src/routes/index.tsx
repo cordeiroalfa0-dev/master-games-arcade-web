@@ -29,6 +29,40 @@ export const Route = createFileRoute("/")({
 
 function Index() {
   useEffect(() => {
+    const responsiveStyle = document.createElement("style");
+    responsiveStyle.id = "mga-landscape-library-fix";
+    responsiveStyle.textContent = `
+      /* A interface remota ativa o breakpoint sm pela largura do celular
+         horizontal, mas mantém a biblioteca com 240px e texto de 8px. */
+      @media (orientation: landscape) and (max-height: 600px),
+             (orientation: landscape) and (max-width: 900px) {
+        main > aside {
+          top: 48px !important;
+          right: 8px !important;
+          bottom: 8px !important;
+          width: min(48vw, 380px) !important;
+          max-width: calc(100vw - 16px) !important;
+        }
+
+        main > aside > div.flex-1.overflow-y-auto {
+          min-height: 0 !important;
+          overscroll-behavior: contain;
+        }
+
+        main > aside > div.flex-1.overflow-y-auto > button {
+          padding: 7px 10px !important;
+          font-size: clamp(11px, 2.15vw, 14px) !important;
+          line-height: 1.2 !important;
+        }
+
+        main > aside input[placeholder="Buscar (fuzzy)..."] {
+          padding: 6px 8px !important;
+          font-size: 12px !important;
+        }
+      }
+    `;
+    document.head.appendChild(responsiveStyle);
+
     const loader = document.createElement("script");
     loader.src = "/web/mame-web.js";
     document.head.appendChild(loader);
@@ -54,6 +88,7 @@ function Index() {
     return () => {
       loader.remove();
       app.remove();
+      responsiveStyle.remove();
     };
   }, []);
 
