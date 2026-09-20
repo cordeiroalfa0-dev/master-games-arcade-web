@@ -63,6 +63,39 @@ function Index() {
     `;
     document.head.appendChild(responsiveStyle);
 
+    // O bundle do launcher remoto sintetiza bipes para navegação, seleção,
+    // erros e configuração. O player de cada jogo é um iframe separado, por
+    // isso o áudio dele — inclusive a intro do game — não é afetado.
+    const audioWindow = window as Window & {
+      webkitAudioContext?: typeof AudioContext;
+    };
+    const nativeAudioContexts = [
+      ["AudioContext", window.AudioContext],
+      ["webkitAudioContext", audioWindow.webkitAudioContext],
+    ] as const;
+    const silentContexts: Array<["AudioContext" | "webkitAudioContext", typeof AudioContext]> = [];
+
+    for (const [key, NativeAudioContext] of nativeAudioContexts) {
+      if (!NativeAudioContext) continue;
+      const SilentAudioContext = function (...args: ConstructorParameters<typeof AudioContext>) {
+        const context = new NativeAudioContext(...args);
+        context.suspend().catch(() => {});
+        context.resume = () => Promise.resolve();
+        return context;
+      } as unknown as typeof AudioContext;
+      SilentAudioContext.prototype = NativeAudioContext.prototype;
+      audioWindow[key] = SilentAudioContext;
+      silentContexts.push([key, NativeAudioContext]);
+    }
+
+    const NativeAudio = window.Audio;
+    window.Audio = function (...args: ConstructorParameters<typeof Audio>) {
+      const audio = new NativeAudio(...args);
+      audio.muted = true;
+      audio.volume = 0;
+      return audio;
+    } as typeof Audio;
+
     const loader = document.createElement("script");
     loader.src = "/web/mame-web.js";
     document.head.appendChild(loader);
@@ -89,6 +122,10 @@ function Index() {
       loader.remove();
       app.remove();
       responsiveStyle.remove();
+      for (const [key, NativeAudioContext] of silentContexts) {
+        audioWindow[key] = NativeAudioContext;
+      }
+      window.Audio = NativeAudio;
     };
   }, []);
 
