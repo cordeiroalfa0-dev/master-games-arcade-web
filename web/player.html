@@ -908,12 +908,20 @@
   // ---------------------------------------------------------------
   const MGA_VOLUME=1;
   let mgaAudioConfigured=false;
+  const mgaAudioResumePending=new WeakSet();
   const resumeAudioContexts=()=>{
     const emu=window.EJS_emulator;
     const mod=emu?.gameManager?.Module||window.Module;
     const ctxs=[emu?.audioContext,mod?.SDL2?.audioContext,mod?.audioContext,window.MGA_audioCtx];
     ctxs.forEach(ctx=>{
-      try{if(ctx&&ctx.state!=='running')ctx.resume()}catch(e){}
+      if(!ctx||ctx.state==='running'||mgaAudioResumePending.has(ctx))return;
+      try{
+        const resume=ctx.resume?.();
+        if(resume?.finally){
+          mgaAudioResumePending.add(ctx);
+          resume.catch(()=>{}).finally(()=>mgaAudioResumePending.delete(ctx));
+        }
+      }catch(e){}
     });
   };
   const enableGameAudio=()=>{

@@ -141,15 +141,16 @@ class EJS_GameManager {
             "screenshot_directory = \"/\"\n" +
             "block_sram_overwrite = false\n" +
             "video_gpu_screenshot = false\n" +
-            // Áudio no celular: 512 ms era grande demais e fazia o som atrasar
-            // e "travar" quando o navegador reduzia o ritmo. 192 ms mantém o
-            // buffer seguro sem atraso perceptível.
-            // Configuração para evitar engasgos de áudio no FBNeo em celulares
-            "audio_latency = 256\n" +
+            // Em celulares, um buffer um pouco maior evita underruns quando o
+            // navegador reduz o ritmo por causa de toque, rotação ou economia
+            // de energia, sem voltar ao atraso perceptível de 512 ms.
+            "audio_latency = 384\n" +
             "audio_sync = true\n" +
             "audio_rate_control = true\n" +
-            "audio_rate_control_delta = 0.02\n" +
-            "audio_max_timing_skew = 0.20\n" +
+            // Correções pequenas e graduais evitam que o pitch/ritmo seja
+            // esticado de forma audível a cada variação do frame time.
+            "audio_rate_control_delta = 0.01\n" +
+            "audio_max_timing_skew = 0.10\n" +
             "audio_resampler = \"linear\"\n" +
             "audio_volume = 0.0\n" +
             "video_top_portrait_viewport = false\n" +
