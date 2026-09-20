@@ -1100,14 +1100,31 @@
     for(let attempt=1;attempt<=3;attempt++){
       const manager=window.EJS_emulator?.gameManager;
       if(manager?.loadState){
+        const emulator=window.EJS_emulator;
+        const wasPaused=!!emulator?.paused;
         try{
-          resumeIfPaused();
+          // O core pode descartar o estado enquanto o loop está executando.
+          // Pause antes de carregar e só retome depois que o arquivo for consumido.
+          if(!wasPaused){
+            if(typeof emulator?.pause==='function')emulator.pause(true);
+            else manager.toggleMainLoop?.(0);
+          }
           manager.loadState(new Uint8Array(bytes));
-          await mgaSleep(300);
-          resumeIfPaused();
+          await mgaSleep(1200);
+          if(!wasPaused){
+            if(typeof emulator?.play==='function')emulator.play(true);
+            else manager.toggleMainLoop?.(1);
+          }
+          await mgaSleep(250);
           log(`${label}: estado aplicado (tentativa ${attempt})`);
           return true;
         }catch(e){
+          if(!wasPaused){
+            try{
+              if(typeof emulator?.play==='function')emulator.play(true);
+              else manager.toggleMainLoop?.(1);
+            }catch{}
+          }
           log(`${label}: tentativa ${attempt} falhou (${e?.message||e})`);
         }
       }
