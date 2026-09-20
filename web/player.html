@@ -567,16 +567,13 @@
 
   if(window.EJS_biosUrl){
     log('BIOS configurado via EJS_biosUrl: '+window.EJS_biosUrl);
-    try{
-      const head=await fetch(window.EJS_biosUrl,{method:'HEAD'});
+    // Diagnóstico não deve bloquear o início do emulador: alguns CDNs e
+    // navegadores móveis atrasam ou recusam HEAD mesmo aceitando GET.
+    fetch(window.EJS_biosUrl,{method:'HEAD'}).then(head=>{
       const len=head.headers.get('content-length');
       log('Checagem HEAD da BIOS: status '+head.status+', tamanho '+(len||'desconhecido')+' bytes');
-      if(!head.ok){
-        log('AVISO: endpoint da BIOS não respondeu OK — o core pode falhar ao montar o arquivo.');
-      }
-    }catch(e){
-      log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)');
-    }
+      if(!head.ok)log('AVISO: endpoint da BIOS não respondeu OK — o core pode falhar ao montar o arquivo.');
+    }).catch(e=>log('Checagem HEAD da BIOS falhou: '+(e?.message||e)+' (pode ser CORS ou rede)'));
   }
 
   // Jogos CPS2 precisam de arquivo .key nos romsets para o FBNeo (core "arcade").
@@ -825,10 +822,19 @@
   // Reemite resize em dois frames para o EmulatorJS recalcular o canvas e o
   // gamepad depois de uma rotação, sem forçar a orientação do aparelho.
   let orientationResizeTimer;
+  let orientationResizeFrame=0;
+  let lastViewportWidth=innerWidth;
+  let lastViewportHeight=innerHeight;
   const refreshAfterOrientation=()=>{
     clearTimeout(orientationResizeTimer);
-    const refresh=()=>window.dispatchEvent(new Event('resize'));
-    requestAnimationFrame(()=>{refresh();requestAnimationFrame(refresh)});
+    cancelAnimationFrame(orientationResizeFrame);
+    const refresh=()=>{
+      if(innerWidth===lastViewportWidth&&innerHeight===lastViewportHeight)return;
+      lastViewportWidth=innerWidth;
+      lastViewportHeight=innerHeight;
+      window.dispatchEvent(new Event('resize'));
+    };
+    orientationResizeFrame=requestAnimationFrame(refresh);
     orientationResizeTimer=setTimeout(refresh,220);
   };
   addEventListener('orientationchange',refreshAfterOrientation,{passive:true});
@@ -1476,6 +1482,14 @@
       el.style.display='none';
     });
   };
+  let hideUiFrame=0;
+  const scheduleHideEmulatorUi=()=>{
+    if(hideUiFrame)return;
+    hideUiFrame=requestAnimationFrame(()=>{
+      hideUiFrame=0;
+      hideEmulatorUi();
+    });
+  };
 
   window.EJS_ready=()=>{
     ready=true;
@@ -1511,7 +1525,7 @@
     log('unhandledrejection: '+(e.reason?.message||e.reason));
   });
 
-  new MutationObserver(hideEmulatorUi).observe(document.getElementById('game'),{childList:true,subtree:true});
+  new MutationObserver(scheduleHideEmulatorUi).observe(document.getElementById('game'),{childList:true,subtree:true});
 
   startWatchdog=setTimeout(()=>{
     if(!ready&&!started){
