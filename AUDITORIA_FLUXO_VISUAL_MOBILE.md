@@ -112,3 +112,15 @@ O teste interativo foi realizado no navegador sandbox com a aplicação local. A
 [4]: https://github.com/cordeiroalfa0-dev/master-games-arcade-system/blob/main/dist/launcher.html "Launcher remoto, biblioteca e contrato de status"
 
 [5]: https://github.com/cordeiroalfa0-dev/master-games-arcade-system/tree/main/tests "Testes automatizados disponíveis no repositório do sistema"
+
+
+## Atualização da Auditoria (21 de setembro de 2026)
+
+### 1. Resolução do Save State no 1942 / MAME
+- A captura e restauração foram alteradas para executar com o core em andamento contínuo.
+- Pausar o core congelava a rotina de VBLANK e os buffers de DMA de vídeo; com a execução contínua durante `loadState`, o driver Capcom Z80 aplica imediatamente a VRAM restaurada ao canvas.
+- Estados vazios são rejeitados com feedback informativo na UI.
+
+### 2. Acessibilidade do Botão Saves no Touch
+- O botão `#btn-save` agora permanece visível no HUD touch em todas as situações móveis: dentro do launcher, fora do launcher e em modo tela cheia.
+- Alvos de toque adequados com margens protegidas por `safe-area-inset-top` e `safe-area-inset-right`.
