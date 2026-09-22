@@ -371,19 +371,6 @@
   }
 
   function showWebPlayer(romName) {
-    try {
-      const el = document.documentElement;
-      const req = el.requestFullscreen || el.webkitRequestFullscreen;
-      if (req && !document.fullscreenElement) {
-        req.call(el).then(() => {
-          if (screen.orientation?.lock) {
-            screen.orientation.lock("landscape").catch(() => {});
-          }
-        }).catch(() => {});
-      } else if (screen.orientation?.lock) {
-        screen.orientation.lock("landscape").catch(() => {});
-      }
-    } catch {}
     return new Promise((resolve, reject) => {
       document.getElementById("mga-web-player")?.remove();
 

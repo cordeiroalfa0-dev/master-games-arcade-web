@@ -1097,7 +1097,6 @@
   const saveToSlot=async(slot,silent=false)=>{
     const manager=window.EJS_emulator?.gameManager;
     if(!manager||!started||mgaSaveBusy||mgaLoadBusy){
-      if(!silent)showToast('⚠️ O jogo ainda não iniciou!');
       return false;
     }
     mgaSaveBusy=true;
@@ -1222,14 +1221,12 @@
       mgaInitialLoadStarted=true;
       const saved=await readSlotRecord(getSlotKey(slot));
       if(!isValidSavedRecord(saved)){
-        if(!silent)showToast(`⚠️ Slot ${slot} está vazio!`);
         return false;
       }
       if(!silent)showToast(`⏳ Restaurando o Slot ${slot}...`,4000);
       const ready=await waitForGameReady();
       if(!ready){
         log(`Slot ${slot}: o jogo não iniciou a tempo para restaurar`);
-        if(!silent)showToast(`⚠️ Aguarde o jogo iniciar e tente carregar o Slot ${slot} de novo`,4000);
         return false;
       }
       const ok=await applyStateWithRetry(saved.state,`Slot ${slot}`);
@@ -1308,12 +1305,10 @@
       const ready=await waitForGameReady();
       if(!ready){
         log('Progresso: jogo não iniciou a tempo para restaurar o save automático');
-        showToast('⚠️ Não deu para retomar a última partida. Use o botão Saves.',4000);
         return false;
       }
       const ok=await applyStateWithRetry(saved.state,'Save automático');
       if(!ok){
-        showToast('⚠️ Não deu para retomar a última partida. Tente pelo botão Saves.',4000);
         return false;
       }
       log('Progresso anterior restaurado');
@@ -1513,7 +1508,6 @@
     btnPause.addEventListener('click', () => {
       const emu = window.EJS_emulator;
       if (!emu || !started) {
-        showToast('⚠️ O jogo ainda não iniciou');
         return;
       }
       emu.togglePlaying?.();
@@ -1586,7 +1580,6 @@
     mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);
     // O shader só pode ser ativado depois de o contexto gráfico do core existir.
     setTimeout(applyPixelEnhancement,0);
-    goFullscreen();
     requestWakeLock();
 
     try{
@@ -1665,7 +1658,6 @@
 
   manual.addEventListener('click',()=>{
     manual.style.display='none';
-    goFullscreen();
     const b=findStartButton();
     if(b&&!started){
       attempting=true;
