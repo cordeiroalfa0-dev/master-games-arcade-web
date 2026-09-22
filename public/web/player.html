@@ -1027,6 +1027,7 @@
   const MGA_TOTAL_SLOTS=15;
   let mgaSaveTimer=null;
   let mgaSaveBusy=false;
+  let mgaLoadBusy=false;
 
   const showToast=(msg,duration=2600)=>{
     const toast=document.getElementById('mga-toast');
@@ -1056,9 +1057,26 @@
     try{localStorage.setItem(`mga_last_slot_${romBase}`,String(slot))}catch{}
   };
 
+  // IndexedDB pode devolver ArrayBuffer ou Uint8Array dependendo do navegador.
+  // Normalizar sempre para uma cópia independente evita salvar um buffer vazio,
+  // truncado ou ligado à memória interna do EmulatorJS.
+  const normalizeStateBytes=state=>{
+    if(state==null)return null;
+    try{
+      const bytes=new Uint8Array(state);
+      return bytes.byteLength?new Uint8Array(bytes):null;
+    }catch{return null}
+  };
+
+  const isValidSavedRecord=record=>{
+    const bytes=normalizeStateBytes(record?.state);
+    if(!bytes)return false;
+    return !record.stateSize||record.stateSize===bytes.byteLength;
+  };
+
   const saveToSlot=async(slot,silent=false)=>{
     const manager=window.EJS_emulator?.gameManager;
-    if(!manager||!started||mgaSaveBusy){
+    if(!manager||!started||mgaSaveBusy||mgaLoadBusy){
       if(!silent)showToast('⚠️ O jogo ainda não iniciou!');
       return false;
     }
@@ -1073,12 +1091,13 @@
         else manager.toggleMainLoop?.(0);
         await mgaSleep(150);
       }
-      const state=manager.getState();
+      const state=normalizeStateBytes(manager.getState());
+      if(!state)throw new Error('Estado vazio ou inválido');
       const db=await openProgressDb();
       const now=Date.now();
       const dateStr=new Date(now).toLocaleString('pt-BR');
       const key=getSlotKey(slot);
-      const record={key,slot,rom:romBase,core,savedAt:now,dateStr,state:new Uint8Array(state)};
+      const record={key,slot,rom:romBase,core,savedAt:now,dateStr,state,stateSize:state.byteLength};
       await new Promise((resolve,reject)=>{
         const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
         tx.objectStore(MGA_SAVE_STORE).put(record,key);
@@ -1131,7 +1150,8 @@
   };
 
   const applyStateWithRetry=async(state,label)=>{
-    const bytes=new Uint8Array(state);
+    const bytes=normalizeStateBytes(state);
+    if(!bytes)throw new Error('Estado vazio ou inválido');
     for(let attempt=1;attempt<=3;attempt++){
       const manager=window.EJS_emulator?.gameManager;
       if(manager?.loadState){
@@ -1184,9 +1204,14 @@
   };
 
   const loadFromSlot=async(slot,silent=false)=>{
+    if(mgaLoadBusy||mgaSaveBusy){
+      if(!silent)showToast('⏳ Aguarde a operação de save terminar.',3000);
+      return false;
+    }
+    mgaLoadBusy=true;
     try{
       const saved=await readSlotRecord(getSlotKey(slot));
-      if(!saved?.state?.byteLength){
+      if(!isValidSavedRecord(saved)){
         if(!silent)showToast(`⚠️ Slot ${slot} está vazio!`);
         return false;
       }
@@ -1211,7 +1236,7 @@
       log(`Progresso: falha ao carregar slot ${slot} (${e?.message||e})`);
       if(!silent)showToast(`❌ Falha ao carregar slot ${slot}`);
       return false;
-    }
+    }finally{mgaLoadBusy=false}
   };
 
   const deleteSlot=async(slot)=>{
@@ -1235,7 +1260,7 @@
 
   const saveProgress=async(silent=false)=>{
     const manager=window.EJS_emulator?.gameManager;
-    if(!manager||!started||mgaSaveBusy)return false;
+    if(!manager||!started||mgaSaveBusy||mgaLoadBusy)return false;
     mgaSaveBusy=true;
     const emulator=window.EJS_emulator;
     const wasPaused=!!emulator?.paused;
@@ -1245,13 +1270,14 @@
         else manager.toggleMainLoop?.(0);
         await mgaSleep(150);
       }
-      const state=manager.getState();
+      const state=normalizeStateBytes(manager.getState());
+      if(!state)throw new Error('Estado vazio ou inválido');
       const db=await openProgressDb();
       const now=Date.now();
       const dateStr=new Date(now).toLocaleString('pt-BR');
       await new Promise((resolve,reject)=>{
         const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
-        tx.objectStore(MGA_SAVE_STORE).put({state:new Uint8Array(state),savedAt:now,dateStr},MGA_SAVE_KEY);
+        tx.objectStore(MGA_SAVE_STORE).put({state,stateSize:state.byteLength,savedAt:now,dateStr},MGA_SAVE_KEY);
         tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
       });
       db.close();
@@ -1270,9 +1296,11 @@
   };
 
   const loadProgress=async()=>{
+    if(mgaLoadBusy||mgaSaveBusy)return false;
+    mgaLoadBusy=true;
     try{
       const saved=await readSlotRecord(MGA_SAVE_KEY);
-      if(!saved?.state?.byteLength)return false;
+      if(!isValidSavedRecord(saved))return false;
       const ready=await waitForGameReady();
       if(!ready){
         log('Progresso: jogo não iniciou a tempo para restaurar o save automático');
@@ -1287,6 +1315,7 @@
       log('Progresso anterior restaurado');
       return true;
     }catch(e){log('Progresso: nenhum save auto restaurado ('+(e?.message||e)+')');return false}
+    finally{mgaLoadBusy=false}
   };
 
   const saveAndExit=async()=>{
