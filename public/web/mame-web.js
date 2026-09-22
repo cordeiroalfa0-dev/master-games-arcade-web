@@ -407,7 +407,7 @@
       bar.appendChild(brand);
 
       const navActions = document.createElement("div");
-      navActions.style.cssText = "display:flex;align-items:center;gap:8px;";
+      navActions.style.cssText = "display:flex;align-items:center;gap:4px;";
 
       const btnSaves = document.createElement("button");
       btnSaves.type = "button";
@@ -415,7 +415,12 @@
       btnSaves.title = "Gerenciar Partidas Salvas";
       btnSaves.setAttribute("aria-label", "Partidas Salvas");
       btnSaves.style.cssText =
-        "pointer-events:auto;height:34px;padding:0 12px;display:flex;align-items:center;justify-content:center;background:#0d001e;border:1px solid #00e5ff;box-shadow:0 0 8px #00e5ff55;color:#00e5ff;cursor:pointer;font-size:11px;font-weight:bold;font-family:monospace;border-radius:4px;";
+        "pointer-events:auto;height:34px;padding:0 10px;display:flex;align-items:center;justify-content:center;background:#0d001e;border:1px solid #00e5ff;box-shadow:0 0 8px #00e5ff55;color:#00e5ff;cursor:pointer;font-size:11px;font-weight:bold;font-family:monospace;border-radius:4px;white-space:nowrap;";
+      if(window.matchMedia?.("(max-width:480px)").matches){
+        brand.textContent="MGA";
+        btnSaves.textContent="💾";
+        btnSaves.style.padding="0 9px";
+      }
       btnSaves.onclick = () => {
         const iframe = overlay.querySelector("iframe");
         iframe?.contentWindow?.postMessage({ type: "mga-open-saves" }, "*");
