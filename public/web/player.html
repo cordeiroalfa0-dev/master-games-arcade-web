@@ -428,6 +428,8 @@
   const earlyOpenSaves=()=>{
     if(!earlySavesModal)return;
     earlySavesModal.classList.add('open');
+    const list=document.getElementById('mga-slots-list');
+    if(list&&!window.MGA_refreshSaves)list.innerHTML='<div style="color:#00e5ff;font-size:12px;padding:8px;">Carregando slots...</div>';
     window.MGA_refreshSaves?.();
   };
   const earlyCloseSaves=()=>earlySavesModal?.classList.remove('open');
@@ -1401,6 +1403,10 @@
   // O listener do botão já foi instalado no início do script. Este callback
   // apenas conecta a listagem dos 15 slots quando ela estiver disponível.
   window.MGA_refreshSaves=renderSlotsList;
+  // Se o usuário abriu o painel antes do core terminar a inicialização, o
+  // listener antecipado já exibiu o modal, mas ainda não havia uma função de
+  // listagem registrada. Preenche o painel assim que esta rotina fica pronta.
+  if(earlySavesModal?.classList.contains('open'))renderSlotsList();
 
   // Wire up saves controls
   const btnQuickSave=document.getElementById('mga-btn-quick-save');
