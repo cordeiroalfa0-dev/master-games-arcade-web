@@ -1046,6 +1046,24 @@
     req.onerror=()=>reject(req.error||new Error('Falha no banco de progresso'));
   });
 
+  const withProgressDb=async task=>{
+    const db=await openProgressDb();
+    try{return await task(db)}finally{db.close()}
+  };
+
+  const putAndVerifyRecord=async(db,key,record)=>{
+    await new Promise((resolve,reject)=>{
+      const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
+      tx.objectStore(MGA_SAVE_STORE).put(record,key);
+      tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
+    });
+    const persisted=await new Promise((resolve,reject)=>{
+      const req=db.transaction(MGA_SAVE_STORE,'readonly').objectStore(MGA_SAVE_STORE).get(key);
+      req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+    });
+    if(!isValidSavedRecord(persisted))throw new Error('Estado não confirmado no IndexedDB');
+  };
+
   const getSlotKey=slot=>`${MGA_SAVE_KEY}:slot_${slot}`;
 
   const getLastSlot=()=>{
@@ -1093,17 +1111,11 @@
       }
       const state=normalizeStateBytes(manager.getState());
       if(!state)throw new Error('Estado vazio ou inválido');
-      const db=await openProgressDb();
       const now=Date.now();
       const dateStr=new Date(now).toLocaleString('pt-BR');
       const key=getSlotKey(slot);
       const record={key,slot,rom:romBase,core,savedAt:now,dateStr,state,stateSize:state.byteLength};
-      await new Promise((resolve,reject)=>{
-        const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
-        tx.objectStore(MGA_SAVE_STORE).put(record,key);
-        tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
-      });
-      db.close();
+      await withProgressDb(db=>putAndVerifyRecord(db,key,record));
       setLastSlot(slot);
       if(!silent)showToast(`💾 Partida salva no Slot ${slot}!`);
       log(`Slot ${slot} salvo com sucesso`);
@@ -1192,15 +1204,10 @@
   };
 
   const readSlotRecord=async key=>{
-    const db=await openProgressDb();
-    try{
-      return await new Promise((resolve,reject)=>{
-        const req=db.transaction(MGA_SAVE_STORE,'readonly').objectStore(MGA_SAVE_STORE).get(key);
-        req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
-      });
-    }finally{
-      db.close();
-    }
+    return withProgressDb(db=>new Promise((resolve,reject)=>{
+      const req=db.transaction(MGA_SAVE_STORE,'readonly').objectStore(MGA_SAVE_STORE).get(key);
+      req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);
+    }));
   };
 
   const loadFromSlot=async(slot,silent=false)=>{
@@ -1241,14 +1248,12 @@
 
   const deleteSlot=async(slot)=>{
     try{
-      const db=await openProgressDb();
       const key=getSlotKey(slot);
-      await new Promise((resolve,reject)=>{
+      await withProgressDb(db=>new Promise((resolve,reject)=>{
         const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
         tx.objectStore(MGA_SAVE_STORE).delete(key);
         tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
-      });
-      db.close();
+      }));
       showToast(`🗑 Slot ${slot} apagado.`);
       await renderSlotsList();
       return true;
@@ -1272,15 +1277,9 @@
       }
       const state=normalizeStateBytes(manager.getState());
       if(!state)throw new Error('Estado vazio ou inválido');
-      const db=await openProgressDb();
       const now=Date.now();
       const dateStr=new Date(now).toLocaleString('pt-BR');
-      await new Promise((resolve,reject)=>{
-        const tx=db.transaction(MGA_SAVE_STORE,'readwrite');
-        tx.objectStore(MGA_SAVE_STORE).put({state,stateSize:state.byteLength,savedAt:now,dateStr},MGA_SAVE_KEY);
-        tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);
-      });
-      db.close();
+      await withProgressDb(db=>putAndVerifyRecord(db,MGA_SAVE_KEY,{state,stateSize:state.byteLength,savedAt:now,dateStr}));
       if(!silent)showToast('💾 Progresso salvo automaticamente');
       return true;
     }catch(e){log('Progresso: falha ao salvar auto '+(e?.message||e));return false}
