@@ -1028,6 +1028,8 @@
   let mgaSaveTimer=null;
   let mgaSaveBusy=false;
   let mgaLoadBusy=false;
+  let mgaInitialLoadTimer=null;
+  let mgaInitialLoadStarted=false;
 
   const showToast=(msg,duration=2600)=>{
     const toast=document.getElementById('mga-toast');
@@ -1168,33 +1170,26 @@
       const manager=window.EJS_emulator?.gameManager;
       if(manager?.loadState){
         const emulator=window.EJS_emulator;
-        const wasPaused=!!emulator?.paused;
         try{
-          // O estado é gravado em /game.state pelo GameManager e só é
-          // consumido pelo core quando o loop volta a processar frames.
-          // Pausar antes do load é seguro, mas nunca podemos deixar o core
-          // pausado depois: em alguns boots do EmulatorJS ele já começa
-          // pausado e, nesse caso, a partida carregada ficava congelada.
-          if(!wasPaused){
-            if(typeof emulator?.pause==='function')emulator.pause(true);
-            else manager.toggleMainLoop?.(0);
-          }
+          // O GameManager grava o estado em /game.state e o core só o aplica
+          // enquanto o loop está processando frames. A sequência anterior
+          // pausava o core antes do load e, em alguns celulares, o loop não
+          // voltava a processar o estado: o slot aparecia como carregado, mas
+          // a partida permanecia congelada ou voltava ao início.
           manager.loadState(new Uint8Array(bytes));
           if(emulator?.paused){
             if(typeof emulator.play==='function')emulator.play(true);
             else manager.toggleMainLoop?.(1);
           }
-          await mgaSleep(1200);
+          await mgaSleep(1500);
           await mgaSleep(250);
           log(`${label}: estado aplicado (tentativa ${attempt})`);
           return true;
         }catch(e){
-          if(!wasPaused){
-            try{
-              if(typeof emulator?.play==='function')emulator.play(true);
-              else manager.toggleMainLoop?.(1);
-            }catch{}
-          }
+          try{
+            if(emulator?.paused&&typeof emulator?.play==='function')emulator.play(true);
+            else if(emulator?.paused)manager.toggleMainLoop?.(1);
+          }catch{}
           log(`${label}: tentativa ${attempt} falhou (${e?.message||e})`);
         }
       }
@@ -1217,6 +1212,14 @@
     }
     mgaLoadBusy=true;
     try{
+      // Um load manual tem prioridade. Sem cancelar o timer, o auto-load
+      // agendado no início podia aplicar o slot automático logo depois e
+      // substituir silenciosamente o slot escolhido pelo jogador.
+      if(mgaInitialLoadTimer){
+        clearTimeout(mgaInitialLoadTimer);
+        mgaInitialLoadTimer=null;
+      }
+      mgaInitialLoadStarted=true;
       const saved=await readSlotRecord(getSlotKey(slot));
       if(!isValidSavedRecord(saved)){
         if(!silent)showToast(`⚠️ Slot ${slot} está vazio!`);
@@ -1296,6 +1299,8 @@
 
   const loadProgress=async()=>{
     if(mgaLoadBusy||mgaSaveBusy)return false;
+    if(mgaInitialLoadStarted)return false;
+    mgaInitialLoadStarted=true;
     mgaLoadBusy=true;
     try{
       const saved=await readSlotRecord(MGA_SAVE_KEY);
@@ -1571,7 +1576,10 @@
     // Restaura o último ponto em qualquer dispositivo. O core precisa de um
     // pouco mais de tempo no celular para criar o estado antes do loadState;
     // deixar esse caminho fora do touch fazia o jogo reabrir sempre do zero.
-    setTimeout(()=>loadProgress(),isTouchDevice?3500:2500);
+    mgaInitialLoadTimer=setTimeout(()=>{
+      mgaInitialLoadTimer=null;
+      loadProgress();
+    },isTouchDevice?3500:2500);
     // Mantém um checkpoint periódico em qualquer dispositivo. A captura pausa
     // o core por poucos milissegundos e evita depender de pagehide no celular.
     if(mgaSaveTimer)clearInterval(mgaSaveTimer);
