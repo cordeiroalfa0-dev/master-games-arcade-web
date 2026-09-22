@@ -241,6 +241,7 @@
 
     let closed = false;
     let closeInProgress = false;
+    let playerStarted = false;
 
     const finishClose = () => {
       if (closed) return;
@@ -265,7 +266,7 @@
       iframe.contentWindow.postMessage({ type: "mga-request-save-exit" }, location.origin);
       window.setTimeout(() => {
         if (closeInProgress && !closed) {
-          message.textContent = "O salvamento demorou. Tente novamente ou saia sem salvar.";
+          finishClose();
           closeInProgress = false;
         }
       }, 10000);
@@ -273,12 +274,8 @@
 
     const closePlayer = () => {
       if (closed) return;
-      if (!player) return finishClose();
-      if (window.confirm("Deseja salvar a partida antes de sair?\n\nOK = salvar e sair\nCancelar = continuar jogando")) {
-        requestSaveAndClose();
-      } else {
-        if (window.confirm("Sair sem salvar?")) finishClose();
-      }
+      if (!player || !playerStarted) return finishClose();
+      requestSaveAndClose();
     };
 
     const onMessage = (event) => {
@@ -288,6 +285,7 @@
       ) return;
 
       if (event.data?.type === "mga-emulator-started") {
+        playerStarted = true;
         message.remove();
       }
 
