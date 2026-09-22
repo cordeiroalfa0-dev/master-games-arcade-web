@@ -142,17 +142,6 @@ function Index() {
     loader.onload = () => document.head.appendChild(app);
     loader.onerror = () => document.head.appendChild(app);
 
-    const requestFullscreen = () => {
-      if (document.fullscreenElement) return;
-      try {
-        document.documentElement.requestFullscreen?.().catch(() => {});
-      } catch {
-        /* o navegador pode recusar fora de um toque do usuário */
-      }
-    };
-    document.addEventListener("pointerdown", requestFullscreen, { once: true, capture: true });
-    document.addEventListener("keydown", requestFullscreen, { once: true, capture: true });
-
     return () => {
       loader.remove();
       app.remove();
