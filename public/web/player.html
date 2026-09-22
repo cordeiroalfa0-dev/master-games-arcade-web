@@ -1138,18 +1138,21 @@
         const emulator=window.EJS_emulator;
         const wasPaused=!!emulator?.paused;
         try{
-          // O core pode descartar o estado enquanto o loop está executando.
-          // Pause antes de carregar e só retome depois que o arquivo for consumido.
+          // O estado é gravado em /game.state pelo GameManager e só é
+          // consumido pelo core quando o loop volta a processar frames.
+          // Pausar antes do load é seguro, mas nunca podemos deixar o core
+          // pausado depois: em alguns boots do EmulatorJS ele já começa
+          // pausado e, nesse caso, a partida carregada ficava congelada.
           if(!wasPaused){
             if(typeof emulator?.pause==='function')emulator.pause(true);
             else manager.toggleMainLoop?.(0);
           }
           manager.loadState(new Uint8Array(bytes));
-          await mgaSleep(1200);
-          if(!wasPaused){
-            if(typeof emulator?.play==='function')emulator.play(true);
+          if(emulator?.paused){
+            if(typeof emulator.play==='function')emulator.play(true);
             else manager.toggleMainLoop?.(1);
           }
+          await mgaSleep(1200);
           await mgaSleep(250);
           log(`${label}: estado aplicado (tentativa ${attempt})`);
           return true;
