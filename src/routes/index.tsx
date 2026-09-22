@@ -46,9 +46,16 @@ function Index() {
 
         main > aside > div.flex-1.overflow-y-auto {
           display: block !important;
+          flex: 1 1 0% !important;
+          height: auto !important;
+          max-height: none !important;
           overflow-x: hidden !important;
           overflow-y: auto !important;
           min-height: 0 !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          position: relative !important;
+          z-index: 2 !important;
           overscroll-behavior-y: contain;
           -webkit-overflow-scrolling: touch;
           touch-action: pan-y !important;
@@ -72,6 +79,11 @@ function Index() {
         }
 
         main > aside > div.flex-1.overflow-y-auto > button {
+          display: flex !important;
+          visibility: visible !important;
+          opacity: 1 !important;
+          width: 100% !important;
+          min-height: 30px !important;
           padding: 7px 10px !important;
           font-size: clamp(11px, 2.15vw, 14px) !important;
           line-height: 1.2 !important;
