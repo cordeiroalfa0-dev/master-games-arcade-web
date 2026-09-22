@@ -668,9 +668,11 @@
   // público). O CDN só é usado como failsafe automático (emulator.js já
   // tenta cdn.emulatorjs.org sozinho se algum arquivo local faltar).
   window.EJS_pathtodata='/web/emulatorjs-data/';
-  // No touch, aguarde o toque explícito do usuário para reduzir a corrida de
-  // inicialização e liberar áudio/tela cheia no gesto que inicia o jogo.
-  window.EJS_startOnLoaded=!isTouchDevice;
+  // A ROM deve iniciar diretamente ao abrir o jogo, inclusive no celular.
+  // Deixar false no touch fazia o EmulatorJS cair no menu interno do RetroArch
+  // quando o botão manual não era criado a tempo. O botão próprio do player
+  // continua disponível apenas como fallback se o carregamento falhar.
+  window.EJS_startOnLoaded=true;
   window.EJS_alignStartButton='center';
   window.EJS_language='en-US';
   window.EJS_disableAutoLang=true;
