@@ -1027,6 +1027,7 @@
   const MGA_TOTAL_SLOTS=15;
   let mgaSaveTimer=null;
   let mgaSaveBusy=false;
+  let mgaSaveQueued=false;
   let mgaLoadBusy=false;
   let mgaInitialLoadTimer=null;
   let mgaInitialLoadStarted=false;
@@ -1044,7 +1045,14 @@
     if(!window.indexedDB)return reject(new Error('IndexedDB indisponível'));
     const req=indexedDB.open(MGA_SAVE_DB,1);
     req.onupgradeneeded=()=>req.result.createObjectStore(MGA_SAVE_STORE);
-    req.onsuccess=()=>resolve(req.result);
+    req.onsuccess=()=>{
+      // Em navegadores móveis, o armazenamento de origem pode ser removido
+      // sob pressão de espaço. Solicitar persistência não é obrigatório para
+      // funcionar e é ignorado silenciosamente quando o navegador não dá
+      // suporte ou não concede a permissão.
+      try{navigator.storage?.persist?.().catch?.(()=>{})}catch{}
+      resolve(req.result);
+    };
     req.onerror=()=>reject(req.error||new Error('Falha no banco de progresso'));
   });
 
@@ -1265,7 +1273,14 @@
 
   const saveProgress=async(silent=false)=>{
     const manager=window.EJS_emulator?.gameManager;
-    if(!manager||!started||mgaSaveBusy||mgaLoadBusy)return false;
+    if(!manager||!started||mgaLoadBusy)return false;
+    if(mgaSaveBusy){
+      // visibilitychange e pagehide podem chegar quase juntos no celular.
+      // Não descarte o segundo pedido: ele será executado assim que o save
+      // atual terminar, antes de o iframe ser removido pelo launcher.
+      mgaSaveQueued=true;
+      return false;
+    }
     mgaSaveBusy=true;
     const emulator=window.EJS_emulator;
     const wasPaused=!!emulator?.paused;
@@ -1291,6 +1306,10 @@
         }catch(e){log('Progresso: falha ao retomar após auto-save ('+(e?.message||e)+')')}
       }
       mgaSaveBusy=false
+      if(mgaSaveQueued){
+        mgaSaveQueued=false;
+        setTimeout(()=>saveProgress(true),0);
+      }
     }
   };
 
@@ -1577,7 +1596,9 @@
     // Mantém um checkpoint periódico em qualquer dispositivo. A captura pausa
     // o core por poucos milissegundos e evita depender de pagehide no celular.
     if(mgaSaveTimer)clearInterval(mgaSaveTimer);
-    mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},120000);
+    // Checkpoint mais frequente no celular reduz a janela de perda quando o
+    // sistema encerra a aba sem entregar pagehide ao navegador.
+    mgaSaveTimer=setInterval(()=>{if(!document.hidden)saveProgress(true)},isTouchDevice?30000:120000);
     // O shader só pode ser ativado depois de o contexto gráfico do core existir.
     setTimeout(applyPixelEnhancement,0);
     requestWakeLock();
