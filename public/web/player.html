@@ -25,10 +25,16 @@
     @media (min-resolution:2dppx){#game canvas,#game video{image-rendering:pixelated}}
     @media (orientation:portrait){body.video-auto #game canvas,body.video-auto #game video{max-width:100vw;max-height:75vh;object-fit:contain}}
     /* O launcher mostra apenas o jogo, não a interface do emulador. */
-    #game button,#game [role="button"],#game .ejs_menu_bar,#game .ejs_menu,
+    #game button:not(.ejs_virtualGamepad_button),#game [role="button"]:not(.ejs_virtualGamepad_button),#game .ejs_menu_bar,#game .ejs_menu,
     #game .ejs_context_menu,#game .ejs_volume_parent,#game [class*="ejs-menu"],
     #game [class*="ejs_context"],#game [class*="ejs-start"]{
       display:none!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important
+    }
+    /* Os botões touch são a única interface do jogo no celular. A regra geral
+       acima oculta a UI interna do EmulatorJS, mas nunca pode ocultar CRÉDITO,
+       START, direcional e ataques do gamepad virtual. */
+    #game .ejs_virtualGamepad_button{
+      display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important
     }
     #status{position:fixed;inset:0;z-index:99999;display:grid;place-items:start center;background:linear-gradient(rgba(0,0,0,.94) 0,rgba(0,0,0,.94) 92px,transparent 92px);color:#00e5ff;font:700 16px monospace;text-align:center;padding:70px 24px 24px;box-sizing:border-box;white-space:pre-wrap;pointer-events:none;text-shadow:0 0 8px #000,0 0 14px #00e5ff}
     #debug{position:fixed;left:10px;right:10px;bottom:10px;z-index:100000;max-height:42vh;overflow:auto;display:none;background:rgba(0,0,0,.9);border:1px solid #00e5ff;color:#00e5ff;padding:10px;box-sizing:border-box;font:12px/1.35 monospace;white-space:pre-wrap}
@@ -372,7 +378,7 @@
   <button id="manual-start" type="button">▶ CLIQUE PARA INICIAR</button>
   
   <div id="player-controls">
-    <button id="btn-save" class="mga-ctrl-btn" type="button" title="Salvar e Carregar Partidas (15 Slots)" aria-label="Saves">💾 Saves</button>
+      <button id="btn-save" class="mga-ctrl-btn" type="button" title="Último momento salvo" aria-label="Último momento salvo">💾 Momento</button>
     <button id="btn-pause" class="mga-ctrl-btn" type="button" title="Pausar / Retomar Jogo" aria-label="Pausa">⏸</button>
     <button id="btn-haptic" class="mga-ctrl-btn" type="button" title="Vibração Tátil nos Botões (Haptic)" aria-label="Vibração">📳</button>
     <button id="btn-opacity" class="mga-ctrl-btn" type="button" title="Ajustar Opacidade dos Controles Virtuais" aria-label="Opacidade">👁 75%</button>
@@ -384,14 +390,14 @@
   <div id="mga-saves-modal" role="dialog" aria-modal="true" aria-labelledby="mga-modal-title">
     <div class="mga-modal-dialog">
       <div class="mga-modal-header">
-        <span id="mga-modal-title" class="mga-modal-title">💾 PARTIDAS SALVAS (15 SLOTS)</span>
+        <span id="mga-modal-title" class="mga-modal-title">💾 ÚLTIMO MOMENTO SALVO</span>
         <button id="mga-modal-close" class="mga-modal-close" type="button" aria-label="Fechar">✕</button>
       </div>
       <div class="mga-modal-actions">
         <button id="mga-btn-return" class="mga-btn-action mga-btn-return" type="button">▶ Voltar à partida</button>
-        <button id="mga-btn-quick-save" class="mga-btn-action" type="button">⚡ Quick Save</button>
-        <button id="mga-btn-quick-load" class="mga-btn-action" type="button">⚡ Quick Load</button>
-        <span style="font-size:10px;color:#888;margin-left:auto;">Toque em Salvar ou Carregar no slot desejado</span>
+        <button id="mga-btn-quick-save" class="mga-btn-action" type="button">📸 Salvar momento</button>
+        <button id="mga-btn-quick-load" class="mga-btn-action" type="button">▶ Retornar ao momento</button>
+        <span style="font-size:10px;color:#888;margin-left:auto;">Imagem e estado da partida salvos juntos</span>
       </div>
       <div id="mga-slots-list" class="mga-slots-grid"></div>
     </div>
@@ -1096,6 +1102,20 @@
     }catch{return null}
   };
 
+  // Guarda uma prévia visual do mesmo frame usado para o estado. A imagem é
+  // apenas a confirmação visual do momento; o estado binário continua sendo
+  // salvo para que "Retornar ao momento" realmente restaure a partida.
+  const captureMomentImage=()=>{
+    try{
+      const canvas=document.querySelector('#game canvas');
+      if(!canvas||!canvas.width||!canvas.height)return '';
+      return canvas.toDataURL('image/jpeg',.78);
+    }catch(e){
+      log('Imagem do momento indisponível: '+(e?.message||e));
+      return '';
+    }
+  };
+
   const isValidSavedRecord=record=>{
     const bytes=normalizeStateBytes(record?.state);
     if(!bytes)return false;
@@ -1123,7 +1143,7 @@
       const now=Date.now();
       const dateStr=new Date(now).toLocaleString('pt-BR');
       const key=getSlotKey(slot);
-      const record={key,slot,rom:romBase,core,savedAt:now,dateStr,state,stateSize:state.byteLength};
+      const record={key,slot,rom:romBase,core,savedAt:now,dateStr,state,stateSize:state.byteLength,preview:captureMomentImage()};
       await withProgressDb(db=>putAndVerifyRecord(db,key,record));
       setLastSlot(slot);
       if(!silent)showToast(`💾 Partida salva no Slot ${slot}!`);
@@ -1299,8 +1319,8 @@
       if(!state)throw new Error('Estado vazio ou inválido');
       const now=Date.now();
       const dateStr=new Date(now).toLocaleString('pt-BR');
-      await withProgressDb(db=>putAndVerifyRecord(db,MGA_SAVE_KEY,{state,stateSize:state.byteLength,savedAt:now,dateStr}));
-      if(!silent)showToast('💾 Progresso salvo automaticamente');
+      await withProgressDb(db=>putAndVerifyRecord(db,MGA_SAVE_KEY,{state,stateSize:state.byteLength,savedAt:now,dateStr,rom:romBase,core,preview:captureMomentImage()}));
+      if(!silent)showToast('📸 Momento salvo');
       return true;
     }catch(e){log('Progresso: falha ao salvar auto '+(e?.message||e));return false}
     finally{
@@ -1365,7 +1385,7 @@
   const renderSlotsList=async()=>{
     const container=document.getElementById('mga-slots-list');
     if(!container)return;
-    container.innerHTML='<div style="color:#00e5ff;font-size:12px;padding:8px;">Carregando slots...</div>';
+      container.innerHTML='<div style="color:#00e5ff;font-size:12px;padding:8px;">Carregando último momento...</div>';
     try{
       const db=await openProgressDb();
       const recordsMap={};
@@ -1394,22 +1414,26 @@
 
       container.innerHTML='';
 
-      // Slot Automático
+      // Um único momento: a imagem confirma visualmente o frame salvo e o
+      // estado binário permite retornar exatamente à partida.
       const autoSave=recordsMap['auto'];
       const autoCard=document.createElement('div');
       autoCard.className='mga-slot-card'+(autoSave?' has-data':'');
       autoCard.style.borderLeft='3px solid #ffbb00';
       autoCard.innerHTML=`
+        ${autoSave?.preview?`<img src="${autoSave.preview}" alt="Imagem do último momento salvo" style="display:block;width:100%;max-height:220px;object-fit:contain;background:#000;border:1px solid #00e5ff44;margin-bottom:10px;">`:''}
         <div class="mga-slot-left">
-          <span class="mga-slot-badge" style="color:#ffbb00">⚡ SLOT AUTOMÁTICO (Auto-Save)</span>
-          <span class="mga-slot-time">${autoSave?('💾 '+ (autoSave.dateStr || new Date(autoSave.savedAt).toLocaleString('pt-BR'))):'Nenhum save automático ainda'}</span>
+          <span class="mga-slot-badge" style="color:#ffbb00">📸 ÚLTIMO MOMENTO</span>
+          <span class="mga-slot-time">${autoSave?('💾 '+ (autoSave.dateStr || new Date(autoSave.savedAt).toLocaleString('pt-BR'))):'Nenhum momento salvo ainda'}</span>
         </div>
         <div class="mga-slot-btns">
-          <button class="mga-btn-load" type="button" ${autoSave?'':'disabled'}>▶ Carregar</button>
+          <button class="mga-btn-load" type="button" ${autoSave?'':'disabled'}>▶ Retornar</button>
+          ${autoSave?.preview?`<a class="mga-btn-action" download="master-games-momento.jpg" href="${autoSave.preview}" style="text-decoration:none;display:inline-block;">⬇ Baixar imagem</a>`:''}
         </div>
       `;
       autoCard.querySelector('.mga-btn-load').onclick=()=>loadProgress();
       container.appendChild(autoCard);
+      return;
 
       // Slots 1 a 15
       for(let i=1;i<=MGA_TOTAL_SLOTS;i++){
@@ -1469,8 +1493,8 @@
   const btnReturn=document.getElementById('mga-btn-return');
   if(btnReturn)btnReturn.addEventListener('click',closeSavesModal);
 
-  if(btnQuickSave)btnQuickSave.addEventListener('click',()=>saveToSlot(getLastSlot()));
-  if(btnQuickLoad)btnQuickLoad.addEventListener('click',()=>loadFromSlot(getLastSlot()));
+  if(btnQuickSave)btnQuickSave.addEventListener('click',()=>saveProgress(false));
+  if(btnQuickLoad)btnQuickLoad.addEventListener('click',()=>loadProgress());
 
   // ===============================================================
   // MELHORIAS MOBILE: Haptic Feedback, Pausa Rápida, Opacidade & Anti-Gestos
@@ -1700,7 +1724,7 @@
   // sintético do EmulatorJS e iniciar o core duas vezes.
 
   const hideEmulatorUi=()=>{
-    document.querySelectorAll('#game button,#game [role="button"],#game .ejs_menu_bar,#game .ejs_menu,#game .ejs_context_menu,#game .ejs_volume_parent').forEach(el=>{
+    document.querySelectorAll('#game button:not(.ejs_virtualGamepad_button),#game [role="button"]:not(.ejs_virtualGamepad_button),#game .ejs_menu_bar,#game .ejs_menu,#game .ejs_context_menu,#game .ejs_volume_parent').forEach(el=>{
       el.style.display='none';
     });
   };
