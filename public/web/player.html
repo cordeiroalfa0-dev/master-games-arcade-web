@@ -1178,12 +1178,17 @@
       if(manager?.loadState){
         const emulator=window.EJS_emulator;
         try{
-          // O GameManager grava o estado em /game.state e o core só o aplica
-          // enquanto o loop está processando frames. A sequência anterior
-          // pausava o core antes do load e, em alguns celulares, o loop não
-          // voltava a processar o estado: o slot aparecia como carregado, mas
-          // a partida permanecia congelada ou voltava ao início.
-          manager.loadState(new Uint8Array(bytes));
+          // O GameManager do EmulatorJS 4.2.3 recebe o caminho do arquivo no
+          // cwrap do core (load_state), não o Uint8Array. Passar os bytes
+          // diretamente fazia o slot parecer carregado, mas o core ignorava
+          // o estado e continuava no início da partida.
+          const fs=manager.FS||emulator?.gameManager?.FS;
+          if(!fs?.writeFile||!manager.functions?.loadState){
+            throw new Error('API de arquivo do core indisponível');
+          }
+          try{fs.unlink('/game.state')}catch{}
+          fs.writeFile('/game.state',new Uint8Array(bytes));
+          manager.functions.loadState('game.state',0);
           if(emulator?.paused){
             if(typeof emulator.play==='function')emulator.play(true);
             else manager.toggleMainLoop?.(1);
