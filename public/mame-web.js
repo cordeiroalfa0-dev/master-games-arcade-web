@@ -289,10 +289,12 @@
 
       if (event.data?.type === "mga-emulator-started") {
         message.remove();
-        // Depois que a ROM iniciou, o jogador deve ver somente o jogo e os
-        // controles touch; a barra do launcher não pode ficar sobre a tela.
-        bar.style.opacity = "0";
+        // Durante a partida, mantenha apenas uma saída discreta acessível;
+        // o botão Saves e o restante da barra não cobrem mais a tela.
+        btnSaves.style.display = "none";
+        bar.style.background = "transparent";
         bar.style.pointerEvents = "none";
+        close.style.pointerEvents = "auto";
       }
 
       if (event.data?.type === "mga-emulator-exit") {
@@ -426,11 +428,11 @@
 
       const close = document.createElement("button");
       close.type = "button";
-      close.textContent = "✕";
-      close.title = "Fechar";
-      close.setAttribute("aria-label", "Fechar");
+      close.textContent = "Sair";
+      close.title = "Sair do jogo";
+      close.setAttribute("aria-label", "Sair do jogo");
       close.style.cssText =
-        "pointer-events:auto;width:34px;height:34px;padding:0;display:grid;place-items:center;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;cursor:pointer;font-size:20px;font-weight:bold;line-height:1;font-family:Arial,sans-serif;border-radius:4px;";
+        "pointer-events:auto;height:34px;min-width:58px;padding:0 10px;display:grid;place-items:center;background:#16051d;border:1px solid #ff2bd6;box-shadow:0 0 10px #ff2bd655;color:#fff;cursor:pointer;font-size:12px;font-weight:bold;line-height:1;font-family:monospace;border-radius:4px;";
       navActions.appendChild(close);
 
       bar.appendChild(navActions);
