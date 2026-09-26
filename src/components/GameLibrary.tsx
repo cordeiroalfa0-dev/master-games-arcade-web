@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Star, Play, Clock3, Ghost, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
+import { Search, Star, Play, Clock3, Ghost, RotateCcw, Maximize2, Minimize2, Gamepad2, Minus } from "lucide-react";
 
 /**
  * Biblioteca de jogos local.
@@ -69,6 +69,8 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
 
   const [backgroundIndex, setBackgroundIndex] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isWindowOpen, setIsWindowOpen] = useState(true);
+  const [isWindowExpanded, setIsWindowExpanded] = useState(false);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -274,58 +276,104 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
         </div>
       </header>
 
-      <main className="relative z-10 w-full px-0 py-6">
-        {phase === "loading" && <LibrarySkeleton />}
-
-        {phase === "error" && (
-          <div className="mx-auto mt-16 flex max-w-md flex-col items-center gap-4 text-center">
-            <Ghost className="h-10 w-10 text-pink-400" />
-            <p className="font-mono text-sm text-pink-300">{errorMessage}</p>
-            <button
-              type="button"
-              onClick={loadLibrary}
-              className="flex items-center gap-2 rounded-full border border-cyan-400 px-4 py-2 font-mono text-xs font-bold text-cyan-300 hover:bg-cyan-400/10"
-            >
-              <RotateCcw className="h-3.5 w-3.5" /> Tentar novamente
-            </button>
+      {isWindowOpen ? (
+        <section
+          aria-label="Janela da biblioteca de jogos"
+          className={`fixed right-3 top-24 z-30 flex max-h-[calc(100dvh-7rem)] flex-col overflow-hidden rounded-2xl border border-cyan-500/35 bg-[#050009]/85 shadow-[0_0_36px_rgba(0,229,255,.22)] backdrop-blur-xl transition-[width] duration-300 ${
+            isWindowExpanded ? "w-[min(96vw,1100px)]" : "w-[min(92vw,420px)]"
+          }`}
+        >
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-cyan-500/20 bg-black/35 px-3 py-2.5">
+            <div className="min-w-0">
+              <h2 className="font-mono text-xs font-bold tracking-[0.16em] text-cyan-300">BIBLIOTECA</h2>
+              <p className="font-mono text-[10px] text-zinc-500">
+                {phase === "ready" ? `${visibleRoms.length} jogos` : "Master Games Arcade"}
+              </p>
+            </div>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setIsWindowExpanded((expanded) => !expanded)}
+                aria-label={isWindowExpanded ? "Recolher janela" : "Expandir janela"}
+                title={isWindowExpanded ? "Recolher janela" : "Expandir janela"}
+                className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:border-cyan-400/60 hover:text-cyan-200"
+              >
+                {isWindowExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+              </button>
+              <button
+                type="button"
+                onClick={() => setIsWindowOpen(false)}
+                aria-label="Ocultar janela da biblioteca"
+                title="Ocultar janela"
+                className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:border-pink-400/60 hover:text-pink-200"
+              >
+                <Minus className="h-4 w-4" />
+              </button>
+            </div>
           </div>
-        )}
 
-        {phase === "ready" && visibleRoms.length === 0 && (
-          <div className="mt-16 text-center font-mono text-sm text-zinc-500">
-            {tab === "favorites"
-              ? "Nenhum favorito ainda. Toque na estrela de um jogo para guardar aqui."
-              : tab === "recent"
-                ? "Você ainda não jogou nada nesta sessão."
-                : "Nenhum jogo encontrado para essa busca."}
-          </div>
-        )}
+          <div className="min-h-0 flex-1 overflow-y-auto p-3 sm:p-4">
+            {phase === "loading" && <LibrarySkeleton expanded={isWindowExpanded} />}
 
-        {phase === "ready" && visibleRoms.length > 0 && (
-          <div className="ml-auto grid w-full max-w-xs grid-cols-2 gap-3">
-            {visibleRoms.map((rom) => (
-              <GameCard
-                key={rom}
-                title={titleFor(rom)}
-                snapUrl={snapFor(rom)}
-                isFavorite={favoriteSet.has(rom)}
-                isLaunching={launching === rom}
-                onPlay={() => playGame(rom)}
-                onToggleFavorite={(e) => toggleFavorite(rom, e)}
-              />
-            ))}
-          </div>
-        )}
+            {phase === "error" && (
+              <div className="mx-auto mt-12 flex max-w-md flex-col items-center gap-4 text-center">
+                <Ghost className="h-10 w-10 text-pink-400" />
+                <p className="font-mono text-sm text-pink-300">{errorMessage}</p>
+                <button
+                  type="button"
+                  onClick={loadLibrary}
+                  className="flex items-center gap-2 rounded-full border border-cyan-400 px-4 py-2 font-mono text-xs font-bold text-cyan-300 hover:bg-cyan-400/10"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" /> Tentar novamente
+                </button>
+              </div>
+            )}
 
-        {launchError && (
-          <div
-            role="alert"
-            className="fixed bottom-4 left-1/2 z-40 -translate-x-1/2 rounded-full border border-pink-500 bg-black/90 px-4 py-2 font-mono text-xs text-pink-300 shadow-[0_0_20px_rgba(255,43,109,.35)]"
-          >
-            {launchError}
+            {phase === "ready" && visibleRoms.length === 0 && (
+              <div className="mt-12 text-center font-mono text-sm text-zinc-500">
+                {tab === "favorites"
+                  ? "Nenhum favorito ainda. Toque na estrela de um jogo para guardar aqui."
+                  : tab === "recent"
+                    ? "Você ainda não jogou nada nesta sessão."
+                    : "Nenhum jogo encontrado para essa busca."}
+              </div>
+            )}
+
+            {phase === "ready" && visibleRoms.length > 0 && (
+              <div className={`grid grid-cols-2 gap-3 ${isWindowExpanded ? "sm:grid-cols-3 xl:grid-cols-4" : ""}`}>
+                {visibleRoms.map((rom) => (
+                  <GameCard
+                    key={rom}
+                    title={titleFor(rom)}
+                    snapUrl={snapFor(rom)}
+                    isFavorite={favoriteSet.has(rom)}
+                    isLaunching={launching === rom}
+                    onPlay={() => playGame(rom)}
+                    onToggleFavorite={(e) => toggleFavorite(rom, e)}
+                  />
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </main>
+        </section>
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsWindowOpen(true)}
+          className="fixed bottom-4 right-4 z-30 flex items-center gap-2 rounded-full border border-cyan-400/60 bg-[#050009]/90 px-4 py-3 font-mono text-xs font-bold text-cyan-200 shadow-[0_0_22px_rgba(0,229,255,.24)] backdrop-blur-md transition-colors hover:bg-cyan-400/15"
+        >
+          <Gamepad2 className="h-4 w-4" /> Mostrar biblioteca
+        </button>
+      )}
+
+      {launchError && (
+        <div
+          role="alert"
+          className="fixed bottom-4 left-1/2 z-40 -translate-x-1/2 rounded-full border border-pink-500 bg-black/90 px-4 py-2 font-mono text-xs text-pink-300 shadow-[0_0_20px_rgba(255,43,109,.35)]"
+        >
+          {launchError}
+        </div>
+      )}
     </div>
   );
 }
@@ -407,9 +455,9 @@ function GameCard({
   );
 }
 
-function LibrarySkeleton() {
+function LibrarySkeleton({ expanded }: { expanded: boolean }) {
   return (
-    <div className="ml-auto grid w-full max-w-xs grid-cols-2 gap-3">
+    <div className={`grid grid-cols-2 gap-3 ${expanded ? "sm:grid-cols-3 xl:grid-cols-4" : ""}`}>
       {Array.from({ length: 12 }).map((_, i) => (
         <div key={i} className="animate-pulse overflow-hidden rounded-lg border border-white/10 bg-[#0a0014]">
           <div className="aspect-[4/3] bg-white/5" />
