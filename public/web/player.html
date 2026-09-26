@@ -177,6 +177,9 @@
       body{
         --mga-l-strip:calc(38px + max(8px, env(safe-area-inset-bottom)));
         --mga-l-game:calc(100dvh - var(--mga-l-strip));
+        /* Reserva espaço real para o direcional e os botões, deixando a
+           imagem do jogo no centro em vez de colocar os controles por cima. */
+        --mga-l-side:calc(max(clamp(112px,34vw,184px),calc(clamp(48px,13.5vw,74px)*3 + clamp(6px,2.2vw,14px)*2)) + 24px);
       }
       #game{
         position:fixed!important;inset:0!important;
@@ -209,10 +212,19 @@
       #game canvas,#game video{
         position:absolute!important;top:0!important;bottom:var(--mga-l-strip)!important;
         left:0!important;right:0!important;margin:auto!important;
-        width:min(100dvw,calc(var(--mga-l-game) * 1.333333))!important;
+        width:min(calc(100dvw - var(--mga-l-side)*2),calc(var(--mga-l-game) * 1.333333))!important;
         height:var(--mga-l-game)!important;
         max-width:100dvw!important;max-height:var(--mga-l-game)!important;
         object-fit:fill!important;z-index:1;transform:none!important
+      }
+      /* A regra stretch global preenche a viewport inteira; no celular ela
+         também precisa respeitar as duas faixas laterais reservadas. */
+      body.video-stretch #game .ejs_canvas_parent,
+      body.video-stretch #game canvas,body.video-stretch #game video{
+        top:0!important;left:50%!important;right:auto!important;bottom:var(--mga-l-strip)!important;
+        width:min(calc(100dvw - var(--mga-l-side)*2),calc(var(--mga-l-game) * 1.333333))!important;
+        height:var(--mga-l-game)!important;max-width:none!important;max-height:var(--mga-l-game)!important;
+        transform:translateX(-50%)!important;object-fit:fill!important;z-index:1
       }
       /* CRÉDITO/START centralizados na base com fundo semitransparente */
       #game .ejs_virtualGamepad_bottom{
@@ -237,7 +249,7 @@
         z-index:99999!important
       }
     }
-    @media (orientation:landscape) and (max-height:600px){
+      @media (orientation:landscape) and (max-height:600px){
       #game .ejs_virtualGamepad_parent{
         /* Direcional e botões maiores na horizontal: ocupam as faixas
            laterais livres, sem cobrir a tela do jogo centralizada. */
@@ -247,6 +259,7 @@
         --mga-side:max(10px,env(safe-area-inset-left));
         --mga-floor:max(8px,env(safe-area-inset-bottom))
       }
+      body{--mga-l-side:calc(max(128px,calc(54px*3 + 6px*2)) + 24px)}
       #difficulty-setup{padding:10px max(12px,env(safe-area-inset-left)) 10px}
       #difficulty-setup .difficulty-card{width:min(620px,100%);max-height:calc(100vh - 20px);overflow:auto;padding:8px 12px}
       #difficulty-setup .difficulty-card>div:first-child{margin-bottom:6px!important;font-size:10px!important}
