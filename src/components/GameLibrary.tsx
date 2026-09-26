@@ -225,7 +225,7 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-6xl px-4 py-6 sm:px-8">
+      <main className="relative z-10 w-full px-0 py-6">
         {phase === "loading" && <LibrarySkeleton />}
 
         {phase === "error" && (
