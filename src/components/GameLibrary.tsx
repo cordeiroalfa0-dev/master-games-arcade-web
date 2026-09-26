@@ -28,6 +28,11 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "recent", label: "Recentes" },
 ];
 
+const BACKGROUND_IMAGES = [
+  "/assets/arcade-hero-alternate-2.png",
+  "/assets/arcade-hero-alternate.png",
+];
+
 const fileBase = (name: string) =>
   name
     .toLowerCase()
@@ -62,11 +67,21 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
   const [launchError, setLaunchError] = useState("");
   const mountedRef = useRef(true);
 
+  const [backgroundIndex, setBackgroundIndex] = useState(0);
+
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setBackgroundIndex((current) => (current + 1) % BACKGROUND_IMAGES.length);
+    }, 10_000);
+
+    return () => window.clearInterval(intervalId);
   }, []);
 
   const loadLibrary = async () => {
@@ -169,12 +184,17 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#050009] text-[#eafffe]">
       <div className="pointer-events-none fixed inset-0 z-0 bg-[#050009]">
-        <img
-          src="/assets/arcade-hero.png"
-          alt=""
-          aria-hidden="true"
-          className="h-full w-full object-cover object-center opacity-60"
-        />
+        {BACKGROUND_IMAGES.map((image, index) => (
+          <img
+            key={image}
+            src={image}
+            alt=""
+            aria-hidden="true"
+            className={`absolute inset-0 h-full w-full object-cover object-center transition-opacity duration-1000 ${
+              index === backgroundIndex ? "opacity-60" : "opacity-0"
+            }`}
+          />
+        ))}
         <div className="absolute inset-0 bg-[#050009]/45" />
       </div>
 
