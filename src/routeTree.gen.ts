@@ -13,6 +13,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as BiosFileRouteImport } from './routes/$biosFile'
 import { Route as AssetsSplatRouteImport } from './routes/assets/$'
 import { Route as FontsSplatRouteImport } from './routes/fonts/$'
+import { Route as ApiAuthGoogleRouteImport } from './routes/api/auth/google'
+import { Route as ApiAuthLogoutRouteImport } from './routes/api/auth/logout'
+import { Route as ApiAuthMeRouteImport } from './routes/api/auth/me'
+import { Route as ApiSavesIndexRouteImport } from './routes/api/saves/index'
+import { Route as ApiAuthGoogleCallbackRouteImport } from './routes/api/auth/google/callback'
 import { Route as ApiRomIdNameRouteImport } from './routes/api/rom/$id/$name'
 
 const IndexRoute = IndexRouteImport.update({
@@ -35,6 +40,31 @@ const FontsSplatRoute = FontsSplatRouteImport.update({
   path: '/fonts/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAuthGoogleRoute = ApiAuthGoogleRouteImport.update({
+  id: '/api/auth/google',
+  path: '/api/auth/google',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthLogoutRoute = ApiAuthLogoutRouteImport.update({
+  id: '/api/auth/logout',
+  path: '/api/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthMeRoute = ApiAuthMeRouteImport.update({
+  id: '/api/auth/me',
+  path: '/api/auth/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSavesIndexRoute = ApiSavesIndexRouteImport.update({
+  id: '/api/saves/',
+  path: '/api/saves/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAuthGoogleCallbackRoute = ApiAuthGoogleCallbackRouteImport.update({
+  id: '/callback',
+  path: '/callback',
+  getParentRoute: () => ApiAuthGoogleRoute,
+} as any)
 const ApiRomIdNameRoute = ApiRomIdNameRouteImport.update({
   id: '/api/rom/$id/$name',
   path: '/api/rom/$id/$name',
@@ -46,6 +76,11 @@ export interface FileRoutesByFullPath {
   '/$biosFile': typeof BiosFileRoute
   '/assets/$': typeof AssetsSplatRoute
   '/fonts/$': typeof FontsSplatRoute
+  '/api/auth/google': typeof ApiAuthGoogleRouteWithChildren
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/saves/': typeof ApiSavesIndexRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
   '/api/rom/$id/$name': typeof ApiRomIdNameRoute
 }
 export interface FileRoutesByTo {
@@ -53,6 +88,11 @@ export interface FileRoutesByTo {
   '/$biosFile': typeof BiosFileRoute
   '/assets/$': typeof AssetsSplatRoute
   '/fonts/$': typeof FontsSplatRoute
+  '/api/auth/google': typeof ApiAuthGoogleRouteWithChildren
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/saves': typeof ApiSavesIndexRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
   '/api/rom/$id/$name': typeof ApiRomIdNameRoute
 }
 export interface FileRoutesById {
@@ -61,20 +101,49 @@ export interface FileRoutesById {
   '/$biosFile': typeof BiosFileRoute
   '/assets/$': typeof AssetsSplatRoute
   '/fonts/$': typeof FontsSplatRoute
+  '/api/auth/google': typeof ApiAuthGoogleRouteWithChildren
+  '/api/auth/logout': typeof ApiAuthLogoutRoute
+  '/api/auth/me': typeof ApiAuthMeRoute
+  '/api/saves/': typeof ApiSavesIndexRoute
+  '/api/auth/google/callback': typeof ApiAuthGoogleCallbackRoute
   '/api/rom/$id/$name': typeof ApiRomIdNameRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    '/' | '/$biosFile' | '/assets/$' | '/fonts/$' | '/api/rom/$id/$name'
+    | '/'
+    | '/$biosFile'
+    | '/assets/$'
+    | '/fonts/$'
+    | '/api/auth/google'
+    | '/api/auth/logout'
+    | '/api/auth/me'
+    | '/api/saves/'
+    | '/api/auth/google/callback'
+    | '/api/rom/$id/$name'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$biosFile' | '/assets/$' | '/fonts/$' | '/api/rom/$id/$name'
+  to:
+    | '/'
+    | '/$biosFile'
+    | '/assets/$'
+    | '/fonts/$'
+    | '/api/auth/google'
+    | '/api/auth/logout'
+    | '/api/auth/me'
+    | '/api/saves'
+    | '/api/auth/google/callback'
+    | '/api/rom/$id/$name'
   id:
     | '__root__'
     | '/'
     | '/$biosFile'
     | '/assets/$'
     | '/fonts/$'
+    | '/api/auth/google'
+    | '/api/auth/logout'
+    | '/api/auth/me'
+    | '/api/saves/'
+    | '/api/auth/google/callback'
     | '/api/rom/$id/$name'
   fileRoutesById: FileRoutesById
 }
@@ -83,6 +152,10 @@ export interface RootRouteChildren {
   BiosFileRoute: typeof BiosFileRoute
   AssetsSplatRoute: typeof AssetsSplatRoute
   FontsSplatRoute: typeof FontsSplatRoute
+  ApiAuthGoogleRoute: typeof ApiAuthGoogleRouteWithChildren
+  ApiAuthLogoutRoute: typeof ApiAuthLogoutRoute
+  ApiAuthMeRoute: typeof ApiAuthMeRoute
+  ApiSavesIndexRoute: typeof ApiSavesIndexRoute
   ApiRomIdNameRoute: typeof ApiRomIdNameRoute
 }
 
@@ -116,6 +189,41 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FontsSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/auth/google': {
+      id: '/api/auth/google'
+      path: '/api/auth/google'
+      fullPath: '/api/auth/google'
+      preLoaderRoute: typeof ApiAuthGoogleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/logout': {
+      id: '/api/auth/logout'
+      path: '/api/auth/logout'
+      fullPath: '/api/auth/logout'
+      preLoaderRoute: typeof ApiAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/me': {
+      id: '/api/auth/me'
+      path: '/api/auth/me'
+      fullPath: '/api/auth/me'
+      preLoaderRoute: typeof ApiAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/saves/': {
+      id: '/api/saves/'
+      path: '/api/saves'
+      fullPath: '/api/saves/'
+      preLoaderRoute: typeof ApiSavesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/auth/google/callback': {
+      id: '/api/auth/google/callback'
+      path: '/callback'
+      fullPath: '/api/auth/google/callback'
+      preLoaderRoute: typeof ApiAuthGoogleCallbackRouteImport
+      parentRoute: typeof ApiAuthGoogleRoute
+    }
     '/api/rom/$id/$name': {
       id: '/api/rom/$id/$name'
       path: '/api/rom/$id/$name'
@@ -126,11 +234,27 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface ApiAuthGoogleRouteChildren {
+  ApiAuthGoogleCallbackRoute: typeof ApiAuthGoogleCallbackRoute
+}
+
+const ApiAuthGoogleRouteChildren: ApiAuthGoogleRouteChildren = {
+  ApiAuthGoogleCallbackRoute: ApiAuthGoogleCallbackRoute,
+}
+
+const ApiAuthGoogleRouteWithChildren = ApiAuthGoogleRoute._addFileChildren(
+  ApiAuthGoogleRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BiosFileRoute: BiosFileRoute,
   AssetsSplatRoute: AssetsSplatRoute,
   FontsSplatRoute: FontsSplatRoute,
+  ApiAuthGoogleRoute: ApiAuthGoogleRouteWithChildren,
+  ApiAuthLogoutRoute: ApiAuthLogoutRoute,
+  ApiAuthMeRoute: ApiAuthMeRoute,
+  ApiSavesIndexRoute: ApiSavesIndexRoute,
   ApiRomIdNameRoute: ApiRomIdNameRoute,
 }
 export const routeTree = rootRouteImport

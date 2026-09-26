@@ -235,7 +235,7 @@
     playerUrl.searchParams.set("name", cleanRomName(romName));
     // O player é alterado junto com o bridge; versionar a URL evita que o
     // navegador reutilize uma versão antiga que ainda exibia o menu RetroArch.
-    playerUrl.searchParams.set("v", "20260922-auto-start-v7");
+    playerUrl.searchParams.set("v", "20260926-zip-auto-start-v3");
     if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
     if (biosName) playerUrl.searchParams.set("biosName", biosName);
 
@@ -411,7 +411,7 @@
 
       const btnSaves = document.createElement("button");
       btnSaves.type = "button";
-      btnSaves.textContent = "💾 Saves (1-15)";
+      btnSaves.textContent = "💾 Saves";
       btnSaves.title = "Gerenciar Partidas Salvas";
       btnSaves.setAttribute("aria-label", "Partidas Salvas");
       btnSaves.style.cssText =
