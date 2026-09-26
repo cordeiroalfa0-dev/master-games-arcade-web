@@ -279,10 +279,10 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
       {isWindowOpen ? (
         <section
           aria-label="Janela da biblioteca de jogos"
-          className={`fixed right-2 top-[14rem] z-30 flex max-h-[calc(100dvh-15rem)] w-[min(88vw,360px)] flex-col overflow-hidden rounded-2xl border border-cyan-500/35 bg-[#050009]/85 shadow-[0_0_36px_rgba(0,229,255,.22)] backdrop-blur-xl transition-[width] duration-300 sm:right-3 sm:top-24 sm:max-h-[calc(100dvh-7rem)] ${
+          className={`fixed right-2 top-[14rem] z-30 flex max-h-[calc(100dvh-15rem)] w-[min(88vw,250px)] flex-col overflow-hidden rounded-2xl border border-cyan-500/35 bg-[#050009]/85 shadow-[0_0_36px_rgba(0,229,255,.22)] backdrop-blur-xl transition-[width] duration-300 sm:right-3 sm:top-24 sm:max-h-[calc(100dvh-7rem)] ${
             isWindowExpanded
               ? "w-[calc(100vw-1rem)] sm:w-[min(96vw,1100px)]"
-              : "w-[min(88vw,360px)] sm:w-[min(92vw,420px)]"
+              : "w-[min(88vw,250px)] sm:w-[min(92vw,250px)]"
           }`}
         >
           <div className="flex shrink-0 items-center justify-between gap-3 border-b border-cyan-500/20 bg-black/35 px-3 py-2.5">
