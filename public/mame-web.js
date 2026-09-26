@@ -370,20 +370,24 @@
     return { closePlayer };
   }
 
-  function showWebPlayer(romName) {
+  const enterMobileLandscape = (target) => {
+    if (!matchMedia("(pointer: coarse)").matches) return;
+    const lock = () => {
+      try { screen.orientation?.lock?.("landscape").catch(() => {}); } catch {}
+    };
     try {
-      const el = document.documentElement;
-      const req = el.requestFullscreen || el.webkitRequestFullscreen;
-      if (req && !document.fullscreenElement) {
-        req.call(el).then(() => {
-          if (screen.orientation?.lock) {
-            screen.orientation.lock("landscape").catch(() => {});
-          }
-        }).catch(() => {});
-      } else if (screen.orientation?.lock) {
-        screen.orientation.lock("landscape").catch(() => {});
+      const element = target || document.documentElement;
+      const req = element.requestFullscreen || element.webkitRequestFullscreen;
+      if (!document.fullscreenElement && req) {
+        const result = req.call(element, { navigationUI: "hide" });
+        if (result?.then) result.then(lock).catch(() => {});
+      } else {
+        lock();
       }
     } catch {}
+  };
+
+  function showWebPlayer(romName) {
     return new Promise((resolve, reject) => {
       document.getElementById("mga-web-player")?.remove();
 
@@ -441,6 +445,11 @@
 
       overlay.append(area, message, bar);
       document.body.appendChild(overlay);
+      // O clique do card ainda está no mesmo gesto do usuário: solicitar
+      // fullscreen no overlay (e não antes de criá-lo) aumenta a compatibilidade
+      // com Chrome/Safari mobile e permite o lock horizontal.
+      enterMobileLandscape(overlay);
+      overlay.addEventListener("pointerdown", () => enterMobileLandscape(overlay), { once: true, passive: true });
 
       let player;
       close.onclick = () => closePlayer();

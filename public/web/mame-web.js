@@ -235,13 +235,12 @@
     playerUrl.searchParams.set("name", cleanRomName(romName));
     // O player é alterado junto com o bridge; versionar a URL evita que o
     // navegador reutilize uma versão antiga que ainda exibia o menu RetroArch.
-    playerUrl.searchParams.set("v", "20260926-merged-auto-start-v4");
+    playerUrl.searchParams.set("v", "20260926-zip-auto-start-v3");
     if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
     if (biosName) playerUrl.searchParams.set("biosName", biosName);
 
     let closed = false;
     let closeInProgress = false;
-    let playerStarted = false;
 
     const finishClose = () => {
       if (closed) return;
@@ -266,7 +265,7 @@
       iframe.contentWindow.postMessage({ type: "mga-request-save-exit" }, location.origin);
       window.setTimeout(() => {
         if (closeInProgress && !closed) {
-          finishClose();
+          message.textContent = "O salvamento demorou. Tente novamente ou saia sem salvar.";
           closeInProgress = false;
         }
       }, 10000);
@@ -274,8 +273,12 @@
 
     const closePlayer = () => {
       if (closed) return;
-      if (!player || !playerStarted) return finishClose();
-      requestSaveAndClose();
+      if (!player) return finishClose();
+      if (window.confirm("Deseja salvar a partida antes de sair?\n\nOK = salvar e sair\nCancelar = continuar jogando")) {
+        requestSaveAndClose();
+      } else {
+        if (window.confirm("Sair sem salvar?")) finishClose();
+      }
     };
 
     const onMessage = (event) => {
@@ -285,7 +288,6 @@
       ) return;
 
       if (event.data?.type === "mga-emulator-started") {
-        playerStarted = true;
         message.remove();
       }
 
@@ -368,6 +370,23 @@
     return { closePlayer };
   }
 
+  const enterMobileLandscape = (target) => {
+    if (!matchMedia("(pointer: coarse)").matches) return;
+    const lock = () => {
+      try { screen.orientation?.lock?.("landscape").catch(() => {}); } catch {}
+    };
+    try {
+      const element = target || document.documentElement;
+      const req = element.requestFullscreen || element.webkitRequestFullscreen;
+      if (!document.fullscreenElement && req) {
+        const result = req.call(element, { navigationUI: "hide" });
+        if (result?.then) result.then(lock).catch(() => {});
+      } else {
+        lock();
+      }
+    } catch {}
+  };
+
   function showWebPlayer(romName) {
     return new Promise((resolve, reject) => {
       document.getElementById("mga-web-player")?.remove();
@@ -392,20 +411,15 @@
       bar.appendChild(brand);
 
       const navActions = document.createElement("div");
-      navActions.style.cssText = "display:flex;align-items:center;gap:4px;";
+      navActions.style.cssText = "display:flex;align-items:center;gap:8px;";
 
       const btnSaves = document.createElement("button");
       btnSaves.type = "button";
-      btnSaves.textContent = "💾 Saves (1-15)";
+      btnSaves.textContent = "💾 Saves";
       btnSaves.title = "Gerenciar Partidas Salvas";
       btnSaves.setAttribute("aria-label", "Partidas Salvas");
       btnSaves.style.cssText =
-        "pointer-events:auto;height:34px;padding:0 10px;display:flex;align-items:center;justify-content:center;background:#0d001e;border:1px solid #00e5ff;box-shadow:0 0 8px #00e5ff55;color:#00e5ff;cursor:pointer;font-size:11px;font-weight:bold;font-family:monospace;border-radius:4px;white-space:nowrap;";
-      if(window.matchMedia?.("(max-width:480px)").matches){
-        brand.textContent="MGA";
-        btnSaves.textContent="💾";
-        btnSaves.style.padding="0 9px";
-      }
+        "pointer-events:auto;height:34px;padding:0 12px;display:flex;align-items:center;justify-content:center;background:#0d001e;border:1px solid #00e5ff;box-shadow:0 0 8px #00e5ff55;color:#00e5ff;cursor:pointer;font-size:11px;font-weight:bold;font-family:monospace;border-radius:4px;";
       btnSaves.onclick = () => {
         const iframe = overlay.querySelector("iframe");
         iframe?.contentWindow?.postMessage({ type: "mga-open-saves" }, "*");
@@ -431,6 +445,11 @@
 
       overlay.append(area, message, bar);
       document.body.appendChild(overlay);
+      // O clique do card ainda está no mesmo gesto do usuário: solicitar
+      // fullscreen no overlay (e não antes de criá-lo) aumenta a compatibilidade
+      // com Chrome/Safari mobile e permite o lock horizontal.
+      enterMobileLandscape(overlay);
+      overlay.addEventListener("pointerdown", () => enterMobileLandscape(overlay), { once: true, passive: true });
 
       let player;
       close.onclick = () => closePlayer();
