@@ -235,7 +235,7 @@
     playerUrl.searchParams.set("name", cleanRomName(romName));
     // O player é alterado junto com o bridge; versionar a URL evita que o
     // navegador reutilize uma versão antiga que ainda exibia o menu RetroArch.
-    playerUrl.searchParams.set("v", "20260926-zip-auto-start-v3");
+    playerUrl.searchParams.set("v", "20260926-zip-auto-start-v4");
     if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
     if (biosName) playerUrl.searchParams.set("biosName", biosName);
 
@@ -289,6 +289,10 @@
 
       if (event.data?.type === "mga-emulator-started") {
         message.remove();
+        // Depois que a ROM iniciou, o jogador deve ver somente o jogo e os
+        // controles touch; a barra do launcher não pode ficar sobre a tela.
+        bar.style.opacity = "0";
+        bar.style.pointerEvents = "none";
       }
 
       if (event.data?.type === "mga-emulator-exit") {
@@ -402,13 +406,7 @@
 
       const bar = document.createElement("div");
       bar.style.cssText =
-        "position:absolute;top:0;left:0;right:0;height:44px;z-index:20;display:flex;align-items:center;justify-content:space-between;padding:0 12px 0 14px;box-sizing:border-box;background:linear-gradient(180deg,#08000f 0%,rgba(8,0,15,.78) 72%,transparent 100%);color:#fff;pointer-events:none;";
-
-      const brand = document.createElement("strong");
-      brand.textContent = "MASTER GAMES ARCADE";
-      brand.style.cssText =
-        "font-family:monospace;color:#00e5ff;letter-spacing:1px;font-size:12px;text-shadow:0 0 8px #00e5ff;";
-      bar.appendChild(brand);
+        "position:absolute;top:0;left:0;right:0;height:44px;z-index:20;display:flex;align-items:center;justify-content:flex-end;padding:0 12px;box-sizing:border-box;background:linear-gradient(180deg,#08000f 0%,rgba(8,0,15,.78) 72%,transparent 100%);color:#fff;pointer-events:none;";
 
       const navActions = document.createElement("div");
       navActions.style.cssText = "display:flex;align-items:center;gap:8px;";
