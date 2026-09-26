@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Star, Play, Clock3, Ghost, RotateCcw } from "lucide-react";
+import { Search, Star, Play, Clock3, Ghost, RotateCcw, Maximize2, Minimize2 } from "lucide-react";
 
 /**
  * Biblioteca de jogos local.
@@ -68,6 +68,7 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
   const mountedRef = useRef(true);
 
   const [backgroundIndex, setBackgroundIndex] = useState(0);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -83,6 +84,24 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
 
     return () => window.clearInterval(intervalId);
   }, []);
+
+  useEffect(() => {
+    const syncFullscreenState = () => setIsFullscreen(Boolean(document.fullscreenElement));
+    document.addEventListener("fullscreenchange", syncFullscreenState);
+    return () => document.removeEventListener("fullscreenchange", syncFullscreenState);
+  }, []);
+
+  const toggleFullscreen = async () => {
+    try {
+      if (document.fullscreenElement) {
+        await document.exitFullscreen();
+      } else {
+        await document.documentElement.requestFullscreen();
+      }
+    } catch {
+      // O navegador pode bloquear fullscreen em contextos sem suporte ou permissão.
+    }
+  };
 
   const loadLibrary = async () => {
     setPhase("loading");
@@ -240,6 +259,16 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
               ))}
             </div>
 
+            <button
+              type="button"
+              onClick={toggleFullscreen}
+              aria-label={isFullscreen ? "Sair da tela cheia" : "Entrar em tela cheia"}
+              title={isFullscreen ? "Sair da tela cheia" : "Entrar em tela cheia"}
+              className="flex items-center justify-center gap-1.5 rounded-full border border-cyan-500/30 px-3 py-1.5 font-mono text-[11px] font-bold tracking-wide text-cyan-200 transition-colors hover:border-cyan-400 hover:bg-cyan-400/10"
+            >
+              {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+              <span>{isFullscreen ? "Sair da tela cheia" : "Tela cheia"}</span>
+            </button>
             {accountSlot}
           </div>
         </div>
