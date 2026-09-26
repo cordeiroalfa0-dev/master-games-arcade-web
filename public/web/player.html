@@ -1430,9 +1430,9 @@
     }
   };
 
-  const loadProgress=async()=>{
+  const loadProgress=async(manual=false)=>{
     if(mgaLoadBusy||mgaSaveBusy)return false;
-    if(mgaInitialLoadStarted)return false;
+    if(mgaInitialLoadStarted&&!manual)return false;
     mgaInitialLoadStarted=true;
     mgaLoadBusy=true;
     try{
@@ -1448,13 +1448,19 @@
       const ready=await waitForGameReady();
       if(!ready){
         log('Progresso: jogo não iniciou a tempo para restaurar o save automático');
+        if(manual)showToast('⏳ O jogo ainda está iniciando. Tente novamente.',4000);
         return false;
       }
       const ok=await applyStateWithRetry(saved.state,'Save automático');
       if(!ok){
+        if(manual)showToast('❌ Não foi possível retornar ao momento salvo.',4000);
         return false;
       }
       log('Progresso anterior restaurado');
+      if(manual){
+        showToast('🎮 Momento restaurado!');
+        closeSavesModal();
+      }
       return true;
     }catch(e){log('Progresso: nenhum save auto restaurado ('+(e?.message||e)+')');return false}
     finally{mgaLoadBusy=false}
@@ -1530,7 +1536,7 @@
           ${autoSave?.preview?`<a class="mga-btn-action" download="master-games-momento.jpg" href="${autoSave.preview}" style="text-decoration:none;display:inline-block;">⬇ Baixar imagem</a>`:''}
         </div>
       `;
-      autoCard.querySelector('.mga-btn-load').onclick=()=>loadProgress();
+      autoCard.querySelector('.mga-btn-load').onclick=()=>loadProgress(true);
       container.appendChild(autoCard);
       return;
 
@@ -1593,7 +1599,7 @@
   if(btnReturn)btnReturn.addEventListener('click',closeSavesModal);
 
   if(btnQuickSave)btnQuickSave.addEventListener('click',()=>saveProgress(false));
-  if(btnQuickLoad)btnQuickLoad.addEventListener('click',()=>loadProgress());
+  if(btnQuickLoad)btnQuickLoad.addEventListener('click',()=>loadProgress(true));
 
   // ===============================================================
   // MELHORIAS MOBILE: Haptic Feedback, Pausa Rápida, Opacidade & Anti-Gestos
