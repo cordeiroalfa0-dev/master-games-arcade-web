@@ -1137,6 +1137,63 @@
     return !record.stateSize||record.stateSize===bytes.byteLength;
   };
 
+  // Nuvem: o save local continua sendo a fonte de fallback, mas o último
+  // momento também é sincronizado por usuário/jogo quando o login Google e o
+  // Postgres da produção estão configurados.
+  const bytesToBase64=bytes=>{
+    let out='';
+    const chunk=0x8000;
+    for(let i=0;i<bytes.length;i+=chunk){
+      out+=String.fromCharCode(...bytes.subarray(i,Math.min(i+chunk,bytes.length)));
+    }
+    return btoa(out);
+  };
+  const base64ToBytes=value=>{
+    try{
+      const bin=atob(String(value||''));
+      const bytes=new Uint8Array(bin.length);
+      for(let i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+      return bytes;
+    }catch{return null}
+  };
+  const cloudUrl=`/api/saves/?rom=${encodeURIComponent(romBase)}&core=${encodeURIComponent(core)}`;
+  let cloudAvailable=null;
+  const syncCloudSave=async record=>{
+    try{
+      const bytes=normalizeStateBytes(record?.state);
+      if(!bytes)return false;
+      const response=await fetch('/api/saves/',{
+        method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({rom:romBase,core,stateB64:bytesToBase64(bytes),preview:record.preview||'',savedAt:record.savedAt,dateStr:record.dateStr})
+      });
+      cloudAvailable=response.status!==401;
+      if(!response.ok)return false;
+      log('Save sincronizado na nuvem');
+      return true;
+    }catch(e){
+      cloudAvailable=false;
+      log('Nuvem indisponível; mantendo save local ('+(e?.message||e)+')');
+      return false;
+    }
+  };
+  const readCloudSave=async()=>{
+    try{
+      const response=await fetch(cloudUrl,{credentials:'same-origin'});
+      if(response.status===401){cloudAvailable=false;return null}
+      if(!response.ok){cloudAvailable=false;return null}
+      const data=await response.json();
+      const remote=data?.save;
+      const state=base64ToBytes(remote?.stateB64);
+      if(!state)return null;
+      cloudAvailable=true;
+      return {state,stateSize:state.byteLength,savedAt:Number(remote.savedAt)||0,dateStr:remote.dateStr||'',preview:remote.preview||''};
+    }catch(e){
+      cloudAvailable=false;
+      log('Nuvem indisponível ao carregar; usando save local');
+      return null;
+    }
+  };
+
   const saveToSlot=async(slot,silent=false)=>{
     const manager=window.EJS_emulator?.gameManager;
     if(!manager||!started||mgaSaveBusy||mgaLoadBusy){
@@ -1334,7 +1391,9 @@
       if(!state)throw new Error('Estado vazio ou inválido');
       const now=Date.now();
       const dateStr=new Date(now).toLocaleString('pt-BR');
-      await withProgressDb(db=>putAndVerifyRecord(db,MGA_SAVE_KEY,{state,stateSize:state.byteLength,savedAt:now,dateStr,rom:romBase,core,preview:captureMomentImage()}));
+      const record={state,stateSize:state.byteLength,savedAt:now,dateStr,rom:romBase,core,preview:captureMomentImage()};
+      await withProgressDb(db=>putAndVerifyRecord(db,MGA_SAVE_KEY,record));
+      await syncCloudSave(record);
       if(!silent)showToast('📸 Momento salvo');
       return true;
     }catch(e){log('Progresso: falha ao salvar auto '+(e?.message||e));return false}
@@ -1359,8 +1418,15 @@
     mgaInitialLoadStarted=true;
     mgaLoadBusy=true;
     try{
-      const saved=await readSlotRecord(MGA_SAVE_KEY);
+      const localSaved=await readSlotRecord(MGA_SAVE_KEY);
+      const cloudSaved=await readCloudSave();
+      const saved=isValidSavedRecord(cloudSaved)&&(!isValidSavedRecord(localSaved)||cloudSaved.savedAt>localSaved.savedAt)
+        ? cloudSaved : localSaved;
       if(!isValidSavedRecord(saved))return false;
+      if(saved===cloudSaved){
+        await withProgressDb(db=>putAndVerifyRecord(db,MGA_SAVE_KEY,saved));
+        log('Save da nuvem baixado para este dispositivo');
+      }
       const ready=await waitForGameReady();
       if(!ready){
         log('Progresso: jogo não iniciou a tempo para restaurar o save automático');
