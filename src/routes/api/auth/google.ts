@@ -5,11 +5,11 @@ import { createOAuthStateCookie } from "../../../lib/auth";
 async function startGoogleLogin({ request }: { request: Request }) {
   const clientId = process.env.GOOGLE_CLIENT_ID;
   if (!clientId) {
-    return new Response(
-      "GOOGLE_CLIENT_ID não configurado. Adicione GOOGLE_CLIENT_ID e GOOGLE_CLIENT_SECRET " +
-        "nas variáveis de ambiente do projeto na Vercel e faça um novo deploy.",
-      { status: 500 },
-    );
+    const origin = new URL(request.url).origin;
+    return new Response(null, {
+      status: 302,
+      headers: { Location: `${origin}/?auth=unavailable` },
+    });
   }
 
   const origin = new URL(request.url).origin;
