@@ -254,14 +254,24 @@
       }
       /* Direcional no canto esquerdo; botões no canto direito */
       #game .ejs_virtualGamepad_left{
+        position:absolute!important;top:auto!important;right:auto!important;
         left:max(10px,env(safe-area-inset-left))!important;
         bottom:max(8px,env(safe-area-inset-bottom))!important;
+        width:var(--mga-dpad)!important;height:var(--mga-dpad)!important;
         z-index:99999!important
       }
       #game .ejs_virtualGamepad_right{
-        left:auto!important;right:max(10px,env(safe-area-inset-right))!important;
+        position:absolute!important;top:auto!important;left:auto!important;
+        right:max(10px,env(safe-area-inset-right))!important;
         bottom:max(8px,env(safe-area-inset-bottom))!important;
+        width:calc(var(--mga-btn)*3 + var(--mga-gap)*2)!important;
+        height:calc(var(--mga-btn)*2 + var(--mga-gap))!important;
+        overflow:visible!important;
         z-index:99999!important
+      }
+      #game .ejs_virtualGamepad_bottom{
+        position:absolute!important;top:auto!important;
+        width:100%!important;height:36px!important;
       }
     }
       @media (orientation:landscape) and (max-height:600px){
@@ -324,13 +334,6 @@
       #difficulty-setup label:has([data-setting="vignette"]){display:none!important}
     }
 
-    /* Em horizontal mobile, o cabeçalho externo pode ficar oculto pelo modo
-       tela cheia. Mantenha o botão de salvar acessível dentro do player. */
-    @media (hover:none) and (pointer:coarse) and (orientation:landscape){
-      body.mga-embedded #btn-save{display:flex!important}
-      body.mga-embedded #player-controls{gap:4px;right:max(8px,env(safe-area-inset-right))}
-    }
-
     /* Dentro do launcher (iframe) o cabeçalho externo já tem Saves (1-15) e
        Fechar e fica por cima do canto superior direito. Então o botão Saves
        interno some (o externo abre o mesmo painel via postMessage) e os demais
@@ -342,16 +345,14 @@
       right:max(10px,env(safe-area-inset-right))
     }
 
-    /* Em tela cheia horizontal o cabeçalho externo pode ficar fora da área
-       visível ou ser ocultado pelo navegador. Nesse caso o botão interno é a
-       alternativa de acesso aos mesmos 15 slots de save. Esta regra precisa
-       ficar depois da regra geral de iframe para vencer o display:none. */
+    /* No launcher, mantenha os controles internos abaixo do cabeçalho externo
+       para que nenhum botão superior fique sobre outro. */
     @media (hover:none) and (pointer:coarse) and (orientation:landscape){
-      body.mga-embedded #btn-save{display:flex!important}
       body.mga-embedded #player-controls{
-        top:max(8px,env(safe-area-inset-top));
+        top:calc(max(8px,env(safe-area-inset-top)) + var(--mga-header-h) + 4px);
+        left:max(8px,env(safe-area-inset-left));
         right:max(8px,env(safe-area-inset-right));
-        gap:4px
+        max-width:none;justify-content:flex-end;gap:4px
       }
     }
 
