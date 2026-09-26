@@ -167,14 +167,18 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
   };
 
   return (
-    <div
-      className="min-h-screen bg-[#050009] bg-cover bg-center bg-fixed text-[#eafffe]"
-      style={{
-        backgroundImage:
-          "linear-gradient(rgba(5,0,9,.82),rgba(5,0,9,.9)),url('/assets/arcade-hero.png')",
-      }}
-    >
-      <header className="sticky top-0 z-30 border-b border-cyan-500/20 bg-[#050009]/95 backdrop-blur px-4 py-3 sm:px-8">
+    <div className="relative min-h-screen overflow-hidden bg-[#050009] text-[#eafffe]">
+      <div className="pointer-events-none fixed inset-0 z-0 bg-[#050009]">
+        <img
+          src="/assets/arcade-hero.png"
+          alt=""
+          aria-hidden="true"
+          className="h-full w-full object-contain object-center opacity-60"
+        />
+        <div className="absolute inset-0 bg-[#050009]/45" />
+      </div>
+
+      <header className="relative z-10 sticky top-0 border-b border-cyan-500/20 bg-[#050009]/90 px-4 py-3 backdrop-blur sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="font-mono text-lg font-bold tracking-wide text-cyan-400 [text-shadow:0_0_10px_rgba(0,229,255,.5)] sm:text-xl">
@@ -221,7 +225,7 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
         </div>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-6 sm:px-8">
+      <main className="relative z-10 mx-auto max-w-6xl px-4 py-6 sm:px-8">
         {phase === "loading" && <LibrarySkeleton />}
 
         {phase === "error" && (
