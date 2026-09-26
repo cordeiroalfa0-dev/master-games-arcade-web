@@ -173,7 +173,7 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
           src="/assets/arcade-hero.png"
           alt=""
           aria-hidden="true"
-          className="h-full w-full object-contain object-center opacity-60"
+          className="h-full w-full object-cover object-center opacity-60"
         />
         <div className="absolute inset-0 bg-[#050009]/45" />
       </div>
@@ -225,7 +225,7 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
         </div>
       </header>
 
-      <main className="relative z-10 mx-auto max-w-3xl px-4 py-6 sm:px-8">
+      <main className="relative z-10 mx-auto max-w-6xl px-4 py-6 sm:px-8">
         {phase === "loading" && <LibrarySkeleton />}
 
         {phase === "error" && (
@@ -253,7 +253,7 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
         )}
 
         {phase === "ready" && visibleRoms.length > 0 && (
-          <div className="grid grid-cols-2 gap-3">
+          <div className="ml-auto grid w-full max-w-xs grid-cols-2 gap-3">
             {visibleRoms.map((rom) => (
               <GameCard
                 key={rom}
@@ -360,7 +360,7 @@ function GameCard({
 
 function LibrarySkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="ml-auto grid w-full max-w-xs grid-cols-2 gap-3">
       {Array.from({ length: 12 }).map((_, i) => (
         <div key={i} className="animate-pulse overflow-hidden rounded-lg border border-white/10 bg-[#0a0014]">
           <div className="aspect-[4/3] bg-white/5" />
