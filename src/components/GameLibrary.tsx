@@ -167,7 +167,13 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
   };
 
   return (
-    <div className="min-h-screen bg-[#050009] text-[#eafffe]">
+    <div
+      className="min-h-screen bg-[#050009] bg-cover bg-center bg-fixed text-[#eafffe]"
+      style={{
+        backgroundImage:
+          "linear-gradient(rgba(5,0,9,.82),rgba(5,0,9,.9)),url('/assets/arcade-hero.png')",
+      }}
+    >
       <header className="sticky top-0 z-30 border-b border-cyan-500/20 bg-[#050009]/95 backdrop-blur px-4 py-3 sm:px-8">
         <div className="mx-auto flex max-w-6xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
@@ -243,7 +249,7 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
         )}
 
         {phase === "ready" && visibleRoms.length > 0 && (
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+          <div className="grid grid-cols-2 gap-3">
             {visibleRoms.map((rom) => (
               <GameCard
                 key={rom}
@@ -350,7 +356,7 @@ function GameCard({
 
 function LibrarySkeleton() {
   return (
-    <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6">
+    <div className="grid grid-cols-2 gap-3">
       {Array.from({ length: 12 }).map((_, i) => (
         <div key={i} className="animate-pulse overflow-hidden rounded-lg border border-white/10 bg-[#0a0014]">
           <div className="aspect-[4/3] bg-white/5" />
