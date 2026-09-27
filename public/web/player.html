@@ -289,8 +289,13 @@
         left:0!important;right:0!important;transform:none!important;justify-content:center;
         pointer-events:none!important;z-index:99999!important
       }
-      body.mga-game-started #game .b_credit.mga-control-used,
       body.mga-game-started #game .b_start.mga-control-used{display:none!important}
+      body.mga-game-started.mga-manually-hide-credit-start #game .b_credit,
+      body.mga-game-started.mga-manually-hide-credit-start #game .b_start{display:none!important}
+      body.mga-game-started.mga-manually-show-credit-start #game .b_credit,
+      body.mga-game-started.mga-manually-show-credit-start #game .b_start{
+        display:block!important;visibility:visible!important;opacity:1!important;pointer-events:auto!important
+      }
       #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
         pointer-events:auto!important;touch-action:none!important;
         min-width:88px;height:36px!important;line-height:36px!important;font-size:11px!important;
@@ -371,6 +376,20 @@
     #btn-fullscreen{width:36px;height:36px;padding:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.55);border:1px solid #00e5ff66;color:#00e5ff;font-size:20px;cursor:pointer;backdrop-filter:blur(4px);transition:opacity .2s;border-radius:4px;touch-action:manipulation;pointer-events:auto;-webkit-tap-highlight-color:transparent}
     #btn-close:hover,#btn-fullscreen:hover{background:rgba(0,0,0,.8);border-color:#00e5ff}
     #player-controls.hidden{opacity:0;pointer-events:none}
+    #mga-credit-start-toggle{
+      position:fixed;top:max(8px,env(safe-area-inset-top));right:max(8px,env(safe-area-inset-right));z-index:100004;
+      height:34px;padding:0 10px;display:inline-flex;align-items:center;justify-content:center;
+      border:1px solid #00e5ff;background:rgba(4,10,20,.9);color:#87f4ff;border-radius:6px;
+      box-shadow:0 0 12px rgba(0,229,255,.28);font:700 10px monospace;letter-spacing:.04em;
+      cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent
+    }
+    #mga-credit-start-toggle[hidden]{display:none!important}
+    #mga-credit-start-toggle:active{background:rgba(0,229,255,.28);transform:scale(.96)}
+    body.mga-embedded #mga-credit-start-toggle{
+      top:calc(max(8px,env(safe-area-inset-top)) + var(--mga-header-h) + 4px);
+      right:max(8px,env(safe-area-inset-right))
+    }
+    body.mga-embedded #mga-credit-start-toggle{display:none!important}
     @media (hover:none) and (pointer:coarse){
       #btn-close,#btn-fullscreen{width:36px;height:36px;padding:0;font-size:19px}
       #player-controls{top:max(8px,env(safe-area-inset-top));right:calc(max(8px,env(safe-area-inset-right)) + 50px);gap:6px;max-width:calc(100vw - 68px)}
@@ -460,6 +479,7 @@
     <button id="btn-fullscreen" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
     <button id="btn-close" type="button" title="Fechar" aria-label="Fechar">✕</button>
   </div>
+  <button id="mga-credit-start-toggle" type="button" aria-label="Mostrar Crédito e Start" aria-pressed="false" hidden>MOSTRAR C/S</button>
 
 
   <div id="mga-saves-modal" role="dialog" aria-modal="true" aria-labelledby="mga-modal-title">
@@ -521,8 +541,23 @@
     if(e.target===earlySavesModal)earlyCloseSaves();
   });
   window.MGA_openSaves=earlyOpenSaves;
+  window.MGA_setCreditStartVisibility=visible=>{
+    const show=Boolean(visible);
+    document.body.classList.toggle('mga-manually-hide-credit-start',!show);
+    document.body.classList.toggle('mga-manually-show-credit-start',show);
+    if(show)document.querySelector('#game .b_start')?.classList.remove('mga-control-used');
+    const toggle=document.getElementById('mga-credit-start-toggle');
+    if(toggle){
+      toggle.textContent=show?'OCULTAR C/S':'MOSTRAR C/S';
+      toggle.setAttribute('aria-label',show?'Ocultar Crédito e Start':'Mostrar Crédito e Start');
+      toggle.setAttribute('aria-pressed',String(show));
+    }
+  };
   window.addEventListener('message',e=>{
     if(e.data?.type==='mga-open-saves')earlyOpenSaves();
+    if(e.source===window.parent&&e.origin===location.origin&&e.data?.type==='mga-set-credit-start-visible'){
+      window.MGA_setCreditStartVisibility(e.data.visible);
+    }
   });
 
   // Escapa texto vindo da URL antes de inserir em innerHTML (evita XSS via ?name=).
@@ -1760,25 +1795,16 @@
     const touchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
     if(touchDevice){
       document.body.classList.add('mga-game-started');
-      const hideAfterFirstUse=selector=>{
-        let attempts=0;
-        const attach=()=>{
-          const button=document.querySelector(`#game ${selector}`);
-          if(!button){if(++attempts<40)setTimeout(attach,100);return}
-          if(button.dataset.mgaHideAfterUse)return;
-          button.dataset.mgaHideAfterUse='true';
-          let used=false;
-          const markUsed=()=>{
-            if(used)return;
-            used=true;
-            setTimeout(()=>button.classList.add('mga-control-used'),150);
-          };
-          button.addEventListener('touchend',markUsed,{once:true,passive:true});
-          button.addEventListener('pointerup',markUsed,{once:true});
-          button.addEventListener('click',markUsed,{once:true});
-        };
-        attach();
-      };
+      const creditStartToggle=document.getElementById('mga-credit-start-toggle');
+      if(creditStartToggle){
+        creditStartToggle.hidden=false;
+        const creditStartVisible=!document.body.classList.contains('mga-manually-hide-credit-start');
+        window.MGA_setCreditStartVisibility(creditStartVisible);
+        creditStartToggle.addEventListener('click',()=>{
+          const show=document.body.classList.contains('mga-manually-hide-credit-start');
+          window.MGA_setCreditStartVisibility(show);
+        });
+      }
       const waitForStartRecognition=()=>{
         let attempts=0;
         const attach=()=>{
@@ -1834,7 +1860,6 @@
         };
         attach();
       };
-      hideAfterFirstUse('.b_credit');
       waitForStartRecognition();
       try{window.EJS_emulator?.toggleVirtualGamepad?.(true)}catch(e){log('Gamepad touch: '+(e?.message||e))}
       try{

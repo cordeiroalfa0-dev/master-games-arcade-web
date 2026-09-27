@@ -235,7 +235,7 @@
     playerUrl.searchParams.set("name", cleanRomName(romName));
     // O player é alterado junto com o bridge; versionar a URL evita que o
     // navegador reutilize uma versão antiga que ainda exibia o menu RetroArch.
-    playerUrl.searchParams.set("v", "20260926-mobile-controls-v8");
+    playerUrl.searchParams.set("v", "20260926-credit-start-toggle-v12");
     if (biosUrl) playerUrl.searchParams.set("bios", biosUrl);
     if (biosName) playerUrl.searchParams.set("biosName", biosName);
 
@@ -478,6 +478,29 @@
         iframe?.contentWindow?.postMessage({ type: "mga-open-saves" }, "*");
       };
       navActions.appendChild(btnSaves);
+
+      let creditStartVisible = true;
+      const btnCreditStart = document.createElement("button");
+      btnCreditStart.type = "button";
+      btnCreditStart.textContent = "OCULTAR C/S";
+      btnCreditStart.title = "Ocultar Crédito e Start";
+      btnCreditStart.setAttribute("aria-label", "Ocultar Crédito e Start");
+      btnCreditStart.setAttribute("aria-pressed", "true");
+      btnCreditStart.style.cssText =
+        "pointer-events:auto;min-width:42px;height:34px;padding:0 8px;display:flex;align-items:center;justify-content:center;background:#0d001e;border:1px solid #00e5ff;box-shadow:0 0 8px #00e5ff55;color:#87f4ff;cursor:pointer;font-size:10px;font-weight:bold;font-family:monospace;border-radius:4px;touch-action:manipulation;-webkit-tap-highlight-color:transparent;";
+      btnCreditStart.onclick = () => {
+        creditStartVisible = !creditStartVisible;
+        const label = creditStartVisible ? "Ocultar Crédito e Start" : "Mostrar Crédito e Start";
+        btnCreditStart.textContent = creditStartVisible ? "OCULTAR C/S" : "MOSTRAR C/S";
+        btnCreditStart.title = label;
+        btnCreditStart.setAttribute("aria-label", label);
+        btnCreditStart.setAttribute("aria-pressed", String(creditStartVisible));
+        overlay.querySelector("iframe")?.contentWindow?.postMessage(
+          { type: "mga-set-credit-start-visible", visible: creditStartVisible },
+          "*"
+        );
+      };
+      navActions.appendChild(btnCreditStart);
 
       const close = document.createElement("button");
       close.type = "button";
