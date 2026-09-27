@@ -1177,11 +1177,15 @@
   const cloudUrl=`/api/saves/?rom=${encodeURIComponent(romBase)}&core=${encodeURIComponent(core)}`;
   let cloudAvailable=null;
   const syncCloudSave=async record=>{
+    let cloudTimeout;
     try{
       const bytes=normalizeStateBytes(record?.state);
       if(!bytes)return false;
+      const controller=new AbortController();
+      cloudTimeout=setTimeout(()=>controller.abort(),8000);
       const response=await fetch('/api/saves/',{
         method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},
+        signal:controller.signal,
         body:JSON.stringify({rom:romBase,core,stateB64:bytesToBase64(bytes),preview:record.preview||'',savedAt:record.savedAt,dateStr:record.dateStr})
       });
       cloudAvailable=response.status!==401;
@@ -1192,7 +1196,7 @@
       cloudAvailable=false;
       log('Nuvem indisponível; mantendo save local ('+(e?.message||e)+')');
       return false;
-    }
+    }finally{clearTimeout(cloudTimeout)}
   };
   const readCloudSave=async()=>{
     try{
@@ -1469,9 +1473,17 @@
   const saveAndExit=async()=>{
     try{
       closeSavesModal?.();
-      showToast('💾 Salvando antes de sair...',10000);
-      const deadline=Date.now()+5000;
-      while(mgaSaveBusy&&Date.now()<deadline)await mgaSleep(100);
+      showToast('💾 Salvando antes de sair...',30000);
+      const deadline=Date.now()+20000;
+      let idleSince=0;
+      while(Date.now()<deadline){
+        if(!mgaSaveBusy&&!mgaLoadBusy){
+          if(!idleSince)idleSince=Date.now();
+          if(Date.now()-idleSince>=150)break;
+        }else idleSince=0;
+        await mgaSleep(100);
+      }
+      if(mgaSaveBusy||mgaLoadBusy)throw new Error('Uma gravação ou restauração anterior continua em andamento.');
       const ok=await saveProgress(true);
       parent.postMessage({
         type:ok?'mga-emulator-save-complete':'mga-emulator-save-failed',

@@ -276,7 +276,7 @@
           message.textContent = "O salvamento demorou. Tente novamente ou saia sem salvar.";
           closeInProgress = false;
         }
-      }, 10000);
+      }, 30000);
     };
 
     const closePlayer = () => {
