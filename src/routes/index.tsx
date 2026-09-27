@@ -32,6 +32,12 @@ function Index() {
   const [user, setUser] = useState<MgaUser | null>(null);
 
   useEffect(() => {
+    // A intro é a porta de entrada; o launcher só abre depois de pressionar Start.
+    if (new URLSearchParams(window.location.search).get("launcher") !== "1") {
+      window.location.replace("/intro.html");
+      return;
+    }
+
     let cancelled = false;
     fetch("/api/auth/me")
       .then((res) => (res.ok ? res.json() : null))
@@ -84,7 +90,6 @@ function Launcher({ user, onLogout }: { user: MgaUser | null; onLogout: () => vo
   const accountBadge = user ? (
     <div className="flex items-center gap-2 rounded-full border border-cyan-500/30 bg-black/50 py-1 pl-1 pr-2 font-mono text-[11px] text-cyan-300">
       {user?.picture && (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={user.picture}
           alt=""
