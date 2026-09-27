@@ -1,6 +1,17 @@
 import * as React from "react";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Search, Star, Play, Clock3, Ghost, RotateCcw, Maximize2, Minimize2, Gamepad2, Minus } from "lucide-react";
+import {
+  Search,
+  Star,
+  Play,
+  Clock3,
+  Ghost,
+  RotateCcw,
+  Maximize2,
+  Minimize2,
+  Gamepad2,
+  Minus,
+} from "lucide-react";
 
 /**
  * Biblioteca de jogos local.
@@ -33,10 +44,7 @@ const BACKGROUND_IMAGES = [
   "/assets/arcade-hero-alternate.png",
 ];
 
-const fileBase = (name: string) =>
-  name
-    .toLowerCase()
-    .replace(/\.(zip|7z|chd)$/i, "");
+const fileBase = (name: string) => name.toLowerCase().replace(/\.(zip|7z|chd)$/i, "");
 
 const prettyFallback = (name: string) =>
   fileBase(name)
@@ -163,7 +171,9 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
 
     const q = query.trim().toLowerCase();
     if (!q) return list;
-    return list.filter((rom) => titleFor(rom).toLowerCase().includes(q) || fileBase(rom).includes(q));
+    return list.filter(
+      (rom) => titleFor(rom).toLowerCase().includes(q) || fileBase(rom).includes(q),
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roms, tab, favoriteSet, recent, query, names]);
 
@@ -268,7 +278,11 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
               title={isFullscreen ? "Sair da tela cheia" : "Entrar em tela cheia"}
               className="flex items-center justify-center gap-1.5 rounded-full border border-cyan-500/30 px-3 py-1.5 font-mono text-[11px] font-bold tracking-wide text-cyan-200 transition-colors hover:border-cyan-400 hover:bg-cyan-400/10"
             >
-              {isFullscreen ? <Minimize2 className="h-3.5 w-3.5" /> : <Maximize2 className="h-3.5 w-3.5" />}
+              {isFullscreen ? (
+                <Minimize2 className="h-3.5 w-3.5" />
+              ) : (
+                <Maximize2 className="h-3.5 w-3.5" />
+              )}
               <span>{isFullscreen ? "Sair da tela cheia" : "Tela cheia"}</span>
             </button>
             {accountSlot}
@@ -279,15 +293,15 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
       {isWindowOpen ? (
         <section
           aria-label="Janela da biblioteca de jogos"
-          className={`fixed right-2 top-[14rem] z-30 flex max-h-[calc(100dvh-15rem)] w-[min(88vw,250px)] flex-col overflow-hidden rounded-2xl border border-cyan-500/35 bg-[#050009]/85 shadow-[0_0_36px_rgba(0,229,255,.22)] backdrop-blur-xl transition-[width] duration-300 sm:right-3 sm:top-24 sm:max-h-[calc(100dvh-7rem)] ${
-            isWindowExpanded
-              ? "w-[calc(100vw-1rem)] sm:w-[min(96vw,1100px)]"
-              : "w-[min(88vw,250px)] sm:w-[min(92vw,250px)]"
+          className={`fixed inset-x-2 top-[14rem] z-30 flex min-w-0 max-h-[calc(100dvh-15rem)] w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-2xl border border-cyan-500/35 bg-[#050009]/90 shadow-[0_0_36px_rgba(0,229,255,.22)] backdrop-blur-xl transition-[width] duration-300 sm:inset-x-auto sm:right-3 sm:top-24 sm:max-h-[calc(100dvh-7rem)] sm:w-[min(92vw,250px)] ${
+            isWindowExpanded ? "sm:w-[min(96vw,1100px)]" : ""
           }`}
         >
           <div className="flex shrink-0 items-center justify-between gap-3 border-b border-cyan-500/20 bg-black/35 px-3 py-2.5">
             <div className="min-w-0">
-              <h2 className="font-mono text-xs font-bold tracking-[0.16em] text-cyan-300">BIBLIOTECA</h2>
+              <h2 className="font-mono text-xs font-bold tracking-[0.16em] text-cyan-300">
+                BIBLIOTECA
+              </h2>
               <p className="font-mono text-[10px] text-zinc-500">
                 {phase === "ready" ? `${visibleRoms.length} jogos` : "Master Games Arcade"}
               </p>
@@ -300,7 +314,11 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
                 title={isWindowExpanded ? "Recolher janela" : "Expandir janela"}
                 className="grid h-8 w-8 place-items-center rounded-lg border border-white/10 text-zinc-300 transition-colors hover:border-cyan-400/60 hover:text-cyan-200"
               >
-                {isWindowExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+                {isWindowExpanded ? (
+                  <Minimize2 className="h-4 w-4" />
+                ) : (
+                  <Maximize2 className="h-4 w-4" />
+                )}
               </button>
               <button
                 type="button"
@@ -342,7 +360,9 @@ export function GameLibrary({ accountSlot }: { accountSlot?: React.ReactNode }) 
             )}
 
             {phase === "ready" && visibleRoms.length > 0 && (
-              <div className={`grid grid-cols-2 gap-3 ${isWindowExpanded ? "sm:grid-cols-3 xl:grid-cols-4" : ""}`}>
+              <div
+                className={`grid w-full min-w-0 grid-cols-2 gap-3 ${isWindowExpanded ? "sm:grid-cols-3 xl:grid-cols-4" : ""}`}
+              >
                 {visibleRoms.map((rom) => (
                   <GameCard
                     key={rom}
@@ -410,7 +430,7 @@ function GameCard({
         }
       }}
       aria-disabled={isLaunching}
-      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0a0014] text-left outline-none transition-[border-color,box-shadow] hover:border-cyan-400/70 hover:shadow-[0_0_18px_rgba(0,229,255,.25)] focus-visible:border-cyan-400 aria-disabled:pointer-events-none aria-disabled:opacity-60"
+      className="group relative flex min-w-0 cursor-pointer flex-col overflow-hidden rounded-lg border border-white/10 bg-[#0a0014] text-left outline-none transition-[border-color,box-shadow] hover:border-cyan-400/70 hover:shadow-[0_0_18px_rgba(0,229,255,.25)] focus-visible:border-cyan-400 aria-disabled:pointer-events-none aria-disabled:opacity-60"
     >
       <span className="relative block aspect-[4/3] w-full overflow-hidden bg-linear-to-br from-[#160227] to-[#03000a]">
         {showArt ? (
@@ -436,10 +456,10 @@ function GameCard({
           onClick={onToggleFavorite}
           aria-label={isFavorite ? "Remover dos favoritos" : "Adicionar aos favoritos"}
           aria-pressed={isFavorite}
-          className="absolute right-1.5 top-1.5 grid h-7 w-7 place-items-center rounded-full bg-black/60 backdrop-blur-sm"
+          className="absolute right-2 top-2 grid h-9 w-9 place-items-center rounded-full bg-black/70 shadow-md backdrop-blur-sm sm:right-1.5 sm:top-1.5 sm:h-8 sm:w-8"
         >
           <Star
-            className={`h-3.5 w-3.5 ${isFavorite ? "fill-yellow-400 text-yellow-400" : "text-white/70"}`}
+            className={`h-4 w-4 ${isFavorite ? "fill-yellow-400 text-yellow-400" : "text-white/85"}`}
           />
         </button>
 
@@ -461,7 +481,10 @@ function LibrarySkeleton({ expanded }: { expanded: boolean }) {
   return (
     <div className={`grid grid-cols-2 gap-3 ${expanded ? "sm:grid-cols-3 xl:grid-cols-4" : ""}`}>
       {Array.from({ length: 12 }).map((_, i) => (
-        <div key={i} className="animate-pulse overflow-hidden rounded-lg border border-white/10 bg-[#0a0014]">
+        <div
+          key={i}
+          className="animate-pulse overflow-hidden rounded-lg border border-white/10 bg-[#0a0014]"
+        >
           <div className="aspect-[4/3] bg-white/5" />
           <div className="m-2 h-3 rounded bg-white/5" />
         </div>
