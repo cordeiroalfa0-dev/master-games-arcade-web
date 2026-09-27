@@ -460,6 +460,24 @@
     .mga-btn-del:disabled{opacity:.2;border-color:#555;color:#777;cursor:not-allowed}
     #mga-toast{position:fixed;top:52px;left:50%;transform:translateX(-50%);z-index:100010;background:rgba(8,0,18,.96);border:1px solid #00e5ff;box-shadow:0 0 16px rgba(0,229,255,.5);color:#00e5ff;padding:8px 16px;border-radius:20px;font:bold 12px monospace;pointer-events:none;opacity:0;transition:opacity .2s,transform .2s;white-space:nowrap}
     #mga-toast.show{opacity:1;transform:translateX(-50%) translateY(4px)}
+    #mga-input-modal{position:fixed;inset:0;z-index:100006;display:none;place-items:center;padding:max(12px,env(safe-area-inset-top)) max(12px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(12px,env(safe-area-inset-left));box-sizing:border-box;background:rgba(1,0,8,.88);font-family:monospace;color:#eafcff}
+    #mga-input-modal.open{display:grid!important}
+    .mga-input-dialog{width:min(680px,100%);max-height:min(92dvh,680px);display:flex;flex-direction:column;overflow:hidden;background:#070012;border:1px solid #00e5ff88;border-radius:12px;box-shadow:0 0 28px #00e5ff33}
+    .mga-input-header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#100022;border-bottom:1px solid #00e5ff33}
+    .mga-input-title{margin:0;color:#00e5ff;font-size:14px;letter-spacing:.05em}
+    .mga-input-content{overflow:auto;padding:14px 16px;display:grid;gap:13px;-webkit-overflow-scrolling:touch}
+    .mga-input-note{margin:0;color:#b9bac6;font-size:11px;line-height:1.5}
+    .mga-input-device{padding:10px 12px;border:1px solid #ffffff20;border-radius:8px;background:#ffffff08;font-size:11px;line-height:1.5;white-space:pre-line}
+    .mga-input-device strong{color:#39ff88}
+    .mga-input-controls{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+    .mga-input-select{min-height:40px;flex:1;min-width:210px;padding:8px 10px;background:#10051b;border:1px solid #00e5ff88;border-radius:6px;color:#fff;font:12px monospace}
+    .mga-input-action{min-height:40px;padding:8px 12px;background:#10051b;border:1px solid #00e5ff88;border-radius:6px;color:#8af5ff;font:bold 11px monospace;cursor:pointer;touch-action:manipulation}
+    .mga-input-action:focus-visible,.mga-modal-close:focus-visible,.mga-input-select:focus-visible{outline:2px solid #fff;outline-offset:2px}
+    .mga-input-players{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+    .mga-input-player{padding:11px;border:1px solid #00e5ff33;border-radius:8px;background:#00e5ff08}
+    .mga-input-player b{display:block;margin-bottom:5px;color:#00e5ff;font-size:11px}
+    .mga-input-player span{color:#d6d7e1;font-size:10px;line-height:1.5}
+    @media(max-width:520px){.mga-input-players{grid-template-columns:1fr}.mga-input-dialog{max-height:94dvh}.mga-input-content{padding:12px}}
 
    </style>
 </head>
@@ -476,6 +494,7 @@
     <button id="btn-pause" class="mga-ctrl-btn" type="button" title="Pausar / Retomar Jogo" aria-label="Pausa">⏸</button>
     <button id="btn-haptic" class="mga-ctrl-btn" type="button" title="Vibração Tátil nos Botões (Haptic)" aria-label="Vibração">📳</button>
     <button id="btn-opacity" class="mga-ctrl-btn" type="button" title="Ajustar Opacidade dos Controles Virtuais" aria-label="Opacidade">👁 75%</button>
+    <button id="mga-open-inputs" class="mga-ctrl-btn" type="button" title="Teclado e controles P1/P2" aria-label="Teclado e controles P1/P2">🎮</button>
     <button id="btn-fullscreen" type="button" title="Tela cheia" aria-label="Tela cheia">⛶</button>
     <button id="btn-close" type="button" title="Fechar" aria-label="Fechar">✕</button>
   </div>
@@ -496,6 +515,30 @@
       </div>
       <div id="mga-slots-list" class="mga-slots-grid"></div>
     </div>
+  </div>
+  <div id="mga-input-modal" role="dialog" aria-modal="true" aria-labelledby="mga-input-modal-title">
+    <section class="mga-input-dialog">
+      <header class="mga-input-header"><h2 id="mga-input-modal-title" class="mga-input-title">CONTROLES · JOGADORES 1 E 2</h2><button id="mga-input-close" class="mga-modal-close" type="button" aria-label="Fechar configurações de controles">✕</button></header>
+      <div class="mga-input-content">
+        <p class="mga-input-note">Controles USB, Bluetooth, XInput, DirectInput, DualShock e genéricos usam a Gamepad API do navegador. O primeiro controle conectado é atribuído ao Jogador 1; o segundo ao Jogador 2. Controles especiais podem ser remapeados abaixo.</p>
+        <div id="mga-input-gamepads" class="mga-input-device" role="status" aria-live="polite">Verificando controles conectados…</div>
+        <div class="mga-input-controls">
+          <label for="mga-keyboard-profile" class="mga-input-note">Layout do teclado</label>
+          <select id="mga-keyboard-profile" class="mga-input-select">
+            <option value="arcade">Arcade · P1 setas + Z/X/A/S · P2 T/F/G/H + J/K/U/I</option>
+            <option value="alternate">Alternativo · P1 WASD + J/K/U/I · P2 setas + teclado numérico</option>
+          </select>
+        </div>
+        <div class="mga-input-controls"><button id="mga-keyboard-mode" class="mga-input-action" type="button" aria-pressed="true">⌨ Modo teclado: ligado</button><button id="mga-refresh-gamepads" class="mga-input-action" type="button">↻ Atualizar controles</button></div>
+        <div class="mga-input-players">
+          <div class="mga-input-player"><b>PLAYER 1 · PADRÃO</b><span id="mga-player1-keys">Setas · Z/X/A/S · C crédito · Enter start</span></div>
+          <div class="mga-input-player"><b>PLAYER 2 · PADRÃO</b><span id="mga-player2-keys">T/F/G/H · J/K/U/I · V crédito · B start</span></div>
+        </div>
+        <p class="mga-input-note">Os atalhos usam a posição física das teclas (KeyboardEvent.code), não as letras impressas; funcionam em QWERTY, AZERTY, QWERTZ e ABNT2. Para trocar qualquer botão individualmente, use o remapeador por jogador.</p>
+        <button id="mga-open-remap" class="mga-input-action" type="button">🎮 Remapear botões individuais · P1/P2</button>
+        <p class="mga-input-note">No remapeador, escolha P1 ou P2, toque em “Set” no botão desejado e pressione uma tecla ou botão do controle. O remapeamento individual salvo prevalece sobre o perfil universal.</p>
+      </div>
+    </section>
   </div>
   <div id="mga-toast"></div>
 
@@ -540,6 +583,61 @@
   earlySavesModal?.addEventListener('click',e=>{
     if(e.target===earlySavesModal)earlyCloseSaves();
   });
+  const earlyInputModal=document.getElementById('mga-input-modal');
+  const earlyProfileSelect=document.getElementById('mga-keyboard-profile');
+  const earlyKeyboardButton=document.getElementById('mga-keyboard-mode');
+  const earlyGamepadStatus=document.getElementById('mga-input-gamepads');
+  let earlyInputGamepadTimer=null;
+  let keyboardEnabled=localStorage.getItem('mga_keyboard_enabled')!=='0';
+  if(earlyProfileSelect){
+    earlyProfileSelect.value=localStorage.getItem('mga_keyboard_profile')==='alternate'?'alternate':'arcade';
+    earlyProfileSelect.addEventListener('change',()=>{
+      const alternate=earlyProfileSelect.value==='alternate';
+      try{localStorage.setItem('mga_keyboard_profile',alternate?'alternate':'arcade')}catch{}
+      const p1=document.getElementById('mga-player1-keys');
+      const p2=document.getElementById('mga-player2-keys');
+      if(p1)p1.textContent=alternate?'W/A/S/D · J/K/U/I · H crédito · G start':'Setas · Z/X/A/S · C crédito · Enter start';
+      if(p2)p2.textContent=alternate?'Setas · numpad 1/3/7/9 · 0 crédito · Enter start':'T/F/G/H · J/K/U/I · V crédito · B start';
+      window.MGA_onKeyboardProfileChange?.(alternate?'alternate':'arcade');
+    });
+  }
+  const earlyUpdateKeyboardButton=()=>{
+    if(!earlyKeyboardButton)return;
+    earlyKeyboardButton.setAttribute('aria-pressed',String(keyboardEnabled));
+    earlyKeyboardButton.textContent=keyboardEnabled?'⌨ Modo teclado: ligado':'⌨ Modo teclado: desligado';
+  };
+  earlyUpdateKeyboardButton();
+  earlyKeyboardButton?.addEventListener('click',()=>{
+    keyboardEnabled=!keyboardEnabled;
+    try{localStorage.setItem('mga_keyboard_enabled',keyboardEnabled?'1':'0')}catch{}
+    earlyUpdateKeyboardButton();
+    window.MGA_onKeyboardModeChange?.(keyboardEnabled);
+  });
+  const earlyListGamepads=()=>{
+    let pads=[];
+    try{pads=[...navigator.getGamepads()].filter(pad=>pad?.connected).sort((a,b)=>a.index-b.index)}catch{}
+    if(earlyGamepadStatus)earlyGamepadStatus.textContent=pads.length?pads.map((pad,index)=>`Controle ${index+1} · ${pad.id||'Controle'} — conectado (índice ${pad.index})`).join('\n'):'Nenhum controle conectado. Conecte USB/Bluetooth e toque em “Atualizar controles”.';
+    return pads;
+  };
+  const earlyOpenInputSettings=()=>{
+    earlyInputModal?.classList.add('open');
+    earlyListGamepads();
+    if(earlyInputGamepadTimer)clearInterval(earlyInputGamepadTimer);
+    earlyInputGamepadTimer=setInterval(earlyListGamepads,1200);
+    document.getElementById('mga-input-close')?.focus();
+  };
+  const earlyCloseInputSettings=()=>{
+    earlyInputModal?.classList.remove('open');
+    if(earlyInputGamepadTimer){clearInterval(earlyInputGamepadTimer);earlyInputGamepadTimer=null;}
+  };
+  window.MGA_openInputSettings=earlyOpenInputSettings;
+  window.MGA_closeInputSettings=earlyCloseInputSettings;
+  document.getElementById('mga-open-inputs')?.addEventListener('click',earlyOpenInputSettings);
+  document.getElementById('mga-input-close')?.addEventListener('click',earlyCloseInputSettings);
+  earlyInputModal?.addEventListener('click',event=>{if(event.target===earlyInputModal)earlyCloseInputSettings()});
+  document.getElementById('mga-refresh-gamepads')?.addEventListener('click',earlyListGamepads);
+  addEventListener('gamepadconnected',earlyListGamepads);
+  addEventListener('gamepaddisconnected',earlyListGamepads);
   window.MGA_openSaves=earlyOpenSaves;
   window.MGA_setCreditStartVisibility=visible=>{
     const show=Boolean(visible);
@@ -582,7 +680,7 @@
     const current=readDifficulty();
     const panel=document.createElement('div');
     panel.id='difficulty-setup';
-    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${esc(name||'Master Games Arcade')}</h1><p>Escolha o modo e ajuste a apresentação antes de iniciar. Os jogos para celular funcionam somente na horizontal.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div class="config-section"><div class="config-title">VÍDEO</div><div class="config-grid"><label>Paleta <select data-setting="palette"><option value="normal">Normal</option><option value="cool">Fria</option><option value="amber">Âmbar</option><option value="soft">Suave</option></select></label><label><input type="checkbox" data-setting="scanlines"> Scanlines</label><label><input type="checkbox" data-setting="vignette"> Vinheta</label><label><input type="checkbox" data-setting="integer"> Escala inteira</label><label><input type="checkbox" data-setting="shader"> Shader SABR</label></div></div><div class="config-section"><div class="config-title">CONTROLES</div><div class="controls-note"><b>P1:</b> Shift/5 crédito · Enter/1 entrar · setas + Z/X/A/S jogar.<br><b>P2:</b> só entra quando solicitado · C/V ou 6/2 crédito/START.<br>Segundo controle USB continua disponível.</div></div><div style="margin-top:18px;color:#aaa;font-size:10px">DIP switches são aplicados quando o core expõe a opção.</div></div>`;
+    panel.innerHTML=`<div class="difficulty-card"><div style="color:#00e5ff;font-size:12px;letter-spacing:2px;margin-bottom:12px">CONFIGURAÇÃO DO JOGO</div><h1>${esc(name||'Master Games Arcade')}</h1><p>Escolha o modo e ajuste a apresentação antes de iniciar. Os jogos para celular funcionam somente na horizontal.</p><div class="difficulty-actions"><button type="button" data-difficulty="easy">FÁCIL<br><small>mais vidas e continues</small></button><button type="button" data-difficulty="hard">DIFÍCIL<br><small>desafio máximo</small></button></div><div class="config-section"><div class="config-title">VÍDEO</div><div class="config-grid"><label>Paleta <select data-setting="palette"><option value="normal">Normal</option><option value="cool">Fria</option><option value="amber">Âmbar</option><option value="soft">Suave</option></select></label><label><input type="checkbox" data-setting="scanlines"> Scanlines</label><label><input type="checkbox" data-setting="vignette"> Vinheta</label><label><input type="checkbox" data-setting="integer"> Escala inteira</label><label><input type="checkbox" data-setting="shader"> Shader SABR</label></div></div><div class="config-section"><div class="config-title">CONTROLES · TECLADO</div><div class="controls-note"><b>P1:</b> setas + Z/X/A/S · C crédito · Enter start.<br><b>P2:</b> T/F/G/H + J/K/U/I · V crédito · B start.<br>Teclas usam posição física; abra 🎮 para ver gamepads, trocar perfil ou remapear.</div></div><div style="margin-top:18px;color:#aaa;font-size:10px">DIP switches são aplicados quando o core expõe a opção.</div></div>`;
     const palette=panel.querySelector('[data-setting="palette"]');
     palette.value=visual.palette;
     for(const key of ['scanlines','vignette','integer'])panel.querySelector(`[data-setting="${key}"]`).checked=!!visual[key];
@@ -800,85 +898,36 @@
   };
 
   // ---------------------------------------------------------------
-  // Controles de teclado (valem para TODOS os jogos)
-  // Jogador 1: setas + Z X A S (socos/chutes), Enter = Start, Shift = Coin.
-  // Jogador 2: T F G H + J K U I, V = Start, C = Coin. As teclas de
-  // SELECT/START são deliberadamente diferentes: P2 só entra depois de
-  // inserir o crédito dele e pressionar o próprio START.
-  // ---------------------------------------------------------------
+  // Os valores value2 mantêm o mapeamento padrão do Gamepad API para qualquer
+  // controle reconhecido pelo navegador. A entrada de teclado é tratada abaixo
+  // por KeyboardEvent.code, independente do idioma impresso nas teclas.
   window.EJS_defaultControls={
     0:{
-      0:{value:'z',value2:'BUTTON_2'},
-      1:{value:'a',value2:'BUTTON_4'},
-      2:{value:'shift',value2:'SELECT'},
-      3:{value:'enter',value2:'START'},
-      4:{value:'up arrow',value2:'DPAD_UP'},
-      5:{value:'down arrow',value2:'DPAD_DOWN'},
-      6:{value:'left arrow',value2:'DPAD_LEFT'},
-      7:{value:'right arrow',value2:'DPAD_RIGHT'},
-      8:{value:'x',value2:'BUTTON_1'},
-      9:{value:'s',value2:'BUTTON_3'},
-      10:{value:'q',value2:'LEFT_TOP_SHOULDER'},
-      11:{value:'w',value2:'RIGHT_TOP_SHOULDER'},
-      12:{value:'1',value2:'LEFT_BOTTOM_SHOULDER'},
-      13:{value:'2',value2:'RIGHT_BOTTOM_SHOULDER'},
-      14:{value:'',value2:'LEFT_STICK'},
-      15:{value:'',value2:'RIGHT_STICK'},
-      16:{value:'',value2:'LEFT_STICK_X:+1'},
-      17:{value:'',value2:'LEFT_STICK_X:-1'},
-      18:{value:'',value2:'LEFT_STICK_Y:+1'},
-      19:{value:'',value2:'LEFT_STICK_Y:-1'},
-      20:{value:'',value2:'RIGHT_STICK_X:+1'},
-      21:{value:'',value2:'RIGHT_STICK_X:-1'},
-      22:{value:'',value2:'RIGHT_STICK_Y:+1'},
-      23:{value:'',value2:'RIGHT_STICK_Y:-1'},
+      0:{value:'',value2:'BUTTON_2'},1:{value:'',value2:'BUTTON_4'},
+      2:{value:'',value2:'SELECT'},3:{value:'',value2:'START'},
+      4:{value:'',value2:'DPAD_UP'},5:{value:'',value2:'DPAD_DOWN'},
+      6:{value:'',value2:'DPAD_LEFT'},7:{value:'',value2:'DPAD_RIGHT'},
+      8:{value:'',value2:'BUTTON_1'},9:{value:'',value2:'BUTTON_3'},
+      10:{value:'',value2:'LEFT_TOP_SHOULDER'},11:{value:'',value2:'RIGHT_TOP_SHOULDER'},
+      12:{value:'',value2:'LEFT_BOTTOM_SHOULDER'},13:{value:'',value2:'RIGHT_BOTTOM_SHOULDER'},
+      14:{value:'',value2:'LEFT_STICK'},15:{value:'',value2:'RIGHT_STICK'},
+      16:{value:'',value2:'LEFT_STICK_X:+1'},17:{value:'',value2:'LEFT_STICK_X:-1'},
+      18:{value:'',value2:'LEFT_STICK_Y:+1'},19:{value:'',value2:'LEFT_STICK_Y:-1'},
+      20:{value:'',value2:'RIGHT_STICK_X:+1'},21:{value:'',value2:'RIGHT_STICK_X:-1'},
+      22:{value:'',value2:'RIGHT_STICK_Y:+1'},23:{value:'',value2:'RIGHT_STICK_Y:-1'},
       24:{value:''},25:{value:''},26:{value:''},27:{},28:{},29:{}
     },
     1:{
-      0:{value:'j',value2:'BUTTON_2'},
-      1:{value:'u',value2:'BUTTON_4'},
-      // P2 não recebe crédito nem entra automaticamente. Os atalhos C/V
-      // (ou 6/2) são encaminhados abaixo somente quando o usuário solicitar.
-      // Mantemos value2 para que um segundo gamepad continue funcionando.
-      2:{value:'',value2:'SELECT'},
-      3:{value:'',value2:'START'},
-      4:{value:'t',value2:'DPAD_UP'},
-      5:{value:'g',value2:'DPAD_DOWN'},
-      6:{value:'f',value2:'DPAD_LEFT'},
-      7:{value:'h',value2:'DPAD_RIGHT'},
-      8:{value:'k',value2:'BUTTON_1'},
-      9:{value:'i',value2:'BUTTON_3'},
-      10:{value:'o',value2:'LEFT_TOP_SHOULDER'},
-      11:{value:'p',value2:'RIGHT_TOP_SHOULDER'},
-      12:{value:'3',value2:'LEFT_BOTTOM_SHOULDER'},
-      13:{value:'4',value2:'RIGHT_BOTTOM_SHOULDER'}
+      0:{value:'',value2:'BUTTON_2'},1:{value:'',value2:'BUTTON_4'},
+      2:{value:'',value2:'SELECT'},3:{value:'',value2:'START'},
+      4:{value:'',value2:'DPAD_UP'},5:{value:'',value2:'DPAD_DOWN'},
+      6:{value:'',value2:'DPAD_LEFT'},7:{value:'',value2:'DPAD_RIGHT'},
+      8:{value:'',value2:'BUTTON_1'},9:{value:'',value2:'BUTTON_3'},
+      10:{value:'',value2:'LEFT_TOP_SHOULDER'},11:{value:'',value2:'RIGHT_TOP_SHOULDER'},
+      12:{value:'',value2:'LEFT_BOTTOM_SHOULDER'},13:{value:'',value2:'RIGHT_BOTTOM_SHOULDER'}
     },
     2:{},3:{}
   };
-
-  // Alguns cores CPS2 não encaminham de forma consistente SELECT/START pelo
-  // listener interno do EmulatorJS. Envie esses quatro comandos diretamente
-  // ao jogador correspondente. Mantemos os atalhos antigos (Shift/Enter e
-  // C/V) e também os padrões de gabinete (5/1 e 6/2).
-  const arcadeSystemKeys={
-    shift:[0,2], enter:[0,3], '1':[0,3], '5':[0,2],
-    c:[1,2], v:[1,3], '2':[1,3], '6':[1,2]
-  };
-  const forwardArcadeSystemKey=e=>{
-    if(!started||e.repeat)return;
-    const mapping=arcadeSystemKeys[String(e.key||'').toLowerCase()];
-    if(!mapping)return;
-    const manager=window.EJS_emulator?.gameManager;
-    // EmulatorJS expõe o cwrap em gameManager.functions; algumas versões
-    // também oferecem o método direto. Use ambos para manter compatibilidade.
-    const simulateInput=manager?.functions?.simulateInput||manager?.simulateInput;
-    if(typeof simulateInput!=='function')return;
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    simulateInput.call(manager,mapping[0],mapping[1],e.type==='keyup'?0:1);
-  };
-  document.addEventListener('keydown',forwardArcadeSystemKey,true);
-  document.addEventListener('keyup',forwardArcadeSystemKey,true);
 
   const goFullscreen=()=>{
     try{
@@ -1786,6 +1835,7 @@
   window.EJS_onGameStart=()=>{
     if(started)return;
     started=true;
+    try{window.EJS_emulator?.gameManager?.setKeyboardEnabled?.(keyboardEnabled)}catch{}
     attempting=false;
     if(retryTimer)clearTimeout(retryTimer);
     if(startWatchdog)clearTimeout(startWatchdog);
@@ -1918,6 +1968,119 @@
 
     try{parent.postMessage({type:'mga-emulator-started'},location.origin)}catch{}
   };
+
+  // Teclado universal por posição física (KeyboardEvent.code), independente
+  // das letras impressas em QWERTY, AZERTY, QWERTZ ou ABNT2.
+  const inputModal=document.getElementById('mga-input-modal');
+  const profileSelect=document.getElementById('mga-keyboard-profile');
+  const keyboardModeButton=document.getElementById('mga-keyboard-mode');
+  const gamepadStatus=document.getElementById('mga-input-gamepads');
+  let keyboardProfile=localStorage.getItem('mga_keyboard_profile')==='alternate'?'alternate':'arcade';
+  const pressedInputs=new Map();
+  if(profileSelect)profileSelect.value=keyboardProfile;
+
+  const keyboardMaps={
+    arcade:{
+      KeyZ:[0,0],KeyX:[0,1],KeyC:[0,2],Enter:[0,3],ArrowUp:[0,4],ArrowDown:[0,5],ArrowLeft:[0,6],ArrowRight:[0,7],KeyA:[0,8],KeyS:[0,9],
+      KeyJ:[1,0],KeyK:[1,1],KeyV:[1,2],KeyB:[1,3],KeyT:[1,4],KeyG:[1,5],KeyF:[1,6],KeyH:[1,7],KeyU:[1,8],KeyI:[1,9]
+    },
+    alternate:{
+      KeyJ:[0,0],KeyK:[0,1],KeyH:[0,2],KeyG:[0,3],KeyW:[0,4],KeyS:[0,5],KeyA:[0,6],KeyD:[0,7],KeyU:[0,8],KeyI:[0,9],
+      Numpad1:[1,0],Numpad3:[1,1],Numpad0:[1,2],NumpadEnter:[1,3],ArrowUp:[1,4],ArrowDown:[1,5],ArrowLeft:[1,6],ArrowRight:[1,7],Numpad7:[1,8],Numpad9:[1,9]
+    }
+  };
+  const releaseAllMappedKeys=()=>{
+    for(const [code,input] of pressedInputs){
+      try{window.EJS_emulator?.gameManager?.simulateInput(input[0],input[1],0)}catch{}
+      pressedInputs.delete(code);
+    }
+  };
+  const canUseKeyboard=()=>{
+    const remapPopup=window.EJS_emulator?.controlPopup?.parentElement?.parentElement;
+    const remapping=remapPopup&&!remapPopup.hasAttribute('hidden');
+    return keyboardEnabled&&started&&!remapping&&!inputModal?.classList.contains('open')&&!document.getElementById('mga-saves-modal')?.classList.contains('open')&&!document.activeElement?.matches('input,textarea,select,[contenteditable="true"]');
+  };
+  document.addEventListener('keydown',event=>{
+    if(pressedInputs.has(event.code)){event.preventDefault();return}
+    if(!canUseKeyboard())return;
+    const input=keyboardMaps[keyboardProfile]?.[event.code];
+    if(!input)return;
+    const manager=window.EJS_emulator?.gameManager;
+    if(typeof manager?.simulateInput!=='function')return;
+    const nativeKey=manager.controls?.[input[0]]?.[input[1]]?.value;
+    if(nativeKey!==undefined&&nativeKey!==null&&nativeKey!==''&&Number(nativeKey)>0)return;
+    event.preventDefault();
+    try{manager.simulateInput(input[0],input[1],1);pressedInputs.set(event.code,input)}catch(error){log('Teclado arcade: '+(error?.message||error))}
+  },true);
+  document.addEventListener('keyup',event=>{
+    const input=pressedInputs.get(event.code);
+    if(!input)return;
+    event.preventDefault();
+    try{window.EJS_emulator?.gameManager?.simulateInput(input[0],input[1],0)}catch{}
+    pressedInputs.delete(event.code);
+  },true);
+  addEventListener('blur',releaseAllMappedKeys);
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)releaseAllMappedKeys()});
+
+  const updateKeyboardProfileUI=()=>{
+    if(profileSelect)profileSelect.value=keyboardProfile;
+    const p1=document.getElementById('mga-player1-keys');
+    const p2=document.getElementById('mga-player2-keys');
+    if(p1)p1.textContent=keyboardProfile==='arcade'?'Setas · Z/X/A/S · C crédito · Enter start':'W/A/S/D · J/K/U/I · H crédito · G start';
+    if(p2)p2.textContent=keyboardProfile==='arcade'?'T/F/G/H · J/K/U/I · V crédito · B start':'Setas · numpad 1/3/7/9 · 0 crédito · Enter start';
+  };
+  const updateKeyboardModeUI=()=>{
+    if(!keyboardModeButton)return;
+    keyboardModeButton.setAttribute('aria-pressed',String(keyboardEnabled));
+    keyboardModeButton.textContent=keyboardEnabled?'⌨ Modo teclado: ligado':'⌨ Modo teclado: desligado';
+  };
+  updateKeyboardProfileUI();updateKeyboardModeUI();
+  window.MGA_onKeyboardProfileChange=profile=>{
+    releaseAllMappedKeys();keyboardProfile=profile==='alternate'?'alternate':'arcade';
+    updateKeyboardProfileUI();showToast(keyboardProfile==='arcade'?'Perfil arcade P1/P2 ativado':'Perfil alternativo P1/P2 ativado');
+  };
+  window.MGA_onKeyboardModeChange=enabled=>{
+    keyboardEnabled=Boolean(enabled);
+    if(!keyboardEnabled)releaseAllMappedKeys();
+    try{window.EJS_emulator?.gameManager?.setKeyboardEnabled?.(keyboardEnabled)}catch{}
+    updateKeyboardModeUI();
+    if(typeof showToast==='function')showToast(keyboardEnabled?'Teclado ativado':'Teclado desativado');
+  };
+
+  const listGamepads=()=>{
+    let pads=[];
+    try{pads=[...navigator.getGamepads()].filter(pad=>pad?.connected).sort((a,b)=>a.index-b.index)}catch{}
+    if(gamepadStatus){
+      gamepadStatus.innerHTML=pads.length?pads.map((pad,index)=>{
+        const safeId=String(pad.id||'Controle').replace(/[&<>"']/g,char=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[char]));
+      const selection=window.EJS_emulator?.gamepadSelection||[];
+      const playerIndex=selection.indexOf(`${pad.id}_${pad.index}`);
+      const playerLabel=playerIndex>=0?`P${playerIndex+1}`:`Controle ${index+1}`;
+      return `<strong>${playerLabel} · ${safeId}</strong> — conectado (índice ${pad.index})`;
+      }).join('<br>'):'Nenhum controle conectado. Conecte USB/Bluetooth e toque em “Atualizar controles”.';
+    }
+    return pads;
+  };
+  const closeInputModal=()=>window.MGA_closeInputSettings?.();
+  document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&inputModal?.classList.contains('open')){
+      event.preventDefault();event.stopPropagation();closeInputModal();
+    }
+  },true);
+  document.getElementById('mga-refresh-gamepads')?.addEventListener('click',()=>{
+    const pads=listGamepads();
+    try{window.EJS_emulator?.updateGamepadLabels?.();window.EJS_emulator?.checkGamepadInputs?.()}catch{}
+    showToast(pads.length?`${pads.length} controle(s) detectado(s)`:'Nenhum controle detectado');
+  });
+  document.getElementById('mga-open-remap')?.addEventListener('click',()=>{
+    closeInputModal();
+    const emulator=window.EJS_emulator;
+    const remapButton=emulator?.elements?.bottomBar?.gamepad?.[0];
+    if(remapButton){remapButton.click();return}
+    const settingsButton=emulator?.elements?.bottomBar?.settings?.[0];
+    if(settingsButton){settingsButton.click();showToast('Abra “Control Settings” nas configurações');return}
+    showToast('Remapeador ainda carregando; tente novamente em alguns segundos');
+  });
 
   // Inicia somente uma vez. O clique duplicado era capaz de chamar
   // toggleMainLoop antes de o módulo interno do EmulatorJS estar pronto.
