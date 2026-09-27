@@ -21,7 +21,7 @@ import {
  * via CDN). Este componente substitui aquele bundle: ele roda dentro deste
  * projeto, lê os mesmos dados que já existiam localmente
  * (roms-catalog.json, game-titles.json, media-manifest.json) e conversa
- * com o bridge local `public/mame-web.js` só para abrir o jogo, listar
+ * com o bridge local `public/web/mame-web.js` só para abrir o jogo, listar
  * favoritos/recentes e alternar favorito — o próprio bridge já expõe tudo
  * isso via `fetch("/api/...")` interceptado (nenhum servidor real por trás).
  */
@@ -54,7 +54,7 @@ const prettyFallback = (name: string) =>
 async function waitForBridge(): Promise<void> {
   await new Promise<void>((resolve) => {
     const script = document.createElement("script");
-    script.src = "/web/mame-web.js";
+    script.src = "/web/mame-web.js?v=mobile-exit-dialog-20260926";
     script.onload = () => resolve();
     script.onerror = () => resolve();
     document.head.appendChild(script);

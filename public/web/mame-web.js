@@ -241,11 +241,19 @@
 
     let closed = false;
     let closeInProgress = false;
+    let exitDialog = null;
+
+    const dismissExitDialog = () => {
+      if (!exitDialog) return;
+      exitDialog.remove();
+      exitDialog = null;
+    };
 
     const finishClose = () => {
       if (closed) return;
       closed = true;
       closeInProgress = false;
+      dismissExitDialog();
       window.removeEventListener("message", onMessage);
       iframe.src = "about:blank";
       iframe.remove();
@@ -272,13 +280,58 @@
     };
 
     const closePlayer = () => {
-      if (closed) return;
-      if (!player) return finishClose();
-      if (window.confirm("Deseja salvar a partida antes de sair?\n\nOK = salvar e sair\nCancelar = continuar jogando")) {
-        requestSaveAndClose();
-      } else {
-        if (window.confirm("Sair sem salvar?")) finishClose();
-      }
+      if (closed || closeInProgress || exitDialog) return;
+
+      const dialog = document.createElement("div");
+      exitDialog = dialog;
+      dialog.setAttribute("role", "dialog");
+      dialog.setAttribute("aria-modal", "true");
+      dialog.setAttribute("aria-label", "Sair do jogo");
+      dialog.style.cssText =
+        "position:absolute;inset:0;z-index:30;display:grid;place-items:center;box-sizing:border-box;padding:max(18px,env(safe-area-inset-top)) max(18px,env(safe-area-inset-right)) max(18px,env(safe-area-inset-bottom)) max(18px,env(safe-area-inset-left));background:rgba(0,0,0,.78);backdrop-filter:blur(5px);font-family:monospace;touch-action:manipulation;";
+      dialog.addEventListener("pointerdown", (event) => event.stopPropagation());
+
+      const panel = document.createElement("div");
+      panel.style.cssText =
+        "width:min(420px,100%);box-sizing:border-box;padding:22px 18px;border:1px solid #00e5ff88;border-radius:12px;background:#080012;box-shadow:0 0 28px #00e5ff33;color:#fff;text-align:center;";
+
+      const heading = document.createElement("h2");
+      heading.textContent = "SAIR DO JOGO?";
+      heading.style.cssText =
+        "margin:0 0 10px;color:#00e5ff;font-size:18px;letter-spacing:.08em;";
+
+      const description = document.createElement("p");
+      description.textContent = "Quer salvar seu progresso antes de voltar à biblioteca?";
+      description.style.cssText =
+        "margin:0 0 18px;color:#d5d5dc;font-size:13px;line-height:1.5;";
+
+      const actions = document.createElement("div");
+      actions.style.cssText = "display:grid;gap:10px;";
+
+      const makeAction = (label, border, color, handler) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = label;
+        button.style.cssText = `min-height:48px;width:100%;padding:10px 14px;border:1px solid ${border};border-radius:8px;background:#10051b;color:${color};font:bold 13px monospace;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;`;
+        button.addEventListener("click", (event) => {
+          event.stopPropagation();
+          handler();
+        });
+        return button;
+      };
+
+      actions.append(
+        makeAction("Salvar e sair", "#00e5ff", "#6af4ff", () => {
+          dismissExitDialog();
+          requestSaveAndClose();
+        }),
+        makeAction("Sair sem salvar", "#ff2bd6", "#ff8ad8", finishClose),
+        makeAction("Continuar jogando", "#ffffff44", "#eeeeee", dismissExitDialog)
+      );
+      panel.append(heading, description, actions);
+      dialog.appendChild(panel);
+      overlay.appendChild(dialog);
+      actions.querySelector("button")?.focus({ preventScroll: true });
     };
 
     const onMessage = (event) => {
@@ -452,12 +505,31 @@
       overlay.addEventListener("pointerdown", () => enterMobileLandscape(overlay), { once: true, passive: true });
 
       let player;
-      close.onclick = () => closePlayer();
+      let launchCancelled = false;
+      close.onclick = () => {
+        if (player) {
+          player.closePlayer();
+          return;
+        }
+
+        launchCancelled = true;
+        overlay.remove();
+        try {
+          if (document.fullscreenElement) {
+            document.exitFullscreen?.().catch?.(() => {});
+          }
+        } catch {}
+        try {
+          screen.orientation?.unlock?.();
+        } catch {}
+        resolve();
+      };
 
       (async () => {
         try {
           const { item, url, biosUrl, biosName } =
             await resolveRom(romName, message);
+          if (launchCancelled) return;
           player = createWebPlayer(
             item.name,
             url,
