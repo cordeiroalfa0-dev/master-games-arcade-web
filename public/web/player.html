@@ -192,6 +192,11 @@
            imagem do jogo no centro em vez de colocar os controles por cima. */
         --mga-l-side:calc(max(clamp(112px,34vw,184px),calc(clamp(48px,13.5vw,74px)*3 + clamp(6px,2.2vw,14px)*2)) + 24px);
       }
+      body.mga-game-started{
+        --mga-l-strip:0px;
+        --mga-l-game:100dvh;
+        --mga-l-side:0px;
+      }
       #game{
         position:fixed!important;inset:0!important;
         width:100dvw!important;height:100dvh!important;
@@ -247,6 +252,7 @@
         left:0!important;right:0!important;transform:none!important;justify-content:center;
         pointer-events:none!important;z-index:99999!important
       }
+      body.mga-game-started #game .ejs_virtualGamepad_bottom{display:none!important}
       #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
         pointer-events:auto!important;touch-action:none!important;
         min-width:88px;height:36px!important;line-height:36px!important;font-size:11px!important;
@@ -1715,6 +1721,7 @@
     // em desktop, preservamos a experiência sem sobreposição.
     const touchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
     if(touchDevice){
+      document.body.classList.add('mga-game-started');
       try{window.EJS_emulator?.toggleVirtualGamepad?.(true)}catch(e){log('Gamepad touch: '+(e?.message||e))}
       try{
         const pad=window.EJS_emulator?.virtualGamepad;
