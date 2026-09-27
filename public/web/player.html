@@ -1742,8 +1742,63 @@
         };
         attach();
       };
+      const waitForStartRecognition=()=>{
+        let attempts=0;
+        const attach=()=>{
+          const button=document.querySelector('#game .b_start');
+          if(!button){if(++attempts<40)setTimeout(attach,100);return}
+          if(button.dataset.mgaStartAckWatcher)return;
+          button.dataset.mgaStartAckWatcher='true';
+          const signature=()=>{
+            try{
+              const source=document.querySelector('#game canvas');
+              if(!source?.width||!source?.height)return null;
+              const sample=document.createElement('canvas');sample.width=24;sample.height=18;
+              const ctx=sample.getContext('2d',{willReadFrequently:true});
+              ctx.drawImage(source,0,0,24,18);
+              return ctx.getImageData(0,0,24,18).data;
+            }catch{return null}
+          };
+          const sceneChanged=(before,after)=>{
+            if(!before||!after||before.length!==after.length)return false;
+            let changed=0,total=0;
+            for(let i=0;i<before.length;i+=4){
+              const delta=Math.max(Math.abs(before[i]-after[i]),Math.abs(before[i+1]-after[i+1]),Math.abs(before[i+2]-after[i+2]));
+              total+=delta;if(delta>=56)changed++;
+            }
+            const pixels=before.length/4;
+            return changed/pixels>=.38&&total/pixels>=28;
+          };
+          let before=null,watching=false;
+          const watchForAcknowledgement=()=>{
+            if(watching)return;
+            if(!before)before=signature();
+            if(!before)return;
+            watching=true;let checks=0,changedFrames=0;
+            const inspect=()=>{
+              const current=signature();
+              changedFrames=sceneChanged(before,current)?changedFrames+1:0;
+              if(changedFrames>=4){
+                button.classList.add('mga-control-used');
+                log('Start reconhecido pela mudança visual do jogo');
+                return;
+              }
+              if(++checks<40){setTimeout(inspect,160);return}
+              watching=false;before=signature();
+              log('Start ainda não reconhecido; botão permanece disponível');
+            };
+            setTimeout(inspect,160);
+          };
+          button.addEventListener('pointerdown',()=>{before=signature()},{passive:true});
+          button.addEventListener('touchstart',()=>{before=signature()},{passive:true});
+          button.addEventListener('pointerup',watchForAcknowledgement);
+          button.addEventListener('touchend',watchForAcknowledgement,{passive:true});
+          button.addEventListener('click',watchForAcknowledgement);
+        };
+        attach();
+      };
       hideAfterFirstUse('.b_credit');
-      hideAfterFirstUse('.b_start');
+      waitForStartRecognition();
       try{window.EJS_emulator?.toggleVirtualGamepad?.(true)}catch(e){log('Gamepad touch: '+(e?.message||e))}
       try{
         const pad=window.EJS_emulator?.virtualGamepad;
