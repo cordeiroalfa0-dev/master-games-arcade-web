@@ -252,7 +252,8 @@
         left:0!important;right:0!important;transform:none!important;justify-content:center;
         pointer-events:none!important;z-index:99999!important
       }
-      body.mga-game-started #game .ejs_virtualGamepad_bottom{display:none!important}
+      body.mga-game-started #game .b_credit.mga-control-used,
+      body.mga-game-started #game .b_start.mga-control-used{display:none!important}
       #game .ejs_virtualGamepad_bottom .ejs_virtualGamepad_button{
         pointer-events:auto!important;touch-action:none!important;
         min-width:88px;height:36px!important;line-height:36px!important;font-size:11px!important;
@@ -1722,6 +1723,27 @@
     const touchDevice=navigator.maxTouchPoints>0||matchMedia('(pointer:coarse)').matches;
     if(touchDevice){
       document.body.classList.add('mga-game-started');
+      const hideAfterFirstUse=selector=>{
+        let attempts=0;
+        const attach=()=>{
+          const button=document.querySelector(`#game ${selector}`);
+          if(!button){if(++attempts<40)setTimeout(attach,100);return}
+          if(button.dataset.mgaHideAfterUse)return;
+          button.dataset.mgaHideAfterUse='true';
+          let used=false;
+          const markUsed=()=>{
+            if(used)return;
+            used=true;
+            setTimeout(()=>button.classList.add('mga-control-used'),150);
+          };
+          button.addEventListener('touchend',markUsed,{once:true,passive:true});
+          button.addEventListener('pointerup',markUsed,{once:true});
+          button.addEventListener('click',markUsed,{once:true});
+        };
+        attach();
+      };
+      hideAfterFirstUse('.b_credit');
+      hideAfterFirstUse('.b_start');
       try{window.EJS_emulator?.toggleVirtualGamepad?.(true)}catch(e){log('Gamepad touch: '+(e?.message||e))}
       try{
         const pad=window.EJS_emulator?.virtualGamepad;
