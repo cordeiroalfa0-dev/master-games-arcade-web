@@ -2202,6 +2202,104 @@
 
   new MutationObserver(scheduleHideEmulatorUi).observe(document.getElementById('game'),{childList:true,subtree:true});
 
+  // ---------------------------------------------------------------
+  // MODO TV + DOWNLOAD SEGURO DAS ROMs
+  // TVs (Tizen, webOS, Android TV, Fire TV, Chromecast) costumam ter Wi-Fi
+  // fraco e pouca memória. Baixamos BIOS e ROM antes do EmulatorJS, um de
+  // cada vez, com retentativas, verificação de integridade (ZIP + tamanho) e
+  // cache local. O emulador só é carregado depois que os arquivos estão OK,
+  // então o relógio de 30s não estoura durante downloads lentos.
+  const isTvMode=q.get('tv')==='1'||/SmartTV|SMART-TV|Tizen|Web0S|webOS|NetCast|BRAVIA|Android TV|GoogleTV|AFT[A-Z]|CrKey|HbbTV|Roku|Viera|AQUOS/i.test(navigator.userAgent);
+  const conn=navigator.connection||{};
+  const lowBandwidth=isTvMode||conn.saveData||/(^|-)2g|3g/.test(conn.effectiveType||'');
+  if(isTvMode){
+    document.body.classList.add('mga-tv-mode');
+    // Modo leve: sem shader SABR, scanlines ou vinheta (pesam em GPU de TV).
+    pixelEnhancement=false;
+    ['video-scanlines','video-vignette'].forEach(c=>document.body.classList.remove(c));
+    window.EJS_threads=false;
+    log('Modo TV ativo: carregamento leve, shader e efeitos desligados.');
+  }
+  const ROM_CACHE='mga-roms-v1';
+  const fmtMB=n=>(n/1048576).toFixed(1)+' MB';
+  const isZip=async blob=>{
+    const h=new Uint8Array(await blob.slice(0,4).arrayBuffer());
+    return h[0]===0x50&&h[1]===0x4b&&(h[2]===3||h[2]===5||h[2]===7);
+  };
+  const secureDownload=async(url,label)=>{
+    const abs=new URL(url,location.origin).href;
+    const expectZip=/\.zip(\?|#|$)/i.test(abs);
+    let cache=null;
+    try{cache=await caches.open(ROM_CACHE)}catch{}
+    if(cache){
+      try{
+        const hit=await cache.match(abs);
+        if(hit){
+          const b=await hit.blob();
+          if(b.size>0&&(!expectZip||await isZip(b))){log(label+': usando cópia local verificada ('+fmtMB(b.size)+')');return b;}
+          await cache.delete(abs);
+        }
+      }catch{}
+    }
+    const attempts=lowBandwidth?4:3;
+    let lastErr='';
+    for(let i=1;i<=attempts;i++){
+      const ctrl=new AbortController();
+      let stall;
+      const arm=()=>{clearTimeout(stall);stall=setTimeout(()=>ctrl.abort(),lowBandwidth?45000:25000);};
+      try{
+        arm();
+        const res=await fetch(abs,{signal:ctrl.signal,cache:'default',credentials:'same-origin'});
+        if(!res.ok)throw new Error('HTTP '+res.status);
+        const total=Number(res.headers.get('content-length'))||0;
+        const ctype=res.headers.get('content-type')||'';
+        if(/text\/html/i.test(ctype))throw new Error('servidor devolveu uma página em vez do arquivo');
+        let blob;
+        if(res.body?.getReader){
+          const reader=res.body.getReader();const parts=[];let got=0;
+          for(;;){
+            const {done,value}=await reader.read();
+            if(done)break;
+            arm();parts.push(value);got+=value.length;
+            status.textContent='BAIXANDO '+label+' — '+(total?Math.floor(got*100/total)+'% ('+fmtMB(got)+' de '+fmtMB(total)+')':fmtMB(got));
+          }
+          blob=new Blob(parts);
+        }else blob=await res.blob();
+        clearTimeout(stall);
+        if(!blob.size)throw new Error('arquivo vazio');
+        const enc=res.headers.get('content-encoding');
+        if(total&&!enc&&blob.size!==total)throw new Error('download incompleto ('+blob.size+' de '+total+' bytes)');
+        if(expectZip&&!(await isZip(blob)))throw new Error('arquivo corrompido (não é ZIP válido)');
+        if(cache){try{await cache.put(abs,new Response(blob,{headers:{'content-type':'application/zip','content-length':String(blob.size)}}))}catch(e){log('Cache local indisponível: '+(e?.message||e))}}
+        log(label+': download verificado ('+fmtMB(blob.size)+', tentativa '+i+')');
+        return blob;
+      }catch(e){
+        clearTimeout(stall);
+        lastErr=e?.name==='AbortError'?'conexão parada (Wi-Fi lento)':(e?.message||String(e));
+        log(label+': tentativa '+i+'/'+attempts+' falhou — '+lastErr);
+        if(i<attempts){
+          status.textContent='REDE INSTÁVEL — NOVA TENTATIVA '+(i+1)+'/'+attempts+'...';
+          await new Promise(r=>setTimeout(r,1500*i));
+        }
+      }
+    }
+    throw new Error(label+': '+lastErr);
+  };
+  try{
+    // Sequencial (não em paralelo) para não disputar banda no Wi-Fi.
+    if(biosUrl)await secureDownload(biosUrl,'BIOS '+(biosName||''));
+    const romBlob=await secureDownload(romUrl,'ROM '+name);
+    // Entrega a ROM já verificada ao emulador, com o nome do romset intacto
+    // (o FBNeo identifica o jogo pelo nome do ZIP). Evita um segundo download.
+    try{
+      window.EJS_gameUrl=new File([romBlob],(decodeURIComponent(new URL(romUrl).pathname.split('/').pop()||'')||romBase+'.zip'),{type:'application/zip'});
+    }catch{window.EJS_gameUrl=romUrl;}
+    status.textContent='ARQUIVOS VERIFICADOS — INICIANDO '+coreLabel+'...';
+  }catch(e){
+    fail('Falha ao baixar o jogo com segurança. '+(e?.message||e)+'. Verifique o Wi-Fi e tente novamente.');
+    return;
+  }
+
   startWatchdog=setTimeout(()=>{
     if(!ready&&!started){
       fail('Arcade não carregou em 30s. Verifique a ROM, o BIOS e o endpoint de download.');
